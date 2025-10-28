@@ -48,8 +48,8 @@ This project implements a **comprehensive hotel management system**, supporting 
 ---
 
 ## 👨‍💻 Author
-**23120354 - Trinh Ho Minh Thang**  
-**23120356 - Tran Nguyen Tri Thanh**  
-**23120390 - Cao Quoc Tuan**  
-**23120393 - Luc Hoang Tuan**  
-**23120403 - Huynh Trong Vien**  
+- **23120354 - Trinh Ho Minh Thang**  
+- **23120356 - Tran Nguyen Tri Thanh**  
+- **23120390 - Cao Quoc Tuan**  
+- **23120393 - Luc Hoang Tuan**  
+- **23120403 - Huynh Trong Vien**  
