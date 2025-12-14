@@ -1,0 +1,22 @@
+### GET /
+GET http://localhost:8888/
+
+###Register a user POST /auth/register
+POST http://localhost:8888/auth/register
+Content-Type: application/json
+
+{
+  "username": "minhthangzxcv@gmail.com",
+  "password": "minhthang123"
+}
+
+
+###Login a user POST /auth/login
+POST http://localhost:8888/auth/login
+Content-Type: application/json
+
+{
+  "username": "minhthangzxcv@gmail.com",
+  "password": "minhthang123",
+  "role" : "manager"
+}
