@@ -1,0 +1,29 @@
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 2rem;
+}
+
+.filter-bar input,
+.filter-bar select {
+  padding: 10px 15px;
+  border-radius: 20px; /* Bo tròn nhiều như thiết kế */
+  border: 1px solid #ddd;
+  background-color: #e2e8f0; /* Màu nền xám nhạt cho input */
+  outline: none;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.filter-bar input {
+  flex: 2; /* Ô tìm kiếm dài hơn */
+  padding-left: 35px; /* Chừa chỗ cho icon kính lúp nếu có */
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+
+.filter-bar select {
+  flex: 1;
+  cursor: pointer;
+}
