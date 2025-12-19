@@ -66,5 +66,6 @@
 
 .loading-text {
   color: #3b82f6;
-  font-weight: 600;
+  font-weight: bold;
+  font-size: 30px;
 }

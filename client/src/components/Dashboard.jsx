@@ -51,7 +51,7 @@ const Dashboard = () => {
             capacity: 1,
             price: 500000,
             status: "Occupied", 
-            image: 'https://noithathaiminh.com.vn/public/anh1/images/tin-tuc/noi-that-phong-ngu-01.webp'
+            image: 'https://xhomesg.com.vn/wp-content/uploads/2024/08/thiet-ke-noi-that-phong-ngu-12m2-Xhome-Sai-Gon.jpg'
         },
         {
             id: 112,
@@ -60,7 +60,7 @@ const Dashboard = () => {
             capacity: 2,
             price: 750000,
             status: "Maintainance", 
-            image: 'https://noithathaiminh.com.vn/public/anh1/images/tin-tuc/noi-that-phong-ngu-01.webp'
+            image: 'https://www.made4home.com.vn/wp-content/uploads/2025/10/thiet-ke-noi-that-phong-ngu.webp'
         },
         {
             id: 113,
@@ -78,7 +78,7 @@ const Dashboard = () => {
             capacity: 1,
             price: 500000,
             status: "Occupied", 
-            image: 'https://noithathaiminh.com.vn/public/anh1/images/tin-tuc/noi-that-phong-ngu-01.webp'
+            image: 'https://noithatbyt.vn/wp-content/uploads/2025/08/TOP-10-Mau-Thiet-Ke-Phong-Ngu-10m2-Dep-Choang-Ngop.webp'
         },
     ]);
     const [loading, setLoading] = useState(false);
@@ -89,17 +89,18 @@ const Dashboard = () => {
 
     const debouncedSearch = useDebounce(filters.search, 1000);
 
-    const fetchRooms = async () => {
+    const fetchRooms = async (currentPage) => {
+        if(loading) return;
         setLoading(true);
         try {
-            const newRooms = await fetchListRoomsFollowPage(pageNumber);
+            const newRooms = await fetchListRoomsFollowPage(pageNumber, debouncedSearch, filters.type, filters.status);
             if (pageNumber === 1) {
                 setRooms(newRooms); 
             } else {
                 setRooms(prevRooms => [...prevRooms, ...newRooms]); 
             }
 
-            if (newRooms.length === 0) {
+            if (newRooms.length === 0 || newRooms.length < 8) {
                 setHasMore(false);
             } else {
                 setHasMore(true);
@@ -114,13 +115,14 @@ const Dashboard = () => {
     // useEffect cho search
     useEffect(() => {
         setPageNumber(1);
-        fetchRooms(1, debouncedSearch, filters.type, filters.status);
+        setHasMore(true);
+        fetchRooms(1);
     }, [debouncedSearch, filters.type, filters.status]);
 
     // useEffect cho Load More
     useEffect(() => {
         if (pageNumber > 1) {
-            fetchRooms(pageNumber, debouncedSearch, filters.type, filters.status);
+            fetchRooms(pageNumber);
         }
     }, [pageNumber]);
 
@@ -140,8 +142,7 @@ const Dashboard = () => {
             <div className="header">
                 <h1>Room Management</h1>
                 <button className="btn-add">
-                    <i className='bx  bx-plus'></i> 
-                    Add New Room
+                    <i className='bx  bx-plus'></i> Add New Room
                 </button>
             </div>
 
@@ -156,7 +157,7 @@ const Dashboard = () => {
             />
 
             <div className="room-list">
-                {loading ? <p>Loading...</p> : rooms.map(room => (
+                {loading ? <p className="loading-text">Loading...</p> : rooms.map(room => (
                 <RoomCard 
                     key={room.id} 
                     room={room} 
@@ -168,7 +169,6 @@ const Dashboard = () => {
             
             {/* Khu vực nút Load More */}
             <div className="text-center">
-                {loading && <p className="loading-text">Đang tải...</p>}
                 
                 {!loading && hasMore && (
                     <button 

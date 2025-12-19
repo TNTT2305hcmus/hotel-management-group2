@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const ROOMS_URL = 'http://localhost:5000/api/rooms';
-const LIMIT = 12;
+const LIMIT = 8;
 
 export const fetchListRoomsFollowPage = async (pageNumber, search, type, status) => {
     try{
