@@ -27,4 +27,35 @@ async function controllersLogin(req, res) {
   }
 }
 
-export default { controllersRegister, controllersLogin };
+async function controllersForgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    const data = await authServices.forgotPassword(email);
+
+    // Log OTP to console for mock flow
+    if (data?.mockOtp) {
+      console.log(`[ForgotPassword] email: ${email}, otp: ${data.mockOtp}`);
+    }
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+}
+
+async function controllersResetPassword(req, res) {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const data = await authServices.resetPasswordWithOtp(email, otp, newPassword);
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+}
+
+export default { controllersRegister, controllersLogin, controllersForgotPassword, controllersResetPassword };

@@ -19,3 +19,23 @@ Content-Type: application/json
   "username": "minhthangzxcv@gmail.com",
   "password": "minhthang123"
 }
+
+### Test Forgot Password API
+POST http://localhost:5000/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "admin@hotel.com"
+}
+
+###
+
+### Test Reset Password API (replace OTP with value from console log)
+POST http://localhost:5000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "admin@hotel.com",
+  "otp": "968508",
+  "newPassword": "newpassword@123"
+}

@@ -1,6 +1,10 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { sql } from '../config/database.js';
+
+// In-memory store for mock OTPs; in production replace with DB/Redis
+const otpStore = new Map();
 
 async function register(username, password, accountTypeID = 2) {
     try {
@@ -68,4 +72,65 @@ async function login(username, password) {
     }
 }
 
-export default { register, login };
+// Mock forgot-password flow: verify email exists and return a mock OTP (no email sent)
+async function forgotPassword(email) {
+    try {
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('Email', sql.VarChar(255), email)
+            .query('SELECT Username FROM ACCOUNT WHERE Email = @Email');
+
+        if (result.recordset.length === 0) {
+            throw new Error('Email not found');
+        }
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+
+        otpStore.set(email, { otp, expiresAt, username: result.recordset[0].Username });
+
+        return {
+            message: 'Mock OTP generated. In production, this would be emailed to the user.',
+            username: result.recordset[0].Username,
+            mockOtp: otp // keep in response for demo; also logged in controller
+        };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+// Verify OTP and reset password
+async function resetPasswordWithOtp(email, otp, newPassword) {
+    try {
+        const entry = otpStore.get(email);
+
+        if (!entry) {
+            throw new Error('No OTP requested for this email');
+        }
+
+        if (Date.now() > entry.expiresAt) {
+            otpStore.delete(email);
+            throw new Error('OTP expired');
+        }
+
+        if (entry.otp !== otp) {
+            throw new Error('Invalid OTP');
+        }
+
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        const pool = await sql.connect();
+        await pool.request()
+            .input('Email', sql.VarChar(255), email)
+            .input('Password', sql.VarChar(255), hashedPassword)
+            .query('UPDATE ACCOUNT SET Password = @Password WHERE Email = @Email');
+
+        otpStore.delete(email);
+
+        return { message: 'Password reset successfully' };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export default { register, login, forgotPassword, resetPasswordWithOtp };

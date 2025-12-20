@@ -62,6 +62,7 @@ CREATE TABLE ACCOUNT_TYPE (
 -- 6. Table: Account / Login Info (Thông Tin Đăng Nhập)
 CREATE TABLE ACCOUNT (
     Username VARCHAR(50) PRIMARY KEY,
+    Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
     AccountTypeID INT NOT NULL 
 );
@@ -142,10 +143,10 @@ INSERT INTO ACCOUNT_TYPE (AccountTypeID, AccountTypeName) VALUES
 GO
 
 -- 2. Insert Accounts (Password is hashed '123456')
-INSERT INTO ACCOUNT (Username, Password, AccountTypeID) VALUES 
-('admin', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 1), 
-('staff1', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
-('staff2', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2); 
+INSERT INTO ACCOUNT (Username, Email, Password, AccountTypeID) VALUES 
+('admin', 'admin@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 1), 
+('staff1', 'staff1@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
+('staff2', 'staff2@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2); 
 GO
 
 -- 3. Insert Customer Types
