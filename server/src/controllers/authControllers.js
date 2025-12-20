@@ -1,51 +1,30 @@
-import jwt from 'jsonwebtoken'
-import authServices from '../services/authServices.js'
+import authServices from '../services/authServices.js';
 
-function controllersRegister(req,res) {
+async function controllersRegister(req, res) {
   try {
-    const {username,password} = req.body
-    authServices.register(username,password)
-    res.sendStatus(200)
-  }
-  catch (err)
-  {
-    console.log(err.message)
-    res.sendStatus(400)
-  }
+    const { username, password, accountTypeID } = req.body;
 
+    await authServices.register(username, password, accountTypeID);
+
+    return res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
 }
 
-
-//Use token to differentiate roles
-function controllersLogin(req,res) {
-
+// Use token returned from service
+async function controllersLogin(req, res) {
   try {
-    const {username,password,role} = req.body
-    authServices.login(username,password,role)
-    //successful authentication
-    if (role === 'manager') {
+    const { username, password } = req.body;
 
-      const token = jwt.sign({
-      //id: user.id,
-      role: "manager"
-      },process.env.JWT_SECRET,{expiresIn: '8h'})
-      res.json({token})
-    } 
-    else {
-      const token = jwt.sign({
-      //id: user.id,
-      role: "employee"
-      },process.env.JWT_SECRET,{expiresIn: '8h'})
-      res.json({token})
-    }
-    
+    const data = await authServices.login(username, password);
 
-  } catch(err) {
-    console.log(err.message)
-    res.sendStatus(503)
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(401).json({ error: err.message });
   }
-
 }
 
-
-export default { controllersRegister,controllersLogin }
+export default { controllersRegister, controllersLogin };
