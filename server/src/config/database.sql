@@ -1,179 +1,201 @@
-﻿-- I. Tạo Database 
-IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'HOTEL_MANAGEMENT')
+﻿-- =============================================
+-- I. CREATE DATABASE
+-- =============================================
+USE master;
+GO
+
+-- Drop database if it exists to reset
+IF EXISTS(SELECT * FROM sys.databases WHERE name = 'HOTEL_MANAGEMENT')
 BEGIN
-    CREATE DATABASE HOTEL_MANAGEMENT;
+    ALTER DATABASE HOTEL_MANAGEMENT SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE HOTEL_MANAGEMENT;
 END
+GO
+
+CREATE DATABASE HOTEL_MANAGEMENT;
 GO
 
 USE HOTEL_MANAGEMENT;
 GO
 
+-- =============================================
+-- II. CREATE TABLES
+-- =============================================
 
-
-
--- II. Tạo bảng 
--- 1. Bảng Loại Phòng
-CREATE TABLE LOAI_PHONG (
-    MaLoaiPhong INT PRIMARY KEY, 
-    TenLoaiPhong NVARCHAR(45) NOT NULL,
-    DonGia DECIMAL(15, 2) NOT NULL,
-    SoLuongKhachToiDa INT NOT NULL
+-- 1. Table: Room Type (Loại Phòng)
+CREATE TABLE ROOM_TYPE (
+    RoomTypeID INT PRIMARY KEY, 
+    RoomTypeName NVARCHAR(50) NOT NULL,
+    Price DECIMAL(15, 2) NOT NULL,
+    MaxGuests INT NOT NULL
 );
 
--- 2. Bảng Phòng
-CREATE TABLE PHONG (
-    MaPhong INT PRIMARY KEY,
-    MaLoaiPhong INT NOT NULL,
-    TinhTrang NVARCHAR(20) DEFAULT N'Trống', 
-    GhiChu NVARCHAR(MAX)
+-- 2. Table: Room (Phòng)
+CREATE TABLE ROOM (
+    RoomID INT PRIMARY KEY, -- Room Number like 101, 102...
+    RoomTypeID INT NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'Available', 
+	ImageURL NVARCHAR(MAX),
+    Notes NVARCHAR(MAX)
 );
 
--- 3. Bảng Loại Khách Hàng
-CREATE TABLE LOAI_KHACH_HANG (
-    MaLoaiKhachHang INT PRIMARY KEY,
-    TenLoaiKhachHang NVARCHAR(50) NOT NULL
+-- 3. Table: Customer Type (Loại Khách Hàng)
+CREATE TABLE CUSTOMER_TYPE (
+    CustomerTypeID INT PRIMARY KEY,
+    CustomerTypeName NVARCHAR(50) NOT NULL
 );
 
--- 4. Bảng Khách Hàng
-CREATE TABLE KHACH_HANG (
-    CCCD VARCHAR(12) PRIMARY KEY, 
-    MaLoaiKhachHang INT NOT NULL, 
-    TenKhachHang NVARCHAR(100) NOT NULL,
-    DiaChi NVARCHAR(255)
+-- 4. Table: Customer (Khách Hàng)
+CREATE TABLE CUSTOMER (
+    CitizenID VARCHAR(12) PRIMARY KEY, 
+    CustomerTypeID INT NOT NULL, 
+    FullName NVARCHAR(100) NOT NULL,
+    Address NVARCHAR(255)
 );
 
--- 5. Bảng Loại Tài Khoản
-CREATE TABLE LOAI_TAI_KHOAN (
-    MaLoaiTaiKhoan INT PRIMARY KEY,
-    TenLoai NVARCHAR(50) NOT NULL
+-- 5. Table: Account Type / Role (Loại Tài Khoản)
+CREATE TABLE ACCOUNT_TYPE (
+    AccountTypeID INT PRIMARY KEY,
+    AccountTypeName NVARCHAR(50) NOT NULL
 );
 
--- 6. Bảng Thông Tin Đăng Nhập
-CREATE TABLE THONG_TIN_DANG_NHAP (
+-- 6. Table: Account / Login Info (Thông Tin Đăng Nhập)
+CREATE TABLE ACCOUNT (
     Username VARCHAR(50) PRIMARY KEY,
     Password VARCHAR(255) NOT NULL,
-    MaLoaiTaiKhoan INT NOT NULL 
+    AccountTypeID INT NOT NULL 
 );
 
--- 7. Bảng Phiếu Thuê
-CREATE TABLE PHIEU_THUE (
-    MaPhieuThue INT PRIMARY KEY IDENTITY(1,1),
-    MaPhong INT NOT NULL, 
-    NgayBatDau DATETIME NOT NULL DEFAULT GETDATE(),
-    NgayKetThuc DATETIME,
-    NgayThanhToan DATETIME,
-    ThanhTien DECIMAL(15, 2)
+-- 7. Table: Booking (Phiếu Thuê)
+CREATE TABLE BOOKING (
+    BookingID INT PRIMARY KEY IDENTITY(1,1),
+    RoomID INT NOT NULL, 
+    CheckInDate DATETIME NOT NULL DEFAULT GETDATE(),
+    CheckOutDate DATETIME,
+    PaymentDate DATETIME,
+    TotalPrice DECIMAL(15, 2)
 );
 
--- 8. Bảng Chi Tiết Phiếu Thuê
-CREATE TABLE CHI_TIET_PHIEU_THUE (
-    MaPhieuThue INT NOT NULL,
-    CCCD VARCHAR(12) NOT NULL, 
-    PRIMARY KEY (MaPhieuThue, CCCD)
+-- 8. Table: Booking Details (Chi Tiết Phiếu Thuê)
+CREATE TABLE BOOKING_DETAIL (
+    BookingID INT NOT NULL,
+    CitizenID VARCHAR(12) NOT NULL, 
+    PRIMARY KEY (BookingID, CitizenID)
 );
 
--- III. Tạo ràng buộc
--- 1. Tình trạng phòng
-ALTER TABLE PHONG
-ADD CONSTRAINT CK_TinhTrang_Phong
-CHECK (TinhTrang IN (N'Trống', N'Có khách', N'Bảo trì'));
+-- =============================================
+-- III. CONSTRAINTS (RÀNG BUỘC)
+-- =============================================
 
--- 2. Loại khách
-ALTER TABLE LOAI_KHACH_HANG
-ADD CONSTRAINT CK_TenLoaiKhach
-CHECK (TenLoaiKhachHang IN (N'Nội địa', N'Nước ngoài'));
+-- 1. Check Room Status (Standardized to English)
+ALTER TABLE ROOM
+ADD CONSTRAINT CK_Room_Status
+CHECK (Status IN ('Available', 'Occupied', 'Maintenance'));
 
--- IV. Tạo khóa ngoại
--- 1. Nối Phòng -> Loại Phòng
-ALTER TABLE PHONG
-ADD CONSTRAINT FK_Phong_LoaiPhong
-FOREIGN KEY (MaLoaiPhong) REFERENCES LOAI_PHONG(MaLoaiPhong);
+-- 2. Check Customer Type
+ALTER TABLE CUSTOMER_TYPE
+ADD CONSTRAINT CK_CustomerType_Name
+CHECK (CustomerTypeName IN ('Domestic', 'Foreign'));
 
--- 2. Nối Khách Hàng -> Loại Khách Hàng
-ALTER TABLE KHACH_HANG
-ADD CONSTRAINT FK_KhachHang_LoaiKhach
-FOREIGN KEY (MaLoaiKhachHang) REFERENCES LOAI_KHACH_HANG(MaLoaiKhachHang);
+-- =============================================
+-- IV. FOREIGN KEYS (KHÓA NGOẠI)
+-- =============================================
 
--- 3. Nối Tài Khoản -> Loại Tài Khoản
-ALTER TABLE THONG_TIN_DANG_NHAP
-ADD CONSTRAINT FK_User_LoaiTK
-FOREIGN KEY (MaLoaiTaiKhoan) REFERENCES LOAI_TAI_KHOAN(MaLoaiTaiKhoan);
+-- 1. Room -> RoomType
+ALTER TABLE ROOM
+ADD CONSTRAINT FK_Room_RoomType
+FOREIGN KEY (RoomTypeID) REFERENCES ROOM_TYPE(RoomTypeID);
 
--- 4. Nối Phiếu Thuê -> Phòng
-ALTER TABLE PHIEU_THUE
-ADD CONSTRAINT FK_PhieuThue_Phong
-FOREIGN KEY (MaPhong) REFERENCES PHONG(MaPhong);
+-- 2. Customer -> CustomerType
+ALTER TABLE CUSTOMER
+ADD CONSTRAINT FK_Customer_CustomerType
+FOREIGN KEY (CustomerTypeID) REFERENCES CUSTOMER_TYPE(CustomerTypeID);
 
--- 5. Nối Chi Tiết -> Phiếu Thuê
-ALTER TABLE CHI_TIET_PHIEU_THUE
-ADD CONSTRAINT FK_ChiTiet_PhieuThue
-FOREIGN KEY (MaPhieuThue) REFERENCES PHIEU_THUE(MaPhieuThue);
+-- 3. Account -> AccountType
+ALTER TABLE ACCOUNT
+ADD CONSTRAINT FK_Account_AccountType
+FOREIGN KEY (AccountTypeID) REFERENCES ACCOUNT_TYPE(AccountTypeID);
 
--- 6. Nối Chi Tiết -> Khách Hàng (CCCD)
-ALTER TABLE CHI_TIET_PHIEU_THUE
-ADD CONSTRAINT FK_ChiTiet_KhachHang
-FOREIGN KEY (CCCD) REFERENCES KHACH_HANG(CCCD);
+-- 4. Booking -> Room
+ALTER TABLE BOOKING
+ADD CONSTRAINT FK_Booking_Room
+FOREIGN KEY (RoomID) REFERENCES ROOM(RoomID);
 
--- V. Thêm dữ liệu
--- 1. Tạo dữ liệu Loại Tài Khoản (Admin & Staff)
-INSERT INTO LOAI_TAI_KHOAN (MaLoaiTaiKhoan, TenLoai) VALUES 
-(1, N'Quản lý'), 
-(2, N'Lễ tân');   
+-- 5. BookingDetail -> Booking
+ALTER TABLE BOOKING_DETAIL
+ADD CONSTRAINT FK_BookingDetail_Booking
+FOREIGN KEY (BookingID) REFERENCES BOOKING(BookingID);
+
+-- 6. BookingDetail -> Customer
+ALTER TABLE BOOKING_DETAIL
+ADD CONSTRAINT FK_BookingDetail_Customer
+FOREIGN KEY (CitizenID) REFERENCES CUSTOMER(CitizenID);
+
+-- =============================================
+-- V. SEED DATA (DỮ LIỆU MẪU)
+-- =============================================
+
+-- 1. Insert Account Types
+INSERT INTO ACCOUNT_TYPE (AccountTypeID, AccountTypeName) VALUES 
+(1, 'Manager'), 
+(2, 'Receptionist');   
 GO
--- 2. Thêm thông tin đăng nhập
-INSERT INTO THONG_TIN_DANG_NHAP (Username, Password, MaLoaiTaiKhoan) VALUES 
+
+-- 2. Insert Accounts (Password is hashed '123456')
+INSERT INTO ACCOUNT (Username, Password, AccountTypeID) VALUES 
 ('admin', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 1), 
-('nhanvien1', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
-('nhanvien2', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2); 
+('staff1', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
+('staff2', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2); 
 GO
 
--- 3. Tạo Loại Khách Hàng (Nhập cứng ID)
-INSERT INTO LOAI_KHACH_HANG (MaLoaiKhachHang, TenLoaiKhachHang) VALUES 
-(1, N'Nội địa'), 
-(2, N'Nước ngoài');
+-- 3. Insert Customer Types
+INSERT INTO CUSTOMER_TYPE (CustomerTypeID, CustomerTypeName) VALUES 
+(1, 'Domestic'), 
+(2, 'Foreign');
 GO
 
--- 4. Tạo Loại Phòng (Nhập cứng ID 1, 2, 3)
-INSERT INTO LOAI_PHONG (MaLoaiPhong, TenLoaiPhong, DonGia, SoLuongKhachToiDa) VALUES 
-(1, N'Phòng Đơn ', 500000, 1),
-(2, N'Phòng Đôi ', 800000, 2),
-(3, N'Phòng Tiêu Chuẩn', 200000, 1),
-(4, N'Phòng Sang Trọng', 1000000, 1);
+-- 4. Insert Room Types
+INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES 
+(1, 'Single Room', 500000, 1),
+(2, 'Double Room', 800000, 2),
+(3, 'Standard Room', 200000, 1),
+(4, 'Luxury Room', 1000000, 1);
 GO
 
--- 5. Tạo Phòng (Nhập cứng ID Phòng: 101, 102...)
-INSERT INTO PHONG (MaPhong, MaLoaiPhong, TinhTrang, GhiChu) VALUES 
-(101, 1, N'Trống', N'Phòng sạch'),
-(102, 1, N'Trống', N'Gần cầu thang'),
-(103, 1, N'Có khách', N'Khách đang ở'),
-(104, 1, N'Bảo trì', N'Cần dọn'),
-(201, 2, N'Trống', N'Có bồn tắm'),
-(202, 2, N'Trống', N'View biển'),
-(203, 2, N'Bảo trì', N'Hỏng đèn'),
-(301, 3, N'Trống', N'Rộng rãi'),
-(302, 3, N'Có khách', N'Đoàn khách'),
-(303, 3, N'Trống', N'VIP nhất');
+-- 5. Insert Rooms
+INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES 
+(101, 1, 'Available', 'Clean room', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600'),
+(102, 1, 'Available', 'Near stairs', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600'),
+(103, 1, 'Occupied', 'Guest staying', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600'),
+(104, 1, 'Maintenance', 'Need cleaning', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600'),
+(201, 2, 'Available', 'Has bathtub', 'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=600'),
+(202, 2, 'Available', 'Sea view', 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=600'),
+(203, 2, 'Maintenance', 'Broken light', 'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=600'),
+(301, 3, 'Available', 'Spacious', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=600'),
+(302, 3, 'Occupied', 'Group tour', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=600'),
+(303, 3, 'Available', 'VIP Standard', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=600');
 GO
 
--- 6. Thêm thông tin khách hàng
-INSERT INTO KHACH_HANG (CCCD, MaLoaiKhachHang, TenKhachHang, DiaChi) VALUES 
+-- 6. Insert Customers
+INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, Address) VALUES 
 ('001200000001', 1, N'Nguyễn Văn An', N'123 Cầu Giấy, Hà Nội'),
 ('079200000002', 1, N'Trần Thị Bích', N'45 Lê Lợi, Quận 1, TP.HCM'),
 ('031200000003', 1, N'Lê Văn Cường', N'78 Nguyễn Văn Linh, Đà Nẵng'),
-('098765432001', 2, N'John Smith', N'New York, USA'), -- Khách nước ngoài
+('098765432001', 2, N'John Smith', N'New York, USA'), 
 ('001200000005', 1, N'Phạm Thị Duyên', N'10 Lạch Tray, Hải Phòng'),
 ('092200000006', 1, N'Hoàng Văn Em', N'Ninh Kiều, Cần Thơ'),
 ('044200000007', 1, N'Vũ Thị Gấm', N'Hạ Long, Quảng Ninh'),
-('112233445566', 2, N'Akira Yamamoto', N'Tokyo, Japan'), -- Khách nước ngoài
+('112233445566', 2, N'Akira Yamamoto', N'Tokyo, Japan'), 
 ('001200000009', 1, N'Đặng Văn Hùng', N'Vinh, Nghệ An'),
 ('001200000010', 1, N'Bùi Thị Kim', N'Huế, Thừa Thiên Huế');
 GO
 
-
-SELECT * FROM KHACH_HANG
-SELECT * FROM LOAI_KHACH_HANG
-SELECT * FROM PHONG
-SELECT * FROM LOAI_PHONG
-SELECT * FROM LOAI_TAI_KHOAN
-SELECT * FROM CHI_TIET_PHIEU_THUE
-SELECT * FROM PHIEU_THUE
+-- =============================================
+-- VI. VERIFY DATA
+-- =============================================
+SELECT * FROM CUSTOMER;
+SELECT * FROM CUSTOMER_TYPE;
+SELECT * FROM ROOM;
+SELECT * FROM ROOM_TYPE;
+SELECT * FROM ACCOUNT;
+SELECT * FROM ACCOUNT_TYPE;
