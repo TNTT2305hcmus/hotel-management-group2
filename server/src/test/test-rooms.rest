@@ -1,0 +1,77 @@
+### GET all rooms
+GET http://localhost:5000/api/rooms
+
+###
+
+### Filter by status - Available rooms
+GET http://localhost:5000/api/rooms/by-status?status=Available
+
+###
+
+### Filter by status - Occupied rooms
+GET http://localhost:5000/api/rooms/by-status?status=Occupied
+
+###
+
+### Filter by status - Maintenance rooms
+GET http://localhost:5000/api/rooms/by-status?status=Maintenance
+
+###
+
+### Filter by room type - Single Room
+GET http://localhost:5000/api/rooms/by-type?type=Single Room
+
+###
+
+### Filter by room type - Double Room
+GET http://localhost:5000/api/rooms/by-type?type=Double Room
+
+###
+
+### Filter by room type - Standard Room
+GET http://localhost:5000/api/rooms/by-type?type=Standard Room
+
+###
+
+### Filter by room type - Luxury Room
+GET http://localhost:5000/api/rooms/by-type?type=Luxury Room
+
+###
+
+### Filter by status AND type - Available Single Rooms
+GET http://localhost:5000/api/rooms/by-status-and-type?status=Available&type=Single Room
+
+###
+
+### Filter by status AND type - Available Double Rooms
+GET http://localhost:5000/api/rooms/by-status-and-type?status=Available&type=Double Room
+
+###
+
+### Filter by status AND type - Occupied Standard Rooms
+GET http://localhost:5000/api/rooms/by-status-and-type?status=Occupied&type=Standard Room
+
+###
+
+### Filter by status AND type - Maintenance rooms (any type)
+GET http://localhost:5000/api/rooms/by-status-and-type?status=Maintenance&type=Single Room
+
+###
+
+### Test invalid status (should return empty or error)
+GET http://localhost:5000/api/rooms/by-status?status=InvalidStatus
+
+###
+
+### Test missing status parameter (should return error)
+GET http://localhost:5000/api/rooms/by-status
+
+###
+
+### Test missing type parameter (should return error)
+GET http://localhost:5000/api/rooms/by-type
+
+###
+
+### Test missing both parameters (should return error)
+GET http://localhost:5000/api/rooms/by-status-and-type

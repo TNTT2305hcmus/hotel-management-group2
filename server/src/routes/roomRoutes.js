@@ -1,10 +1,24 @@
 // src/routes/roomRoutes.js
 import express from 'express';
-import { getAllRooms } from '../controllers/roomController.js';
+import {
+    getAllRooms,
+    getRoomsByStatus,
+    getRoomsByType,
+    getRoomsByStatusAndType
+} from '../controllers/roomController.js';
 
 const router = express.Router();
 
-// Khi ai đó gọi GET vào đường dẫn này -> Chạy hàm getAllRooms
+// Lấy tất cả phòng
 router.get('/', getAllRooms);
+
+// Lọc theo status: /api/rooms/by-status?status=Available
+router.get('/by-status', getRoomsByStatus);
+
+// Lọc theo loại phòng: /api/rooms/by-type?type=Single Room
+router.get('/by-type', getRoomsByType);
+
+// Lọc theo cả status và loại phòng: /api/rooms/by-status-and-type?status=Available&type=Single Room
+router.get('/by-status-and-type', getRoomsByStatusAndType);
 
 export default router;
