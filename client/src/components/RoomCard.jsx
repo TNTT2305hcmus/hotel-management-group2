@@ -1,17 +1,50 @@
 import '../css/RoomCard.css';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 
 // room: object
 // onEdit / onDelete : function
-const RoomCard = ({room, onEdit, onDelete}) => {
+const RoomCard = ({ room, onEdit, onDelete, isLoading = false }) => {
     const getSatusColor = (status) => {
-        if(status === 'Available'){
+        if (status === 'Available') {
             return 'green';
-        } else if (status === 'Occupied'){
+        } else if (status === 'Occupied') {
             return 'red';
         }
         return 'yellow';
     };
+    if (isLoading) {
+        return (
+            <div className="room-card">
+                {/* Image */}
+                <div className="image-container relative">
+                    <Skeleton height={180} className="skeleton-img" />
 
+                    <span className="status-badge">
+                        <Skeleton width={70} height={18} />
+                    </span>
+
+                    <span className="room-number">
+                        <Skeleton width={90} height={18} />
+                    </span>
+                </div>
+
+                {/* Detail Info */}
+                <div className="detail-infor">
+                    <p><Skeleton width="80%" height={16} /></p>
+                    <p><Skeleton width="70%" height={16} /></p>
+                    <p><Skeleton width="90%" height={16} /></p>
+                </div>
+
+                {/* Buttons */}
+                <div className="action-btn">
+                    <Skeleton width="48%" height={38} />
+                    <Skeleton width="48%" height={38} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="room-card">
@@ -34,11 +67,11 @@ const RoomCard = ({room, onEdit, onDelete}) => {
             {/* Button */}
             <div className="action-btn">
                 <button onClick={() => onEdit(room.id)}>
-                    <i className='bx  bx-edit'></i> 
+                    <i className='bx  bx-edit'></i>
                     Edit
                 </button>
                 <button onClick={() => onDelete(room.id)}>
-                    <i className='bx  bx-trash'></i> 
+                    <i className='bx  bx-trash'></i>
                     Delete
                 </button>
             </div>

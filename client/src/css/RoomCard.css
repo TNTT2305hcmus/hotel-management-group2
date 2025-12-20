@@ -110,3 +110,8 @@
   background: #fef2f2;
   border-color: #ef4444;
 }
+.skeleton-img {
+  border-radius: 10px; 
+  width: 100%;
+  display: block;
+}
