@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# Hotel Management System (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dự án Frontend cho hệ thống quản lý khách sạn, được xây dựng bằng **React (Vite)**. Hệ thống bao gồm các chức năng xác thực người dùng, phân quyền (Manager/Receptionist) và các giao diện quản lý cơ bản.
 
-Currently, two official plugins are available:
+## Tính Năng Chính
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* **Đăng nhập (Login):**
+    * Hỗ trợ chọn vai trò: Quản lý (Manager) hoặc Lễ tân (Receptionist).
+    * Giao diện responsive, full màn hình.
+    * Ẩn/Hiện mật khẩu (Eye Icon).
+* **Quên mật khẩu (Forgot Password):**
+    * Quy trình 3 bước: Nhập SĐT -> Nhập OTP -> Đặt mật khẩu mới.
+    * Giả lập gửi và xác thực OTP.
+* **Bảo mật (Security):**
+    * **Private Route:** Chặn truy cập trái phép. Chỉ người dùng đã đăng nhập và có đúng quyền (Role) mới vào được Dashboard tương ứng.
+    * Lưu Token và thông tin User vào LocalStorage.
+* **Giả lập API (Mock API):**
+    * Hệ thống chạy độc lập không cần Backend thực tế
 
-## React Compiler
+## 🛠️ Công Nghệ Sử Dụng
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Core:** React JS (Vite Bundler).
+* **Routing:** React Router DOM (v6).
+* **HTTP Client:** Axios (hoặc Mock API nội bộ).
+* **Styling:** CSS thuần (Custom layout & animations).
+* **Icons:** SVG Icons.
 
-## Expanding the ESLint configuration
+## 📂 Cấu Trúc Thư Mục
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+```bash
+src/
+├── assets/             # Chứa hình ảnh (hotel.jpg, logo...)
+├── components/         # Các trang chính
+│   ├── Login.jsx       # Trang đăng nhập
+│   ├── ForgotPassword.jsx # Trang quên mật khẩu (Gửi OTP)
+│   └── ResetPassword.jsx  # Trang đặt lại mật khẩu
+├── styles/             # File CSS cho từng component
+│   ├── login.css
+│   └── Forgot.css
+├── utils/              # Các hàm tiện ích & Mock Data
+│   └── mockApi.js      # Giả lập Server (Login, OTP, Reset Pass)
+├── routes/             # Cấu hình bảo vệ Router
+│   └── RoutePrivate.jsx
+├── temp/               # Các trang tạm thời (Dashboard)
+│   ├── ManagerDashboard.jsx
+│   └── ReceptionistDashboard.jsx
+└── App.js              # Cấu hình Routing chính
