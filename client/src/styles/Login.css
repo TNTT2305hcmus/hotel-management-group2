@@ -1,0 +1,147 @@
+/*Reset cơ bản để tránh cuộn trang*/
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center; /* Căn giữa ngang */
+  align-items: center;     /* Căn giữa dọc */
+  gap: 60px; 
+  padding-right: 40px;
+}
+
+/* Card chứa form */
+.login-card {
+  width: 300px;
+  background: #ffffff;
+  padding: 100px;
+  border-radius: 8px; 
+  border: 3px solid #dedede; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 500;
+  font-size: 60px;
+  color: #000;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+/* Style cho Label */
+.login-card label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #666;
+  margin-top: 15px;
+}
+
+/* Style cho Input */
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc; 
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: #000; 
+}
+
+/* icon password */
+.password-box {
+  position: relative;
+  width: 100%;
+}
+
+.password-box input {
+  padding-right: 40px;
+}
+
+.password-box span {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  display: flex; 
+}
+
+/* Select và forgot password */
+.row-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+/* Style cho ô chọn Role (Same same cái nút trong figma) */
+.role-select {
+  width: auto;             
+  min-width: 100px;        
+  padding: 6px 10px;
+  font-size: 13px;
+  border: none;            
+  border-radius: 4px;      
+  background-color: #e0e0e0; 
+  cursor: pointer;
+  outline: none;
+  font-weight: 500;
+  color: #333;
+}
+
+.role-select:hover {
+  background-color: #d0d0d0;
+}
+
+/* Link Forgot Password */
+.forgot-link {
+  font-size: 12px;
+  color: #666; /* Màu xám đen */
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Nút Login */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #000000; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.login-btn:hover {
+  opacity: 0.8;
+}

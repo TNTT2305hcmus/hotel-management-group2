@@ -1,0 +1,191 @@
+/*Reset cơ bản để tránh cuộn trang*/
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Nền trang giống Login form section */
+.forgot-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #f0f8ff; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Đảm bảo Card có thuộc tính relative để làm mốc toạ độ */
+.forgot-card {
+  position: relative; 
+  width: 300px;
+  padding: 100px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Kiểu cho nút Back */
+.back-btn {
+  position: absolute;  /* Tách ra khỏi dòng chảy văn bản */
+  top: 25px;           /* Cách mép trên 25px */
+  left: 25px;          /* Cách mép trái 25px */
+  
+  font-size: 18px;     /* Kích thước icon */
+  color: #333;       /* Màu xám đen */
+  cursor: pointer;     /* Hiện bàn tay khi di chuột */
+  display: flex;       /* Căn giữa icon */
+  padding: 8px;        /* Tăng diện tích bấm cho dễ bấm */
+  border-radius: 50%;  /* Bo tròn hiệu ứng hover */
+  transition: background 0.2s;
+}
+
+/* Hiệu ứng hover cho nút Back */
+.back-btn:hover {
+  background-color: #f0f0f0; 
+  color: #000;
+}
+
+/*Định dạng tiêu đề*/
+.forgot-card h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  white-space: nowrap; 
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 40px;
+}
+
+/* Tên của các ô nhập liệu */
+.forgot-card label {
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 6px;
+  display: block;
+  color: #666;
+  font-weight: 500;
+}
+
+/*Kiểu chung của tất cả cá thẻ trong form*/
+.forgot-card input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box; 
+}
+
+/*Hiệu ứng viền đen khi click vào khung */
+.forgot-card input:focus {
+  border-color: #000;
+}
+
+/* Nút Send OTP */
+/* Khung bao quanh */
+.input-with-button {
+  position: relative; /* Bắt buộc để connằm bên trong */
+  width: 100%;
+  display: flex;      /* Giúp input hiển thị đúng */
+}
+
+/* Ô nhập liệu (Input) */
+.input-with-button input {
+  width: 100%;
+  padding: 12px 12px;   
+  padding-right: 100px; /* Chừa 100px bên phải để nút không đè lên chữ */
+  border: 1px solid #ccc;
+  border-radius: 6px;  
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input-with-button input:focus {
+  border-color: #000;
+}
+
+/* Nút Send OTP */
+.send-otp-btn {
+  position: absolute;   /* Tách khỏi dòng chảy văn bản */
+  right: 3px;         
+  top: 50%;             
+  transform: translateY(-50%); 
+  
+  padding: 6px 12px;   
+  background: #e0e0e0;  
+  border: none;
+  border-radius: 4px;   
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  z-index: 10;          /* Đảm bảo nút luôn nổi lên trên input */
+}
+
+.send-otp-btn:hover {
+  background: #d0d0d0;
+}
+
+/* Nút verify */
+.verify-btn {
+  width: 100%;
+  margin-top: 30px;
+  padding: 14px;
+  background: #000000; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: normal; 
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.verify-btn:hover {
+  opacity: 0.8;
+}
+
+/* Hiển thị mật khẩu khi đặt lại mật khẩu mới */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px; 
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; 
+  padding-left: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.password-wrapper input:focus {
+  outline: none;
+}
+
+/* Nút con mắt */
+.toggle-password-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  color: #666;
+  z-index: 5;
+  outline: none;
+}
+
+.toggle-password-btn:hover {
+  opacity: 0.8;
+}
