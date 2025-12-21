@@ -4,7 +4,8 @@ import {
     getAllRooms,
     getRoomsByStatus,
     getRoomsByType,
-    getRoomsByStatusAndType
+    getRoomsByStatusAndType,
+    createRoom
 } from '../controllers/roomController.js';
 
 const router = express.Router();
@@ -20,5 +21,8 @@ router.get('/by-type', getRoomsByType);
 
 // Lọc theo cả status và loại phòng: /api/rooms/by-status-and-type?status=Available&type=Single Room
 router.get('/by-status-and-type', getRoomsByStatusAndType);
+
+// POST: Thêm phòng mới 
+router.post('/', createRoom);
 
 export default router;

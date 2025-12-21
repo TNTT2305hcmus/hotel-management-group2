@@ -75,3 +75,15 @@ GET http://localhost:5000/api/rooms/by-type
 
 ### Test missing both parameters (should return error)
 GET http://localhost:5000/api/rooms/by-status-and-type
+
+### Test add new room
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 401,
+    "typeId": 1,
+    "status": "Available",
+    "note": "Phòng Test API",
+    "image": "https://images.unsplash.com/photo-1590490360182-c33d57733427"
+}
