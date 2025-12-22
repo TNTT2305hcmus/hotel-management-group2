@@ -1,22 +1,34 @@
-import axios from 'axios';
+import { axiosClient } from "../api/axiosClient"; // Import đúng instance đã cấu hình interceptor
 
-const ROOMS_URL = 'http://localhost:5000/api/rooms';
-const LIMIT = 8;
-
-export const fetchListRoomsFollowPage = async (pageNumber, search, type, status) => {
-    try{
-        const params = new URLSearchParams({
-            page: pageNumber,
-            limit: LIMIT
+// 1. Lấy danh sách phòng
+export const fetchListRoomsFollowPage = async (page, search, type, status) => {
+    try {
+        // URL đúng phải là /api/rooms (đã cấu hình prefix bên server routes chưa? Giả sử server mount ở /api/rooms)
+        // Nếu file index.js server bạn dùng: app.use('/api/rooms', roomRoutes) thì url dưới đây là:
+        const response = await axiosClient.get('/api/rooms', {
+            params: {
+                page: page,
+                limit: 8,
+                search: search,
+                type: type,
+                status: status
+            }
         });
-
-        if (search) params.append('search', search);
-        if (type) params.append('type', type);
-        if (status) params.append('status', status);
-
-        const response = await axios.get(`${ROOMS_URL}?${params.toString()}`);
-        return response.data.data || response.data;
+        
+        return response.data || [];
     } catch (error) {
-        throw error;
+        console.error("API Error (List):", error);
+        return [];
     }
-}
+};
+
+// 2. Lấy thống kê (Thêm mới)
+export const fetchRoomStats = async () => {
+    try {
+        const response = await axiosClient.get('/api/rooms/stats');
+        return response.data; // Trả về { available: x, occupied: y, maintenance: z }
+    } catch (error) {
+        console.error("API Error (Stats):", error);
+        return { available: 0, occupied: 0, maintenance: 0 };
+    }
+};
