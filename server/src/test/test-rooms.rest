@@ -1,0 +1,78 @@
+@url = http://localhost:5000
+@roomUrl = {{url}}/api/rooms
+
+### 1. GET all rooms
+GET {{roomUrl}}
+
+### ---------------------------------------------------
+### FILTER BY STATUS
+### ---------------------------------------------------
+
+### 2. Filter - Available rooms
+GET {{roomUrl}}?status=Available
+
+### 3. Filter - Occupied rooms
+GET {{roomUrl}}?status=Occupied
+
+### 4. Filter - Maintenance rooms
+GET {{roomUrl}}?status=Maintenance
+
+### ---------------------------------------------------
+### FILTER BY TYPE
+### Note: Filtering by ID (1, 2...) is more standard for backend than by name
+### Mapping: 1=Single, 2=Double, 3=Deluxe, 4=Luxury
+### ---------------------------------------------------
+
+### 5. Filter - Single Room (Type ID = 1)
+GET {{roomUrl}}?type=1
+
+### 6. Filter - Double Room (Type ID = 2)
+GET {{roomUrl}}?type=2
+
+### 7. Filter - Standard Room (Type ID = 3)
+GET {{roomUrl}}?type=3
+
+### 8. Filter - Luxury Room (Type ID = 4)
+GET {{roomUrl}}?type=4
+
+### ---------------------------------------------------
+### COMBINE FILTERS
+### ---------------------------------------------------
+
+### 9. Available AND Single Room (ID 1)
+GET {{roomUrl}}?status=Available&type=1
+
+### 10. Available AND Double Room (ID 2)
+GET {{roomUrl}}?status=Available&type=2
+
+### 11. Occupied AND Standard Room (ID 3)
+GET {{roomUrl}}?status=Occupied&type=3
+
+### 12. Maintenance AND Single Room (ID 1)
+GET {{roomUrl}}?status=Maintenance&type=1
+
+### ---------------------------------------------------
+### TEST EDGE CASES
+### ---------------------------------------------------
+
+### 13. Test invalid status (Should return an empty list [])
+GET {{roomUrl}}?status=InvalidStatusName
+
+### 14. Test missing parameters (Should return all rooms by default)
+GET {{roomUrl}}
+
+### ---------------------------------------------------
+### ADD NEW ROOM
+### ---------------------------------------------------
+
+### 15. Add new room
+POST {{roomUrl}}
+Content-Type: application/json
+
+{
+    "id": 401,
+    "typeId": 1,
+    "status": "Available",
+    "note": "Full API Test Room",
+    "image": "https://images.unsplash.com/photo-1590490360182-c33d57733427"
+}

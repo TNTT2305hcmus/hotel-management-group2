@@ -1,0 +1,42 @@
+@url = http://localhost:5000
+
+### 1. Check Server Health
+GET {{url}}/
+
+### 2. Register New Account (IMPORTANT: Email required for password recovery test)
+POST {{url}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "minhthang",
+  "password": "minhthang123",
+  "email": "admin@hotel.com", 
+  "accountTypeID": 2
+}
+
+### 3. Login
+POST {{url}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "minhthang",
+  "password": "minhthang123"
+}
+
+### 4. Forgot Password (Use the email registered in step 2)
+POST {{url}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "admin@hotel.com"
+}
+
+### 5. Reset Password (Get OTP from Server Terminal and paste here)
+POST {{url}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "admin@hotel.com",
+  "otp": "123456", 
+  "newPassword": "newpassword999"
+}
