@@ -1,7 +1,7 @@
 import { sql } from '../config/database.js';
 
-// Lấy tất cả phòng
-export const getAllRoomsService = async () => {
+// Get all rooms
+const getAllRoomsService = async () => {
     const result = await sql.query(`
         SELECT 
             R.RoomID AS id, 
@@ -17,8 +17,8 @@ export const getAllRoomsService = async () => {
     return result.recordset;
 };
 
-// Lọc phòng theo status
-export const getRoomsByStatusService = async (status) => {
+// Filter rooms by status
+const getRoomsByStatusService = async (status) => {
     const result = await sql.query(`
         SELECT 
             R.RoomID AS id, 
@@ -35,8 +35,8 @@ export const getRoomsByStatusService = async (status) => {
     return result.recordset;
 };
 
-// Lọc phòng theo loại phòng (RoomTypeName)
-export const getRoomsByTypeService = async (roomType) => {
+// Filter rooms by room type (RoomTypeName)
+const getRoomsByTypeService = async (roomType) => {
     const result = await sql.query(`
         SELECT 
             R.RoomID AS id, 
@@ -53,8 +53,8 @@ export const getRoomsByTypeService = async (roomType) => {
     return result.recordset;
 };
 
-// Lọc phòng theo cả status và loại phòng
-export const getRoomsByStatusAndTypeService = async (status, roomType) => {
+// Filter rooms by both status and room type
+const getRoomsByStatusAndTypeService = async (status, roomType) => {
     const result = await sql.query(`
         SELECT 
             R.RoomID AS id, 
@@ -70,3 +70,5 @@ export const getRoomsByStatusAndTypeService = async (status, roomType) => {
     `);
     return result.recordset;
 };
+// Export all services
+export { getAllRoomsService, getRoomsByStatusService, getRoomsByTypeService, getRoomsByStatusAndTypeService };

@@ -7,21 +7,21 @@ import {
     getRoomsByStatusAndTypeService
 } from '../services/roomServices.js';
 
-// Controller Lấy tất cả các phòng
-export const getAllRooms = async (req, res) => {
+// Controller Get all rooms
+const getAllRooms = async (req, res) => {
     try {
 
         const rooms = await getAllRoomsService();
 
         res.status(200).json(rooms);
     } catch (error) {
-        console.error("Lỗi khi lấy danh sách phòng:", error);
-        res.status(500).json({ message: 'Lỗi Server', error: error.message });
+        console.error("Error fetching room list:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 
-// Controller lọc theo status
-export const getRoomsByStatus = async (req, res) => {
+// Controller filter by status
+const getRoomsByStatus = async (req, res) => {
     try {
         const { status } = req.query;
 
@@ -33,13 +33,13 @@ export const getRoomsByStatus = async (req, res) => {
 
         res.status(200).json(rooms);
     } catch (error) {
-        console.error("Lỗi khi lọc phòng theo status:", error);
-        res.status(500).json({ message: 'Lỗi Server', error: error.message });
+        console.error("Error filtering rooms by status:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 
-// Controller lọc theo loại phòng
-export const getRoomsByType = async (req, res) => {
+// Controller filter by room type
+const getRoomsByType = async (req, res) => {
     try {
         const { type } = req.query;
 
@@ -51,13 +51,13 @@ export const getRoomsByType = async (req, res) => {
 
         res.status(200).json(rooms);
     } catch (error) {
-        console.error("Lỗi khi lọc phòng theo loại:", error);
-        res.status(500).json({ message: 'Lỗi Server', error: error.message });
+        console.error("Error filtering rooms by type:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 
-// Controller lọc theo cả status và loại phòng
-export const getRoomsByStatusAndType = async (req, res) => {
+// Controller filter by both status and room type
+const getRoomsByStatusAndType = async (req, res) => {
     try {
         const { status, type } = req.query;
 
@@ -69,57 +69,62 @@ export const getRoomsByStatusAndType = async (req, res) => {
 
         res.status(200).json(rooms);
     } catch (error) {
-        console.error("Lỗi khi lọc phòng theo status và loại:", error);
-        res.status(500).json({ message: 'Lỗi Server', error: error.message });
+        console.error("Error filtering rooms by status and type:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 
-// Thêm phòng 
-export const createRoom = async (req, res) => {
+// Add new room
+const createRoom = async (req, res) => {
     try {
-        // 1. Lấy dữ liệu từ Frontend gửi lên
+        // 1. Get data from Frontend
         const { id, typeId, status, note, image } = req.body;
 
-        // 2. Validate cơ bản (Bắt buộc phải có ID và Loại phòng)
+        // 2. Basic validation (Must have ID and Room Type)
         if (!id || !typeId) {
             return res.status(400).json({ 
-                message: 'Vui lòng nhập đầy đủ Mã phòng (id) và Loại phòng (typeId)' 
+                message: 'Please enter complete Room ID (id) and Room Type (typeId)' 
             });
         }
 
-        // 3. Kết nối và thực thi lệnh SQL Insert
+        // 3. Connect and execute SQL Insert
         const request = new sql.Request();
         
-        // Gán tham số (SQL Parameters) để bảo mật
+        // Assign parameters (SQL Parameters) for security
         request.input('id', sql.Int, id);
         request.input('typeId', sql.Int, typeId);
-        request.input('status', sql.NVarChar, status || 'Available'); // Mặc định là Available
+        request.input('status', sql.NVarChar, status || 'Available'); // Default is Available
         request.input('note', sql.NVarChar, note || '');
-        request.input('image', sql.NVarChar, image || ''); // Link ảnh
+        request.input('image', sql.NVarChar, image || ''); // Image URL
 
-        // Câu lệnh SQL 
+        // SQL statement
         await request.query(`
             INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL)
             VALUES (@id, @typeId, @status, @note, @image)
         `);
 
-        // 4. Trả về kết quả thành công
+        // 4. Return success result
         res.status(201).json({ 
-            message: 'Thêm phòng thành công!', 
+            message: 'Room added successfully!', 
             newRoom: { id, typeId, status, note, image }
         });
 
     } catch (error) {
-        console.error("Lỗi khi thêm phòng:", error);
+        console.error("Error adding room:", error);
 
-        // 5. Xử lý lỗi trùng ID (Mã lỗi 2627 của SQL Server)
+        // 5. Handle duplicate ID error (SQL Server error code 2627)
         if (error.number === 2627) {
             return res.status(409).json({ 
-                message: 'Lỗi: Mã phòng này ĐÃ TỒN TẠI trong hệ thống!' 
+                message: 'Error: This room ID ALREADY EXISTS in the system!' 
             });
         }
 
-        // Lỗi khác
-        res.status(500).json({ message: 'Lỗi Server', error: error.message });
+        // Other errors
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+
+// Export all controllers
+export { getAllRooms, getRoomsByStatus, getRoomsByType, getRoomsByStatusAndType, createRoom };
+
+
