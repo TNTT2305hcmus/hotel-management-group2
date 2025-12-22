@@ -1,36 +1,16 @@
-import { StrictMode, useEffect } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import { BrowserRouter } from "react-router-dom";
+import "./index.css"; // CSS toàn cục (nếu có)
 import App from "./App.jsx";
-
-import { AuthProvider, useAuth } from "./api/AuthContext.jsx";
-import { attachAuthInterceptors } from "./api/axiosClient.js";
-
-function InterceptorBinder({ children }) {
-  const auth = useAuth();
-
-  useEffect(() => {
-    // attach interceptors và nhận về hàm cleanup để eject
-    const detach = attachAuthInterceptors({
-      getAccessToken: () => auth.accessToken,
-      onAuthFail: () => auth.logout(),
-    });
-
-    return () => {
-      // tránh bị nhân đôi interceptor khi StrictMode mount/unmount dev
-      detach?.();
-    };
-  }, [auth]);
-
-  return children;
-}
+import { AuthProvider } from "./api/AuthContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <InterceptorBinder>
+    <BrowserRouter>
+      <AuthProvider>
         <App />
-      </InterceptorBinder>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );
