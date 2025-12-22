@@ -1,183 +1,127 @@
-import { useState, useEffect, useMemo } from 'react';
-import { fetchListRoomsFollowPage } from '../services/listRoomService';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { fetchListRoomsFollowPage, fetchRoomStats } from '../services/listRoomService';
 import useDebounce from '../hooks/useDebounce';
 import StatusSummary from './StatusSummary';
 import FilterBar from './FilterBar';
 import RoomCard from './RoomCard';
 import '../css/Dashboard.css';
 
-const Dashboard = () => {
-    const [rooms, setRooms] = useState([
-        {
-            id: 107,
-            roomNumber: "107",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Available",
-            image: 'https://noithathaiminh.com.vn/public/anh1/images/tin-tuc/noi-that-phong-ngu-01.webp'
-        },
-        {
-            id: 108,
-            roomNumber: "108",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Available",
-            image: 'https://www.made4home.com.vn/wp-content/uploads/2025/10/thiet-ke-noi-that-phong-ngu.webp'
-        },
-        {
-            id: 109,
-            roomNumber: "109",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Maintainance",
-            image: 'https://noithatbyt.vn/wp-content/uploads/2025/08/TOP-10-Mau-Thiet-Ke-Phong-Ngu-10m2-Dep-Choang-Ngop.webp'
-        },
-        {
-            id: 110,
-            roomNumber: "110",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Occupied",
-            image: 'https://xhomesg.com.vn/wp-content/uploads/2024/08/thiet-ke-noi-that-phong-ngu-12m2-Xhome-Sai-Gon.jpg'
-        },
-        {
-            id: 111,
-            roomNumber: "111",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Occupied",
-            image: 'https://xhomesg.com.vn/wp-content/uploads/2024/08/thiet-ke-noi-that-phong-ngu-12m2-Xhome-Sai-Gon.jpg'
-        },
-        {
-            id: 112,
-            roomNumber: "112",
-            type: "Double",
-            capacity: 2,
-            price: 750000,
-            status: "Maintainance",
-            image: 'https://www.made4home.com.vn/wp-content/uploads/2025/10/thiet-ke-noi-that-phong-ngu.webp'
-        },
-        {
-            id: 113,
-            roomNumber: "113",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Available",
-            image: 'https://noithathaiminh.com.vn/public/anh1/images/tin-tuc/noi-that-phong-ngu-01.webp'
-        },
-        {
-            id: 114,
-            roomNumber: "110",
-            type: "Single",
-            capacity: 1,
-            price: 500000,
-            status: "Occupied",
-            image: 'https://noithatbyt.vn/wp-content/uploads/2025/08/TOP-10-Mau-Thiet-Ke-Phong-Ngu-10m2-Dep-Choang-Ngop.webp'
-        },
-    ]);
+const PAGE_SIZE = 8;
 
+const Dashboard = () => {
+    const [rooms, setRooms] = useState([]);
+    const [stats, setStats] = useState({ available: 0, occupied: 0, maintenance: 0 }); 
     const [loading, setLoading] = useState(false);
-    // để biết loading trang nào (phân biệt first load vs load more)
-    const [loadingPage, setLoadingPage] = useState(1);
+    
+    // Pagination & Filter states
     const [pageNumber, setPageNumber] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [stats, setStats] = useState({ available: 0, occupied: 0, maintenance: 0 });
     const [filters, setFilters] = useState({ search: '', type: '', status: '' });
+    
+    const debouncedSearch = useDebounce(filters.search, 500); 
 
-    const debouncedSearch = useDebounce(filters.search, 1000);
+    const skeletonList = useMemo(() => Array.from({ length: PAGE_SIZE }, (_, i) => i), []);
 
-    // Số skeleton card = page size
-    const PAGE_SIZE = 8;
-
-    // Danh sách key skeleton ổn định
-    const skeletonList = useMemo(
-        () => Array.from({ length: PAGE_SIZE }, (_, i) => i),
-        []
-    );
-
-    const fetchRooms = async (currentPage) => {
-        if (loading) return;
-
+    // 1. Hàm Load Danh sách phòng
+    const fetchRoomsData = useCallback(async (currentPage, currentFilters, isSearching) => {
         setLoading(true);
-        setLoadingPage(currentPage);
+        if (isSearching) setRooms([]); 
 
         try {
-            // Dùng currentPage thay vì pageNumber (tránh load sai trang)
             const newRooms = await fetchListRoomsFollowPage(
                 currentPage,
-                debouncedSearch,
-                filters.type,
-                filters.status
+                currentFilters.search,
+                currentFilters.type,
+                currentFilters.status
             );
 
-            if (currentPage === 1) {
-                setRooms(newRooms);
+            // Kiểm tra newRooms có phải mảng không ?
+            if (Array.isArray(newRooms)) {
+                if (isSearching || currentPage === 1) {
+                    setRooms(newRooms);
+                } else {
+                    setRooms((prev) => [...prev, ...newRooms]);
+                }
+                
+                // Logic check Load More
+                if (newRooms.length < PAGE_SIZE) {
+                    setHasMore(false);
+                } else {
+                    setHasMore(true);
+                }
             } else {
-                setRooms((prevRooms) => [...prevRooms, ...newRooms]);
+                 setHasMore(false);
             }
-
-            if (newRooms.length === 0 || newRooms.length < PAGE_SIZE) {
-                setHasMore(false);
-            } else {
-                setHasMore(true);
-            }
+            
         } catch (error) {
-            console.error("Lỗi tải danh sách phòng:", error);
+            console.error("Lỗi tải phòng:", error);
         } finally {
             setLoading(false);
         }
+    }, []); 
+
+    // 2. Hàm Load Thống kê (Chỉ gọi 1 lần khi mount hoặc khi action thêm/sửa/xóa xong)
+    const loadStats = async () => {
+        const data = await fetchRoomStats();
+        setStats(data);
     };
 
-    // useEffect cho search/filter
+    // Effect khởi tạo: Load Stats
     useEffect(() => {
-        setPageNumber(1);
-        setHasMore(true);
-        fetchRooms(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedSearch, filters.type, filters.status]);
+        loadStats();
+    }, []);
 
-    // useEffect cho Load More
+    // Effect xử lý Filter (Search/Type/Status)
     useEffect(() => {
-        if (pageNumber > 1) {
-            fetchRooms(pageNumber);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageNumber]);
+        let isActive = true; 
+        const executeFetch = async () => {
+            setPageNumber(1); 
+            if (isActive) {
+                await fetchRoomsData(1, { ...filters, search: debouncedSearch }, true);
+            }
+        };
+        executeFetch();
+        return () => { isActive = false; };
+    }, [debouncedSearch, filters.type, filters.status, fetchRoomsData]);
 
-    // Xử lý action
+    // Effect xử lý Load More
+    useEffect(() => {
+        if (pageNumber === 1) return;
+        let isActive = true;
+        const executeFetch = async () => {
+            if (isActive) {
+                await fetchRoomsData(pageNumber, { ...filters, search: debouncedSearch }, false);
+            }
+        };
+        executeFetch();
+        return () => { isActive = false; };
+    }, [pageNumber, fetchRoomsData]);
+
+
+    // Handlers
     const handleLoadMore = () => {
-        if (loading) return; // ✅ tránh bấm liên tục khi đang load
-        setPageNumber((prev) => prev + 1);
+        if (!loading && hasMore) {
+            setPageNumber(prev => prev + 1);
+        }
     };
 
-    const handleSearch = (val) => setFilters({ ...filters, search: val });
-    const handleFilterType = (val) => setFilters({ ...filters, type: val });
-    const handleFilterStatus = (val) => setFilters({ ...filters, status: val });
-
-    const handleEdit = (id) => console.log("Edit room:", id);
-    const handleDelete = (id) => console.log("Delete room:", id);
-
-    // Phân biệt loading
-    const isFirstLoading = loading && loadingPage === 1;
-    const isLoadingMore = loading && loadingPage > 1;
+    const handleSearch = (val) => setFilters(prev => ({ ...prev, search: val }));
+    const handleFilterType = (val) => setFilters(prev => ({ ...prev, type: val }));
+    const handleFilterStatus = (val) => setFilters(prev => ({ ...prev, status: val }));
+    
+    const handleEdit = (id) => console.log("Edit:", id);
+    const handleDelete = (id) => console.log("Delete:", id);
 
     return (
         <div className="room-management-page">
             <div className="header">
                 <h1>Room Management</h1>
-                <button className="btn-add">
-                    <i className='bx bx-plus'></i> Add New Room
-                </button>
+                <button className="btn-add"><i className='bx bx-plus'></i> Add New Room</button>
             </div>
 
-            <StatusSummary stats={stats} isLoading={loading && pageNumber === 1} />
-
+            {/* Truyền stats vào component con */}
+            <StatusSummary stats={stats} isLoading={false} />
+            
             <FilterBar
                 onSearch={handleSearch}
                 onFilterType={handleFilterType}
@@ -185,40 +129,29 @@ const Dashboard = () => {
             />
 
             <div className="room-list">
-                {/* // Hiển thị skeleton khi là first load  */}
-                {isFirstLoading ? (
-                    skeletonList.map((i) => (
-                        <RoomCard key={`sk-${i}`} isLoading />
-                    ))
-                ) : (
-                    <>
-                        {rooms.map((room) => (
-                            <RoomCard
-                                key={room.id}
-                                room={room}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                            />
-                        ))}
+                {rooms.map((room) => (
+                    <RoomCard key={room.id} room={room} onEdit={handleEdit} onDelete={handleDelete} />
+                ))}
 
-                        {/* ✅ NEW: khi load more thì append skeleton ở dưới */}
-                        {isLoadingMore &&
-                            skeletonList.map((i) => (
-                                <RoomCard key={`sk-more-${i}`} isLoading />
-                            ))}
-                    </>
-                )}
+                {loading && skeletonList.map((i) => (
+                    <RoomCard key={`sk-${i}`} isLoading />
+                ))}
             </div>
 
-            <div className="text-center">
-                {!loading && hasMore && (
+            <div className="text-center" style={{ marginTop: '20px', paddingBottom: '20px' }}>
+                {!loading && hasMore && rooms.length > 0 && (
                     <button onClick={handleLoadMore} className="btn-loadMore">
                         Show More Rooms
                     </button>
                 )}
-
-                {!hasMore && rooms.length > 0 && (
-                    <p className="text-error">Bạn đã xem hết danh sách phòng.</p>
+                {!loading && !hasMore && rooms.length > 0 && (
+                    <p className="text-muted">Bạn đã xem hết danh sách phòng.</p>
+                )}
+                {!loading && rooms.length === 0 && (
+                    <div className="empty-state">
+                        <i className='bx bx-search-alt' style={{fontSize: '40px', color: '#ccc'}}></i>
+                        <p className="text-muted">Không tìm thấy phòng nào phù hợp.</p>
+                    </div>
                 )}
             </div>
         </div>
