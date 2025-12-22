@@ -1,55 +1,54 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
-import { axiosClient } from "../api/axiosClient";
+import { loginAPI, registerAPI } from "../services/authService"; 
 
 const AuthContext = createContext(null);
-const LS_KEY = "hm_token";
+const LS_KEY = "hm_token"; 
 
 const initialState = {
   accessToken: null,
-  user: null, // { username, accountTypeID, accountTypeName, exp }
+  user: null, 
   isAuthenticated: false,
   loading: true,
 };
 
 function parseAccessToken(token) {
-  const p = jwtDecode(token);
-  return {
-    username: p.username,
-    accountTypeID: p.accountTypeID,
-    accountTypeName: p.accountTypeName,
-    exp: p.exp, // seconds
-  };
+  try {
+    const p = jwtDecode(token);
+    return {
+      username: p.username,
+      accountTypeID: p.accountTypeID,
+      accountTypeName: p.accountTypeName,
+      exp: p.exp, 
+    };
+  } catch (e) {
+    return null;
+  }
 }
 
 function isExpired(expSeconds) {
   if (!expSeconds) return true;
-  const now = Math.floor(Date.now() / 1000);
-  return now >= expSeconds;
+  return Math.floor(Date.now() / 1000) >= expSeconds;
 }
 
 function reducer(state, action) {
   switch (action.type) {
     case "SET_TOKEN": {
       const token = action.payload;
-
       if (token) localStorage.setItem(LS_KEY, token);
       else localStorage.removeItem(LS_KEY);
 
       const user = token ? parseAccessToken(token) : null;
-
       return {
         ...state,
         accessToken: token,
         user,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         loading: false,
       };
     }
-
     case "DONE_LOADING":
       return { ...state, loading: false };
-
     default:
       return state;
   }
@@ -62,56 +61,54 @@ export function AuthProvider({ children }) {
     dispatch({ type: "SET_TOKEN", payload: token });
   }, []);
 
+  // --- LOGIN ---
   const login = useCallback(async ({ username, password }) => {
-    // Backend bạn: POST /api/auth/login -> { token, accountTypeID, accountTypeName }
-    const res = await axiosClient.post("/api/auth/login", { username, password });
-
-    const token = res.data?.token;
-    if (!token) throw new Error("Login response không có token");
-
-    setToken(token);
-    return res.data;
+    // 1. Gọi API
+    const res = await loginAPI({ username, password });
+    const data = res.data; 
+    
+    // 2. Lưu token vào Context & LocalStorage
+    if (data?.token) {
+        setToken(data.token);
+    }
+    return data; // Trả data về để Login.jsx xử lý điều hướng
   }, [setToken]);
 
-  const register = useCallback(async ({ username, password }) => {
-    // Backend bạn: POST /api/auth/register
-    const res = await axiosClient.post("/api/auth/register", { username, password });
+  // --- REGISTER ---
+  const register = useCallback(async (registerData) => {
+    const res = await registerAPI(registerData);
     return res.data;
   }, []);
 
+  // --- LOGOUT ---
   const logout = useCallback(() => {
     setToken(null);
+    // window.location.href = "/login"; // Tùy chọn nếu muốn reload sạch sẽ
   }, [setToken]);
 
-  // Hydrate khi reload app
+  // --- AUTO LOAD TOKEN KHI F5 ---
   useEffect(() => {
     const token = localStorage.getItem(LS_KEY);
     if (!token) {
       dispatch({ type: "DONE_LOADING" });
       return;
     }
-
-    try {
-      const user = parseAccessToken(token);
-      if (isExpired(user.exp)) {
-        localStorage.removeItem(LS_KEY);
-        dispatch({ type: "DONE_LOADING" });
-        return;
-      }
-      setToken(token);
-    } catch {
+    const user = parseAccessToken(token);
+    // Nếu token hết hạn thì xóa luôn
+    if (!user || isExpired(user.exp)) {
       localStorage.removeItem(LS_KEY);
-      dispatch({ type: "DONE_LOADING" });
+      dispatch({ type: "SET_TOKEN", payload: null });
+    } else {
+      dispatch({ type: "SET_TOKEN", payload: token });
     }
-  }, [setToken]);
+  }, []);
 
   const value = useMemo(() => ({
     ...state,
     login,
     register,
     logout,
-    setToken,
-  }), [state, login, register, logout, setToken]);
+  }), [state, login, register, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -26,3 +26,4 @@ export function hasRole(user, allowedRoles = []) {
     const userRoles = expandRoles(user?.accountTypeName);
     return allowedRoles.map(norm).some((r) => userRoles.includes(r));
 }
+    
