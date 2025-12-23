@@ -132,6 +132,25 @@ export { surchargeDefault };
         } catch (error) {
             throw new Error('Failed to fetch receptionists: ' + error.message);
         }
+    },
+
+    // Delete Receptionist account
+    deleteReceptionist: async (username) => {
+        try {
+            const deleted = await SettingsModel.deleteReceptionist(username);
+            if (deleted) {
+                return {
+                    deleted: true,
+                    message: `Receptionist account '${username}' deleted successfully`
+                };
+            }
+            return {
+                deleted: false,
+                message: 'Failed to delete account'
+            };
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 };
 

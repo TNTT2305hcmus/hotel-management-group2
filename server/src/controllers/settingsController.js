@@ -95,3 +95,35 @@ export const getReceptionists = async (req, res) => {
         });
     }
 };
+
+export const deleteReceptionist = async (req, res) => {
+    try {
+        const { username } = req.params;
+        
+        if (!username) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username is required'
+            });
+        }
+        
+        const result = await SettingsService.deleteReceptionist(username);
+        
+        res.status(200).json({
+            success: true,
+            message: result.message,
+            data: result
+        });
+    } catch (error) {
+        console.error('Error deleting receptionist:', error.message);
+        
+        // Return appropriate status code
+        const statusCode = error.message.includes('not found') ? 404 : 
+                          error.message.includes('Can only delete') ? 403 : 500;
+        
+        res.status(statusCode).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

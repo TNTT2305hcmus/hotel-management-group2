@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSettings, updateSurcharge, resetSurcharge, getReceptionists } from '../controllers/settingsController.js';
+import { getSettings, updateSurcharge, resetSurcharge, getReceptionists, deleteReceptionist } from '../controllers/settingsController.js';
 
 const router = express.Router();
 
@@ -14,5 +14,8 @@ router.post('/surcharge/reset', resetSurcharge);
 
 // GET /api/settings/receptionists - Get list of receptionist accounts
 router.get('/receptionists', getReceptionists);
+
+// DELETE /api/settings/receptionists/:username - Delete a receptionist account
+router.delete('/receptionists/:username', deleteReceptionist);
 
 export default router;
