@@ -5,6 +5,7 @@ import cors from 'cors';
 import { connectDB } from './config/database.js'; 
 import authRoutes from './routes/authRoutes.js';
 import roomRoutes from './routes/roomRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js'
 
 // Load environment variables at the very beginning
 dotenv.config();
@@ -29,6 +30,9 @@ app.use('/api/auth', authRoutes);
 
 // Room Routes
 app.use('/api/rooms', roomRoutes);
+
+//Setting Routes
+app.use('/api/settings',settingsRoutes)
 
 // 4. Start Server
 app.listen(PORT, () => {
