@@ -50,6 +50,7 @@ CREATE TABLE ACCOUNT (
     Username VARCHAR(50) PRIMARY KEY,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
+    Phone VARCHAR(15),
     AccountTypeID INT NOT NULL 
 );
 
@@ -109,10 +110,10 @@ INSERT INTO ACCOUNT_TYPE (AccountTypeID, AccountTypeName) VALUES
 
 -- 2. Insert Accounts
 -- Lưu ý: Mật khẩu này chỉ là ví dụ hash, thực tế bạn cần dùng bcrypt trong code để tạo
-INSERT INTO ACCOUNT (Username, Email, Password, AccountTypeID) VALUES 
-('admin', 'admin@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 1), 
-('staff1', 'staff1@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
-('staff2', 'staff2@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2);
+INSERT INTO ACCOUNT (Username, Email, Password, Phone, AccountTypeID) VALUES 
+('admin', 'admin@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0901234567', 1), 
+('staff1', 'staff1@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0912345678', 2), 
+('staff2', 'staff2@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0923456789', 2);
 
 -- 3. Insert Customer Types
 INSERT INTO CUSTOMER_TYPE (CustomerTypeID, CustomerTypeName) VALUES 

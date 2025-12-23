@@ -2,10 +2,10 @@ import authServices from '../services/authServices.js';
 
 async function controllersRegister(req, res) {
   try {
-    const { username, password, email, accountTypeID } = req.body;
+    const { username, password, email, phone, accountTypeID } = req.body;
 
     // Gọi service
-    await authServices.register(username, password, email, accountTypeID);
+    await authServices.register(username, password, email, phone, accountTypeID);
 
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
