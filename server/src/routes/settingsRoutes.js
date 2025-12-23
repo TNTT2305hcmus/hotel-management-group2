@@ -1,5 +1,5 @@
 import express from 'express';
-import { getSettings, updateSurcharge, resetSurcharge } from '../controllers/settingsController.js';
+import { getSettings, updateSurcharge, resetSurcharge, getReceptionists } from '../controllers/settingsController.js';
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.put('/surcharge', updateSurcharge);
 
 // POST /api/settings/surcharge/reset - Reset surcharge to default values
 router.post('/surcharge/reset', resetSurcharge);
+
+// GET /api/settings/receptionists - Get list of receptionist accounts
+router.get('/receptionists', getReceptionists);
 
 export default router;

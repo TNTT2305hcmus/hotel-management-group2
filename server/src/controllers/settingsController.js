@@ -77,3 +77,21 @@ export const resetSurcharge = async (req, res) => {
         });
     }
 };
+
+export const getReceptionists = async (req, res) => {
+    try {
+        const receptionists = await SettingsService.getReceptionists();
+        
+        res.status(200).json({
+            success: true,
+            data: receptionists
+        });
+    } catch (error) {
+        console.error('Error fetching receptionists:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch receptionist list',
+            error: error.message
+        });
+    }
+};

@@ -122,6 +122,16 @@ export { surchargeDefault };
         } catch (error) {
             throw new Error('Failed to reset surcharge settings: ' + error.message);
         }
+    },
+
+    // Get list of Receptionist accounts
+    getReceptionists: async () => {
+        try {
+            const receptionists = await SettingsModel.getReceptionists();
+            return receptionists;
+        } catch (error) {
+            throw new Error('Failed to fetch receptionists: ' + error.message);
+        }
     }
 };
 
