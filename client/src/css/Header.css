@@ -1,0 +1,99 @@
+.hm-header {
+    height: 80px;
+    background: #2f4f99;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+}
+
+.hm-header__left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.hm-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 12px;
+    border-right: 1px solid rgba(255, 255, 255, .22);
+}
+
+.hm-brand__logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 52px;
+}
+
+.hm-brand__text {
+    line-height: 1;
+}
+
+.hm-brand__title {
+    font-weight: 650;
+    font-size: 25px;
+    letter-spacing: .6px;
+}
+
+.hm-header__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hm-userpill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #111;
+    border-radius: 999px;
+    padding: 6px 10px;
+    border: 1px solid rgba(0, 0, 0, .08);
+}
+
+.hm-userpill__avatar {
+    font-size: 40px;
+    color: #111;
+    opacity: .9;
+}
+
+.hm-userpill__info {
+    line-height: 1.05;
+    text-align: left;
+}
+
+.hm-userpill__name {
+    font-weight: 750;
+    font-size: 20px;
+}
+
+.hm-userpill__role {
+    margin-top: 2px;
+    font-size: 18px;
+    opacity: .9;
+}
+
+.hm-bell {
+    width: 50px;
+    height: 50px;
+    font-size: 30px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .25);
+    background: rgba(255, 255, 255, .10);
+    color: #fff;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.hm-bell:hover {
+    background: rgba(255, 255, 255, .16);
+}

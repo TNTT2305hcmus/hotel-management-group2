@@ -1,57 +1,61 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { sql } from '../config/database.js';
+import pool from '../config/database.js';
 
-// In-memory store for mock OTPs; in production replace with DB/Redis
+// Mock OTP Store
 const otpStore = new Map();
 
-async function register(username, password, accountTypeID = 2) {
+async function register(username, password, email, accountTypeID = 2) {
     try {
-        // Encrypt password
-        const hashedPassword = bcrypt.hashSync(password, 10);
+        // 1. Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
         
-        // Insert into database
-        const pool = await sql.connect();
-        await pool.request()
-            .input('Username', sql.VarChar(50), username)
-            .input('Password', sql.VarChar(255), hashedPassword)
-            .input('AccountTypeID', sql.Int, accountTypeID)
-            .query('INSERT INTO ACCOUNT (Username, Password, AccountTypeID) VALUES (@Username, @Password, @AccountTypeID)');
+        // 2. MySQL Query: Add Email column
+        const query = `
+            INSERT INTO ACCOUNT (Username, Password, Email, AccountTypeID) 
+            VALUES (?, ?, ?, ?)
+        `;
+        
+        // 3. Execute query (Remember to pass all 4 parameters in correct order)
+        await pool.query(query, [username, hashedPassword, email, accountTypeID]);
         
         return { success: true, message: 'User registered successfully' };
     } catch (error) {
+        // Check for duplicate Email or Username (MySQL Error 1062)
+        if (error.code === 'ER_DUP_ENTRY') {
+             throw new Error('Username or Email already exists!');
+        }
         throw new Error('Registration failed: ' + error.message);
     }
 }
 
 async function login(username, password) {
     try {
-        // Query user from database
-        const pool = await sql.connect();
-        const result = await pool.request()
-            .input('Username', sql.VarChar(50), username)
-            .query(`
-                SELECT a.Username, a.Password, a.AccountTypeID, at.AccountTypeName
-                FROM ACCOUNT a
-                JOIN ACCOUNT_TYPE at ON a.AccountTypeID = at.AccountTypeID
-                WHERE a.Username = @Username
-            `);
+        const query = `
+            SELECT a.Username, a.Password, a.AccountTypeID, at.AccountTypeName
+            FROM ACCOUNT a
+            JOIN ACCOUNT_TYPE at ON a.AccountTypeID = at.AccountTypeID
+            WHERE a.Username = ?
+        `;
+        
+        const [rows] = await pool.query(query, [username]);
         
         // Check if user exists
-        if (result.recordset.length === 0) {
+        if (rows.length === 0) {
             throw new Error('Invalid username or password');
         }
         
-        const user = result.recordset[0];
+        const user = rows[0];
         
-        // Verify password
-        const isPasswordValid = bcrypt.compareSync(password, user.Password);
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, user.Password);
         if (!isPasswordValid) {
             throw new Error('Invalid username or password');
         }
         
-        // Generate JWT token
+        // Generate Token
         const token = jwt.sign(
             { 
                 username: user.Username, 
@@ -72,34 +76,30 @@ async function login(username, password) {
     }
 }
 
-// Mock forgot-password flow: verify email exists and return a mock OTP (no email sent)
 async function forgotPassword(email) {
     try {
-        const pool = await sql.connect();
-        const result = await pool.request()
-            .input('Email', sql.VarChar(255), email)
-            .query('SELECT Username FROM ACCOUNT WHERE Email = @Email');
+        const query = 'SELECT Username FROM ACCOUNT WHERE Email = ?';
+        const [rows] = await pool.query(query, [email]);
 
-        if (result.recordset.length === 0) {
+        if (rows.length === 0) {
             throw new Error('Email not found');
         }
 
         const otp = crypto.randomInt(100000, 999999).toString();
-        const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+        const expiresAt = Date.now() + 15 * 60 * 1000;
 
-        otpStore.set(email, { otp, expiresAt, username: result.recordset[0].Username });
+        otpStore.set(email, { otp, expiresAt, username: rows[0].Username });
 
         return {
-            message: 'Mock OTP generated. In production, this would be emailed to the user.',
-            username: result.recordset[0].Username,
-            mockOtp: otp // keep in response for demo; also logged in controller
+            message: 'Mock OTP generated.',
+            username: rows[0].Username,
+            mockOtp: otp 
         };
     } catch (error) {
         throw new Error(error.message);
     }
 }
 
-// Verify OTP and reset password
 async function resetPasswordWithOtp(email, otp, newPassword) {
     try {
         const entry = otpStore.get(email);
@@ -117,13 +117,11 @@ async function resetPasswordWithOtp(email, otp, newPassword) {
             throw new Error('Invalid OTP');
         }
 
-        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        const pool = await sql.connect();
-        await pool.request()
-            .input('Email', sql.VarChar(255), email)
-            .input('Password', sql.VarChar(255), hashedPassword)
-            .query('UPDATE ACCOUNT SET Password = @Password WHERE Email = @Email');
+        const query = 'UPDATE ACCOUNT SET Password = ? WHERE Email = ?';
+        await pool.query(query, [hashedPassword, email]);
 
         otpStore.delete(email);
 
@@ -133,4 +131,5 @@ async function resetPasswordWithOtp(email, otp, newPassword) {
     }
 }
 
+// Export default Object as before
 export default { register, login, forgotPassword, resetPasswordWithOtp };

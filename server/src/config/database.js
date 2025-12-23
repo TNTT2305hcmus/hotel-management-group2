@@ -1,29 +1,36 @@
-import sql from 'mssql';
+import mysql from 'mysql2/promise'; // Using mysql2 to support async/await
+import dotenv from 'dotenv';
 
-// Lấy thông tin từ biến môi trường (đã được nạp qua --env-file hoặc dotenv)
-const config = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    server: process.env.DB_SERVER, 
-    database: process.env.DB_DATABASE,
-    port: parseInt(process.env.DB_PORT) || 1433,
-    options: {
-        encrypt: true, // Bắt buộc nếu dùng Azure, local thì true/false đều ok
-        trustServerCertificate: true // QUAN TRỌNG: Để true để chạy local không lỗi SSL
-    }
-};
+// Load environment variables from .env file
+dotenv.config(); 
 
+// Create a connection Pool (Better than a single connection)
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'HOTEL_MANAGEMENT',
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+// Function to check connection (to be called in server.js)
 export const connectDB = async () => {
     try {
-        // Tạo pool kết nối để dùng lại, tránh mở quá nhiều kết nối
-        const pool = await sql.connect(config);
-        console.log("✅ Kết nối SQL Server thành công!");
-        return pool;
+        const connection = await pool.getConnection();
+        console.log("✅ MySQL CONNECTION SUCCESSFUL!");
+        connection.release(); // Release connection back to the pool immediately
     } catch (err) {
-        console.error("❌ Lỗi kết nối Database:", err.message);
-        process.exit(1); // Dừng server nếu không kết nối được DB
+        console.error("❌ DATABASE CONNECTION ERROR:", err.message);
+        // Check if it's a password error or if Docker is not running
+        if (err.code === 'ECONNREFUSED') {
+            console.error("Check if Docker MySQL is running?");
+        }
+        process.exit(1);
     }
 };
 
-// Xuất sql để dùng ở các nơi khác (Model/Controller)
-export { sql };
+// Export pool for use in other Model/Service files
+export default pool;

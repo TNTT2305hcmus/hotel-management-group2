@@ -1,0 +1,117 @@
+.room-card {
+  width: 320px;
+  height: 350px;
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid transparent;
+  margin-bottom: 30px;
+}
+
+.room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Phần hình ảnh */
+.image-container {
+  position: relative;
+  height: 160px;
+  width: 100%;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Badge trạng thái */
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.green { background: var(--green-bg); color: var(--green-text); }
+.status-badge.red   { background: var(--red-bg); color: var(--red-text); }
+.status-badge.yellow{ background: var(--yellow-bg); color: var(--yellow-text); }
+
+/* Số phòng */
+.room-number {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.9);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Phần thông tin chi tiết */
+.detail-infor {
+  padding: 15px;
+}
+
+.detail-infor p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-infor strong {
+  color: var(--text-color);
+}
+
+/* Button */
+.action-btn {
+  padding: 15px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn button {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  background: white;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.action-btn button:first-child:hover {
+  background: #f8fafc;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.action-btn button:last-child {
+  color: #ef4444;
+}
+.action-btn button:last-child:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+.skeleton-img {
+  border-radius: 10px; 
+  width: 100%;
+  display: block;
+}

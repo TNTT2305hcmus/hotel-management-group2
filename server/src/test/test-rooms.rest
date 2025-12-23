@@ -1,89 +1,78 @@
-### GET all rooms
-GET http://localhost:5000/api/rooms
+@url = http://localhost:5000
+@roomUrl = {{url}}/api/rooms
 
-###
+### 1. GET all rooms
+GET {{roomUrl}}
 
-### Filter by status - Available rooms
-GET http://localhost:5000/api/rooms/by-status?status=Available
+### ---------------------------------------------------
+### FILTER BY STATUS
+### ---------------------------------------------------
 
-###
+### 2. Filter - Available rooms
+GET {{roomUrl}}?status=Available
 
-### Filter by status - Occupied rooms
-GET http://localhost:5000/api/rooms/by-status?status=Occupied
+### 3. Filter - Occupied rooms
+GET {{roomUrl}}?status=Occupied
 
-###
+### 4. Filter - Maintenance rooms
+GET {{roomUrl}}?status=Maintenance
 
-### Filter by status - Maintenance rooms
-GET http://localhost:5000/api/rooms/by-status?status=Maintenance
+### ---------------------------------------------------
+### FILTER BY TYPE
+### Note: Filtering by ID (1, 2...) is more standard for backend than by name
+### Mapping: 1=Single, 2=Double, 3=Deluxe, 4=Luxury
+### ---------------------------------------------------
 
-###
+### 5. Filter - Single Room (Type ID = 1)
+GET {{roomUrl}}?type=1
 
-### Filter by room type - Single Room
-GET http://localhost:5000/api/rooms/by-type?type=Single Room
+### 6. Filter - Double Room (Type ID = 2)
+GET {{roomUrl}}?type=2
 
-###
+### 7. Filter - Standard Room (Type ID = 3)
+GET {{roomUrl}}?type=3
 
-### Filter by room type - Double Room
-GET http://localhost:5000/api/rooms/by-type?type=Double Room
+### 8. Filter - Luxury Room (Type ID = 4)
+GET {{roomUrl}}?type=4
 
-###
+### ---------------------------------------------------
+### COMBINE FILTERS
+### ---------------------------------------------------
 
-### Filter by room type - Standard Room
-GET http://localhost:5000/api/rooms/by-type?type=Standard Room
+### 9. Available AND Single Room (ID 1)
+GET {{roomUrl}}?status=Available&type=1
 
-###
+### 10. Available AND Double Room (ID 2)
+GET {{roomUrl}}?status=Available&type=2
 
-### Filter by room type - Luxury Room
-GET http://localhost:5000/api/rooms/by-type?type=Luxury Room
+### 11. Occupied AND Standard Room (ID 3)
+GET {{roomUrl}}?status=Occupied&type=3
 
-###
+### 12. Maintenance AND Single Room (ID 1)
+GET {{roomUrl}}?status=Maintenance&type=1
 
-### Filter by status AND type - Available Single Rooms
-GET http://localhost:5000/api/rooms/by-status-and-type?status=Available&type=Single Room
+### ---------------------------------------------------
+### TEST EDGE CASES
+### ---------------------------------------------------
 
-###
+### 13. Test invalid status (Should return an empty list [])
+GET {{roomUrl}}?status=InvalidStatusName
 
-### Filter by status AND type - Available Double Rooms
-GET http://localhost:5000/api/rooms/by-status-and-type?status=Available&type=Double Room
+### 14. Test missing parameters (Should return all rooms by default)
+GET {{roomUrl}}
 
-###
+### ---------------------------------------------------
+### ADD NEW ROOM
+### ---------------------------------------------------
 
-### Filter by status AND type - Occupied Standard Rooms
-GET http://localhost:5000/api/rooms/by-status-and-type?status=Occupied&type=Standard Room
-
-###
-
-### Filter by status AND type - Maintenance rooms (any type)
-GET http://localhost:5000/api/rooms/by-status-and-type?status=Maintenance&type=Single Room
-
-###
-
-### Test invalid status (should return empty or error)
-GET http://localhost:5000/api/rooms/by-status?status=InvalidStatus
-
-###
-
-### Test missing status parameter (should return error)
-GET http://localhost:5000/api/rooms/by-status
-
-###
-
-### Test missing type parameter (should return error)
-GET http://localhost:5000/api/rooms/by-type
-
-###
-
-### Test missing both parameters (should return error)
-GET http://localhost:5000/api/rooms/by-status-and-type
-
-### Test add new room
-POST http://localhost:5000/api/rooms
+### 15. Add new room
+POST {{roomUrl}}
 Content-Type: application/json
 
 {
     "id": 401,
     "typeId": 1,
     "status": "Available",
-    "note": "Phòng Test API",
+    "note": "Full API Test Room",
     "image": "https://images.unsplash.com/photo-1590490360182-c33d57733427"
 }

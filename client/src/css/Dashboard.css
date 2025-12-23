@@ -1,0 +1,71 @@
+.room-management-page {
+  padding: 2rem 4rem; 
+  min-height: 100vh;
+}
+
+.header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 50px;
+  font-weight: bold;
+  color: #000;
+}
+
+.btn-add {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.btn-add:hover {
+  opacity: 0.8;
+}
+
+.room-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.btn-loadMore {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 10px 30px;
+  border-radius: 30px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.btn-loadMore:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.text-error {
+  color: #888;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.loading-text {
+  color: #3b82f6;
+  font-weight: bold;
+  font-size: 30px;
+}

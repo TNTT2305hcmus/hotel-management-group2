@@ -1,0 +1,211 @@
+/* --- Main Layout Container --- */
+.login-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Ngăn cuộn trang */
+}
+
+/* --- Image Section (Left/Right Side) --- */
+.login-image-section {
+  flex: 1.2; /* Chiếm 60% không gian nếu màn hình rộng */
+  position: relative;
+  overflow: hidden;
+  background-color: #000; /* Nền đen lót dưới ảnh */
+}
+
+.login-image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh phủ kín khung mà không bị méo */
+  opacity: 0.9; /* Làm tối ảnh một chút để đỡ chói */
+  transition: transform 10s ease; /* Hiệu ứng zoom nhẹ khi load */
+}
+
+/* Hiệu ứng zoom nhẹ cho ảnh cho cảm giác sang trọng */
+.login-image-section:hover img {
+  transform: scale(1.05);
+}
+
+/* --- Form Section (Right Side) --- */
+.login-form-section {
+  flex: 1; /* Chiếm phần còn lại */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  background-color: #ffffff;
+}
+
+/* --- Login Card --- */
+.login-card {
+  width: 100%;
+  max-width: 420px; /* Giới hạn chiều rộng card */
+  padding: 40px;
+  background: #ffffff;
+  /* Loại bỏ border cứng, dùng shadow mềm */
+  /* border: 1px solid #eee; */ 
+  display: flex;
+  flex-direction: column;
+  /* Animation xuất hiện nhẹ */
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-card h1 {
+  text-align: left; /* Canh trái nhìn hiện đại hơn */
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 32px; /* Giảm size cho cân đối */
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+/* --- Form Elements --- */
+.login-card label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  margin-top: 24px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.login-card input:focus {
+  background-color: #fff;
+  border-color: #000; /* Highlight viền đen khi focus */
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05); /* Shadow nhẹ xung quanh */
+}
+
+/* --- Password Box --- */
+.password-box {
+  position: relative;
+  width: 100%;
+}
+
+.password-box input {
+  padding-right: 45px; /* Chừa chỗ cho icon mắt */
+}
+
+.eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #888;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.eye-icon:hover {
+  color: #333;
+}
+
+/* --- Options Row (Forgot pass) --- */
+.row-options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Đẩy forgot pass sang phải */
+  margin-top: 15px;
+  margin-bottom: 35px;
+}
+
+.forgot-link {
+  font-size: 14px;
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* --- Login Button --- */
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background: #1a1a1a; /* Màu đen sang trọng */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-btn:hover {
+  background: #333;
+  transform: translateY(-2px); /* Nổi lên nhẹ khi hover */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- Error Message --- */
+.login-card p {
+  background-color: #fff0f0;
+  color: #d32f2f !important;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ffcdd2;
+  font-weight: 500;
+}
+
+/* --- Responsive Design (Mobile) --- */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .login-image-section {
+    display: none; /* Ẩn ảnh trên mobile để tập trung form */
+    /* Hoặc có thể để height: 200px nếu muốn hiện 1 phần ảnh */
+  }
+
+  .login-form-section {
+    background-color: #fff; /* Full trắng trên mobile */
+    padding: 20px;
+  }
+
+  .login-card {
+    box-shadow: none; /* Bỏ shadow trên mobile cho phẳng */
+    padding: 0;
+  }
+  
+  .login-card h1 {
+    font-size: 28px;
+    text-align: center;
+  }
+}

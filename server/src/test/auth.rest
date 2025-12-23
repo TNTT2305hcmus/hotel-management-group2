@@ -1,41 +1,42 @@
-### GET /
-GET http://localhost:8888/
+@url = http://localhost:5000
 
-### Register a user POST /api/auth/register
-POST http://localhost:8888/api/auth/register
+### 1. Check Server Health
+GET {{url}}/
+
+### 2. Register New Account (IMPORTANT: Email required for password recovery test)
+POST {{url}}/api/auth/register
 Content-Type: application/json
 
 {
-  "username": "minhthangzxcv@gmail.com",
-  "password": "minhthang123"
+  "username": "minhthang",
+  "password": "minhthang123",
+  "email": "admin@hotel.com", 
+  "accountTypeID": 2
 }
 
-
-### Login a user POST /api/auth/login
-POST http://localhost:8888/api/auth/login
+### 3. Login
+POST {{url}}/api/auth/login
 Content-Type: application/json
 
 {
-  "username": "minhthangzxcv@gmail.com",
+  "username": "minhthang",
   "password": "minhthang123"
 }
 
-### Test Forgot Password API
-POST http://localhost:5000/api/auth/forgot-password
+### 4. Forgot Password (Use the email registered in step 2)
+POST {{url}}/api/auth/forgot-password
 Content-Type: application/json
 
 {
   "email": "admin@hotel.com"
 }
 
-###
-
-### Test Reset Password API (replace OTP with value from console log)
-POST http://localhost:5000/api/auth/reset-password
+### 5. Reset Password (Get OTP from Server Terminal and paste here)
+POST {{url}}/api/auth/reset-password
 Content-Type: application/json
 
 {
   "email": "admin@hotel.com",
-  "otp": "968508",
-  "newPassword": "newpassword@123"
+  "otp": "123456", 
+  "newPassword": "newpassword999"
 }

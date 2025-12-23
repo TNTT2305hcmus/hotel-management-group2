@@ -2,9 +2,10 @@ import authServices from '../services/authServices.js';
 
 async function controllersRegister(req, res) {
   try {
-    const { username, password, accountTypeID } = req.body;
+    const { username, password, email, accountTypeID } = req.body;
 
-    await authServices.register(username, password, accountTypeID);
+    // Gọi service
+    await authServices.register(username, password, email, accountTypeID);
 
     return res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
@@ -13,7 +14,6 @@ async function controllersRegister(req, res) {
   }
 }
 
-// Use token returned from service
 async function controllersLogin(req, res) {
   try {
     const { username, password } = req.body;
@@ -33,7 +33,6 @@ async function controllersForgotPassword(req, res) {
 
     const data = await authServices.forgotPassword(email);
 
-    // Log OTP to console for mock flow
     if (data?.mockOtp) {
       console.log(`[ForgotPassword] email: ${email}, otp: ${data.mockOtp}`);
     }
@@ -58,4 +57,10 @@ async function controllersResetPassword(req, res) {
   }
 }
 
-export default { controllersRegister, controllersLogin, controllersForgotPassword, controllersResetPassword };
+// Export default Object để khớp với file Routes cũ của bạn
+export default { 
+    controllersRegister, 
+    controllersLogin, 
+    controllersForgotPassword, 
+    controllersResetPassword 
+};

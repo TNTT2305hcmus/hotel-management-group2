@@ -1,74 +1,66 @@
-import { sql } from '../config/database.js';
+import RoomModel from '../models/roomModel.js';
 
-// Get all rooms
-const getAllRoomsService = async () => {
-    const result = await sql.query(`
-        SELECT 
-            R.RoomID AS id, 
-            CAST(R.RoomID AS VARCHAR) AS roomNumber, 
-            RT.RoomTypeName AS type, 
-            RT.MaxGuests AS capacity,                
-            RT.Price AS price, 
-            R.Status AS status, 
-            R.ImageURL AS image                  
-        FROM ROOM R
-        INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
-    `);
-    return result.recordset;
+export const getAllRoomsService = async (page, limit, search, typeId, status) => {
+    try {
+        const offset = (page - 1) * limit;
+        const params = [];
+        let whereClause = "WHERE 1=1"; 
+
+        // Build filter logic
+        if (search) {
+            whereClause += " AND R.RoomID LIKE ?";
+            params.push(`%${search}%`);
+        }
+        if (status) {
+            whereClause += " AND R.Status = ?";
+            params.push(status);
+        }
+        if (typeId) {
+            whereClause += " AND R.RoomTypeID = ?";
+            params.push(typeId);
+        }
+
+        // Call Model to fetch data in parallel
+        const [rooms, total] = await Promise.all([
+            RoomModel.findRooms(Number(limit), Number(offset), whereClause, params),
+            RoomModel.countRooms(whereClause, params)
+        ]);
+
+        return {
+            data: rooms,
+            pagination: {
+                page: Number(page),
+                limit: Number(limit),
+                totalRows: total,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
+    } catch (error) {
+        throw error;
+    }
 };
 
-// Filter rooms by status
-const getRoomsByStatusService = async (status) => {
-    const result = await sql.query(`
-        SELECT 
-            R.RoomID AS id, 
-            CAST(R.RoomID AS VARCHAR) AS roomNumber, 
-            RT.RoomTypeName AS type, 
-            RT.MaxGuests AS capacity,                
-            RT.Price AS price, 
-            R.Status AS status, 
-            R.ImageURL AS image                  
-        FROM ROOM R
-        INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
-        WHERE R.Status = '${status}'
-    `);
-    return result.recordset;
+export const createRoomService = async (data) => {
+    return await RoomModel.create(data);
 };
 
-// Filter rooms by room type (RoomTypeName)
-const getRoomsByTypeService = async (roomType) => {
-    const result = await sql.query(`
-        SELECT 
-            R.RoomID AS id, 
-            CAST(R.RoomID AS VARCHAR) AS roomNumber, 
-            RT.RoomTypeName AS type, 
-            RT.MaxGuests AS capacity,                
-            RT.Price AS price, 
-            R.Status AS status, 
-            R.ImageURL AS image                  
-        FROM ROOM R
-        INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
-        WHERE RT.RoomTypeName = '${roomType}'
-    `);
-    return result.recordset;
-};
 
-// Filter rooms by both status and room type
-const getRoomsByStatusAndTypeService = async (status, roomType) => {
-    const result = await sql.query(`
-        SELECT 
-            R.RoomID AS id, 
-            CAST(R.RoomID AS VARCHAR) AS roomNumber, 
-            RT.RoomTypeName AS type, 
-            RT.MaxGuests AS capacity,                
-            RT.Price AS price, 
-            R.Status AS status, 
-            R.ImageURL AS image                  
-        FROM ROOM R
-        INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
-        WHERE R.Status = '${status}' AND RT.RoomTypeName = '${roomType}'
-    `);
-    return result.recordset;
+export const getRoomStatsService = async () => {
+    const rows = await RoomModel.getStats();
+    
+    // Trả về JSON { available: x, occupied: y, maintenance: z }
+    const stats = {
+        available: 0,
+        occupied: 0,
+        maintenance: 0
+    };
+
+    rows.forEach(row => {
+        const statusKey = row.Status.toLowerCase();
+        if (stats.hasOwnProperty(statusKey)) {
+            stats[statusKey] = row.total;
+        }
+    });
+
+    return stats;
 };
-// Export all services
-export { getAllRoomsService, getRoomsByStatusService, getRoomsByTypeService, getRoomsByStatusAndTypeService };
