@@ -119,7 +119,6 @@ const Dashboard = () => {
                 <button className="btn-add"><i className='bx bx-plus'></i> Add New Room</button>
             </div>
 
-            {/* Truyền stats vào component con */}
             <StatusSummary stats={stats} isLoading={false} />
             
             <FilterBar

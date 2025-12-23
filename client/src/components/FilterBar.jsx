@@ -15,9 +15,10 @@ const FilterBar = ({ onSearch, onFilterType, onFilterStatus }) => {
       {/* Dropdown Loại phòng */}
       <select onChange={(e) => onFilterType(e.target.value)}>
         <option value="">All Room Types</option>
-        <option value="Single">Single</option>
-        <option value="Double">Double</option>
-        <option value="Deluxe">Deluxe</option>
+        <option value="1">Single</option>
+        <option value="2">Double</option>
+        <option value="3">Standard</option>
+        <option value="4">Luxury</option>
       </select>
 
       {/* Dropdown Trạng thái */}

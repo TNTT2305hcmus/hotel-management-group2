@@ -41,7 +41,6 @@ export const getAllRoomsService = async (page, limit, search, typeId, status) =>
 };
 
 export const createRoomService = async (data) => {
-    // Business validation logic can be added here
     return await RoomModel.create(data);
 };
 
@@ -49,8 +48,7 @@ export const createRoomService = async (data) => {
 export const getRoomStatsService = async () => {
     const rows = await RoomModel.getStats();
     
-    // Format lại dữ liệu cho đẹp để Client dễ dùng
-    // Default values
+    // Trả về JSON { available: x, occupied: y, maintenance: z }
     const stats = {
         available: 0,
         occupied: 0,
@@ -58,7 +56,7 @@ export const getRoomStatsService = async () => {
     };
 
     rows.forEach(row => {
-        const statusKey = row.Status.toLowerCase(); // 'Available' -> 'available'
+        const statusKey = row.Status.toLowerCase();
         if (stats.hasOwnProperty(statusKey)) {
             stats[statusKey] = row.total;
         }
