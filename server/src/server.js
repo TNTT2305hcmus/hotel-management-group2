@@ -1,11 +1,12 @@
-import express from 'express';
-import dotenv from 'dotenv'; 
-import cors from 'cors';
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
 
-import { connectDB } from './config/database.js'; 
-import authRoutes from './routes/authRoutes.js';
-import roomRoutes from './routes/roomRoutes.js';
-import settingsRoutes from './routes/settingsRoutes.js'
+import { connectDB } from "./config/database.js";
+import authRoutes from "./routes/authRoutes.js";
+import roomRoutes from "./routes/roomRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
+import checkInRoutes from "./routes/checkInRoutes.js";
 
 // Load environment variables at the very beginning
 dotenv.config();
@@ -17,24 +18,27 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // 2. Middleware
-app.use(cors()); 
-app.use(express.json()); 
+app.use(cors());
+app.use(express.json());
 
 // 3. Routes
-app.get('/', (req, res) => {
-    res.send('SERVER IS RUNNING - HOTEL MANAGEMENT API');
+app.get("/", (req, res) => {
+  res.send("SERVER IS RUNNING - HOTEL MANAGEMENT API");
 });
 
 // Auth Routes
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Room Routes
-app.use('/api/rooms', roomRoutes);
+app.use("/api/rooms", roomRoutes);
 
 //Setting Routes
-app.use('/api/settings',settingsRoutes)
+app.use("/api/settings", settingsRoutes);
+
+// Check-in Routes
+app.use("/api/check-in", checkInRoutes);
 
 // 4. Start Server
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running at http://localhost:${PORT}`);
+  console.log(`🚀 Server is running at http://localhost:${PORT}`);
 });
