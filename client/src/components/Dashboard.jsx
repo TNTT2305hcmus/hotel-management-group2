@@ -1,14 +1,28 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { fetchListRoomsFollowPage, fetchRoomStats } from '../services/listRoomService';
+import { 
+    fetchListRoomsFollowPage, 
+    fetchRoomStats,
+    createRoomAPI, 
+    updateRoomAPI, 
+    deleteRoomAPI 
+} from '../services/listRoomService';
 import useDebounce from '../hooks/useDebounce';
+import { useAuth } from '../api/AuthContext';
 import StatusSummary from './StatusSummary';
 import FilterBar from './FilterBar';
 import RoomCard from './RoomCard';
+import DeleteConfirm from '../components/DeleteConfirm';
+import RoomForm from '../components/RoomForm';
+import Unauthorized from '../components/Unauthorized';
 import '../css/Dashboard.css';
 
 const PAGE_SIZE = 8;
 
 const Dashboard = () => {
+    // User info
+    const { user } = useAuth();
+    const isManager = user?.accountTypeID === 1;
+
     const [rooms, setRooms] = useState([]);
     const [stats, setStats] = useState({ available: 0, occupied: 0, maintenance: 0 }); 
     const [loading, setLoading] = useState(false);
@@ -17,12 +31,20 @@ const Dashboard = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [filters, setFilters] = useState({ search: '', type: '', status: '' });
+
+    // Modal
+    const [showUnauthorized, setShowUnauthorized] = useState(false);
+    const [modalState, setModalState] = useState({ 
+        type: null, // 'ADD', 'EDIT', 'DELETE'
+        isOpen: false,
+        data: null // Dữ liệu phòng đang chọn
+    });
     
     const debouncedSearch = useDebounce(filters.search, 500); 
 
     const skeletonList = useMemo(() => Array.from({ length: PAGE_SIZE }, (_, i) => i), []);
 
-    // 1. Hàm Load Danh sách phòng
+    // Hàm Load Danh sách phòng
     const fetchRoomsData = useCallback(async (currentPage, currentFilters, isSearching) => {
         setLoading(true);
         if (isSearching) setRooms([]); 
@@ -60,10 +82,21 @@ const Dashboard = () => {
         }
     }, []); 
 
-    // 2. Hàm Load Thống kê (Chỉ gọi 1 lần khi mount hoặc khi action thêm/sửa/xóa xong)
+    // Hàm Load Thống kê (Chỉ gọi 1 lần khi mount hoặc khi action thêm/sửa/xóa xong)
     const loadStats = async () => {
         const data = await fetchRoomStats();
         setStats(data);
+    };
+
+    // Hàm check quyền
+    const checkPermissionAndOpen = (type, data = null) => {
+        if (isManager) {
+            // Nếu là Manager -> Mở Modal chức năng
+            setModalState({ type, isOpen: true, data });
+        } else {
+            // Nếu là Receptionist -> Mở màn hình báo lỗi 404/403
+            setShowUnauthorized(true);
+        }
     };
 
     // Effect khởi tạo: Load Stats
@@ -109,14 +142,54 @@ const Dashboard = () => {
     const handleFilterType = (val) => setFilters(prev => ({ ...prev, type: val }));
     const handleFilterStatus = (val) => setFilters(prev => ({ ...prev, status: val }));
     
-    const handleEdit = (id) => console.log("Edit:", id);
-    const handleDelete = (id) => console.log("Delete:", id);
+    const handleAdd = () => checkPermissionAndOpen('ADD');
+    const handleEdit = (room) => checkPermissionAndOpen('EDIT', room);
+    const handleDelete = (room) => checkPermissionAndOpen('DELETE', room);
+
+    const closeModal = () => setModalState({ ...modalState, isOpen: false });
+
+    const handleSubmitAction = async (formData) => {
+        try {
+            if (modalState.type === 'ADD') {
+                await createRoomAPI(formData);
+                alert("Thêm phòng thành công!");
+            } else if (modalState.type === 'EDIT') {
+                await updateRoomAPI(modalState.data.id, formData);
+                alert("Cập nhật thành công!");
+            }
+            
+            // Khi thêm/sửa xong, ta nên load lại trang 1 để đảm bảo dữ liệu mới nhất
+            setPageNumber(1); 
+            fetchRoomsData(1, filters, true); 
+            
+            loadStats(); // Update lại số liệu thống kê luôn
+            closeModal();
+        } catch (error) {
+            alert("Lỗi: " + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const confirmDelete = async () => {
+        try {
+            await deleteRoomAPI(modalState.data.id);
+            alert("Xóa thành công!");
+            
+            // Tương tự, xóa xong thì refresh về trang 1
+            setPageNumber(1);
+            fetchRoomsData(1, filters, true);
+            
+            loadStats();
+            closeModal();
+        } catch (error) {
+            alert("Lỗi xóa: " + error.message);
+        }
+    };
 
     return (
         <div className="room-management-page">
             <div className="header">
                 <h1>Room Management</h1>
-                <button className="btn-add"><i className='bx bx-plus'></i> Add New Room</button>
+                <button className="btn-add" onClick={handleAdd}><i className='bx bx-plus'></i> Add New Room</button>
             </div>
 
             <StatusSummary stats={stats} isLoading={false} />
@@ -129,7 +202,7 @@ const Dashboard = () => {
 
             <div className="room-list">
                 {rooms.map((room) => (
-                    <RoomCard key={room.id} room={room} onEdit={handleEdit} onDelete={handleDelete} />
+                    <RoomCard key={room.id} room={room} onEdit={() => handleEdit(room)} onDelete={() => handleDelete(room)} />
                 ))}
 
                 {loading && skeletonList.map((i) => (
@@ -153,6 +226,25 @@ const Dashboard = () => {
                     </div>
                 )}
             </div>
+
+            {showUnauthorized && (
+                <Unauthorized onClose={() => setShowUnauthorized(false)} />
+            )}
+
+            <DeleteConfirm 
+                isOpen={modalState.isOpen && modalState.type === 'DELETE'}
+                onClose={closeModal}
+                onConfirm={confirmDelete}
+                roomNumber={modalState.data?.roomNumber}
+            />
+
+            <RoomForm 
+                isOpen={modalState.isOpen && (modalState.type === 'ADD' || modalState.type === 'EDIT')}
+                onClose={closeModal}
+                onSubmit={handleSubmitAction}
+                mode={modalState.type}
+                initialData={modalState.data}
+            />
         </div>
     );
 };
