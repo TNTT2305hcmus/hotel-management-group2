@@ -4,7 +4,7 @@ async function controllersRegister(req, res) {
   try {
     const { username, password, email, phone, accountTypeID } = req.body;
 
-    // Gọi service
+    // Call service
     await authServices.register(username, password, email, phone, accountTypeID);
 
     return res.status(201).json({ message: 'User registered successfully' });
@@ -57,7 +57,7 @@ async function controllersResetPassword(req, res) {
   }
 }
 
-// Export default Object để khớp với file Routes cũ của bạn
+
 export default { 
     controllersRegister, 
     controllersLogin, 

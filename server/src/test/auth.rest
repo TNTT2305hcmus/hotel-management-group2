@@ -1,10 +1,12 @@
-@url = http://localhost:5000
-
 ### 1. Check Server Health
-GET {{url}}/
+GET http://localhost:5000/
+
+### ---------------------------------------------------
+### AUTHENTICATION - SUCCESS CASES
+### ---------------------------------------------------
 
 ### 2. Register New Account (IMPORTANT: Email required for password recovery test)
-POST {{url}}/api/auth/register
+POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
@@ -14,8 +16,8 @@ Content-Type: application/json
   "accountTypeID": 2
 }
 
-### 3. Login
-POST {{url}}/api/auth/login
+### 3. Login - Success
+POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
@@ -24,7 +26,7 @@ Content-Type: application/json
 }
 
 ### 4. Forgot Password (Use the email registered in step 2)
-POST {{url}}/api/auth/forgot-password
+POST http://localhost:5000/api/auth/forgot-password
 Content-Type: application/json
 
 {
@@ -32,11 +34,63 @@ Content-Type: application/json
 }
 
 ### 5. Reset Password (Get OTP from Server Terminal and paste here)
-POST {{url}}/api/auth/reset-password
+# Note: You must check your backend console/logs to get the real OTP
+POST http://localhost:5000/api/auth/reset-password
 Content-Type: application/json
 
 {
   "email": "admin@hotel.com",
   "otp": "123456", 
   "newPassword": "newpassword999"
+}
+
+### ---------------------------------------------------
+### AUTHENTICATION - ERROR CASES (VALIDATION)
+### ---------------------------------------------------
+
+### 6. Login - Wrong Password (Should return 401 Unauthorized)
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "minhthang",
+  "password": "wrongpassword"
+}
+
+### 7. Login - Non-existent User (Should return 404 or 401)
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "ghostuser",
+  "password": "123"
+}
+
+### 8. Register - Duplicate Username (Should return 409 Conflict)
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "minhthang",
+  "password": "anotherpassword",
+  "email": "another@hotel.com",
+  "accountTypeID": 2
+}
+
+### 9. Forgot Password - Invalid Email (Should return 404 Not Found)
+POST http://localhost:5000/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "notfound@hotel.com"
+}
+
+### 10. Reset Password - Invalid OTP (Should return 400 Bad Request)
+POST http://localhost:5000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "admin@hotel.com",
+  "otp": "000000", 
+  "newPassword": "hackerattempt"
 }
