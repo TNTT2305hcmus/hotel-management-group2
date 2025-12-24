@@ -1,0 +1,74 @@
+.unauthorized-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('../assets/desert-bg.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Luôn nằm trên cùng */
+  animation: fadeIn 0.3s ease-in;
+}
+
+.unauthorized-content {
+  text-align: center;
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid #eee;
+}
+
+.unauthorized-content h1 {
+  font-size: 80px;
+  margin: 0;
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.unauthorized-content h2 {
+  font-size: 24px;
+  color: #333;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.unauthorized-content p {
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.unauthorized-content img {
+  margin: 20px auto;
+  display: block;
+}
+
+/* Nút quay lại */
+.btn-back {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  background-color: #333;
+}
