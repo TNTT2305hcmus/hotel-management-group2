@@ -30,3 +30,21 @@ export const fetchRoomStats = async () => {
         return { available: 0, occupied: 0, maintenance: 0 };
     }
 };
+
+// 3. Xóa phòng
+// DELETE /api/rooms/:id
+export const deleteRoomAPI = (id) => {
+    return axiosClient.delete(`/api/rooms/${id}`);
+};
+
+// 4. Edit phòng
+// PUT /api/rooms/:id
+export const updateRoomAPI = (id, data) => {
+    return axiosClient.put(`/api/rooms/${id}`, data);
+};
+
+// 5. Thêm phòng
+// POST /api/rooms
+export const createRoomAPI = (data) => {
+    return axiosClient.post('/api/rooms', data);
+};
