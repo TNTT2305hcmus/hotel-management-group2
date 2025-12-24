@@ -14,6 +14,17 @@ Content-Type: application/json
   "accountTypeID": 2
 }
 
+### Register New Account (IMPORTANT: Email required for password recovery test)
+POST {{url}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "trithanh",
+  "password": "trithanh23",
+  "email": "tt@hotel.com", 
+  "accountTypeID": 1
+}
+
 ### 3. Login
 POST {{url}}/api/auth/login
 Content-Type: application/json
