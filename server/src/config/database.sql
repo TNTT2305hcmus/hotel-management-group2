@@ -142,13 +142,29 @@ INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES
 
 -- 6. Insert Customers
 INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, Address) VALUES 
-('001200000001', 1, 'Nguyễn Văn An', '123 Cầu Giấy, Hà Nội'),
-('079200000002', 1, 'Trần Thị Bích', '45 Lê Lợi, Quận 1, TP.HCM'),
-('031200000003', 1, 'Lê Văn Cường', '78 Nguyễn Văn Linh, Đà Nẵng'),
-('098765432001', 2, 'John Smith', 'New York, USA'), 
-('001200000005', 1, 'Phạm Thị Duyên', '10 Lạch Tray, Hải Phòng'),
-('092200000006', 1, 'Hoàng Văn Em', 'Ninh Kiều, Cần Thơ'),
-('044200000007', 1, 'Vũ Thị Gấm', 'Hạ Long, Quảng Ninh'),
-('112233445566', 2, 'Akira Yamamoto', 'Tokyo, Japan'), 
-('001200000009', 1, 'Đặng Văn Hùng', 'Vinh, Nghệ An'),
-('001200000010', 1, 'Bùi Thị Kim', 'Huế, Thừa Thiên Huế');
+('001200000001', 1, 'Michael Johnson', '123 Main Street, New York, USA'),
+('079200000002', 1, 'Sarah Williams', '45 Oxford Street, London, UK'),
+('031200000003', 1, 'James Brown', '78 Rue de la Paix, Paris, France'),
+('098765432001', 2, 'John Smith', '456 Fifth Avenue, New York, USA'), 
+('001200000005', 1, 'Emma Davis', '10 Church Street, Toronto, Canada'),
+('092200000006', 1, 'Robert Miller', '99 George Street, Sydney, Australia'),
+('044200000007', 1, 'Lisa Anderson', '55 Champ-Élysées, Paris, France'),
+('112233445566', 2, 'Akira Yamamoto', '1-2-3 Shibuya, Tokyo, Japan'), 
+('001200000009', 1, 'David Martinez', '87 Gran Via, Madrid, Spain'),
+('001200000010', 1, 'Amy Robinson', '202 Brooklyn Bridge, Brooklyn, USA');
+
+-- 7. Insert Bookings (Đơn chưa thanh toán - PaymentDate = NULL)
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) VALUES 
+(1, 101, '2025-12-20 14:00:00', '2025-12-22 11:00:00', NULL, 1000000),
+(2, 201, '2025-12-21 15:30:00', '2025-12-25 11:00:00', NULL, 3200000),
+(3, 301, '2025-12-22 16:00:00', NULL, NULL, 0),
+(4, 102, '2025-12-18 13:00:00', '2025-12-24 11:00:00', NULL, 1000000),
+(5, 202, '2025-12-19 14:00:00', '2025-12-23 11:00:00', NULL, 1600000);
+
+-- 8. Insert Booking Details (Liên kết khách với đơn đặt phòng)
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES 
+(1, '001200000001'),
+(2, '079200000002'),
+(3, '031200000003'),
+(4, '098765432001'),
+(5, '001200000005');
