@@ -8,9 +8,7 @@ const Unauthorized = ({ onClose }) => {
     return (
         <div className="unauthorized-overlay">
             <div className="unauthorized-content">
-                <h1>404 / 403</h1>
-                <img src="https://github.githubassets.com/images/modules/styleguide/octocat-spinner-128.gif" alt="Not Found" style={{width: 100}}/>
-                <h2>Access Denied</h2>
+                <h1>Access Denied</h1>
                 <p>Bạn không có quyền thực hiện chức năng này (Chỉ dành cho Manager).</p>
                 
                 {/* Nếu dùng như Modal thì nút này đóng modal */}
