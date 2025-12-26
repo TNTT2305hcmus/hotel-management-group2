@@ -1,3 +1,5 @@
+@url = http://localhost:5000
+
 ### 1. GET all rooms
 GET http://localhost:5000/api/rooms
 
@@ -229,3 +231,9 @@ Content-Type: application/json
     "status": "Available",
     "description": "Missing typeId"
 }
+
+### 1. [SUCCESS] Get existing room detail
+# Kịch bản: Lấy thông tin phòng 101 (đã tồn tại trong DB)
+# Mong đợi: 200 OK - Trả về object thông tin phòng
+GET {{url}}/api/rooms/101
+Content-Type: application/json
