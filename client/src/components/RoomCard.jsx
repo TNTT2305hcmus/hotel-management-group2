@@ -1,11 +1,14 @@
 import '../css/RoomCard.css';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useNavigate } from 'react-router-dom';
 
 
 // room: object
 // onEdit / onDelete : function
 const RoomCard = ({ room, onEdit, onDelete, isLoading = false }) => {
+    const navigate = useNavigate();
+    
     const getSatusColor = (status) => {
         if (status === 'Available') {
             return 'green';
@@ -14,6 +17,19 @@ const RoomCard = ({ room, onEdit, onDelete, isLoading = false }) => {
         }
         return 'yellow';
     };
+
+    // Hàm chuyển trang
+    const handleViewDetail = () => {
+        // Thêm dòng log này
+        console.log("Check ID Click:", room?.id); 
+        
+        if (room?.id) {
+            navigate(`/room/${room.id}`);
+        } else {
+            alert("Lỗi: Không lấy được ID phòng!");
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="room-card">
@@ -47,9 +63,9 @@ const RoomCard = ({ room, onEdit, onDelete, isLoading = false }) => {
     }
 
     return (
-        <div className="room-card">
+        <div className="room-card" style={{cursor: 'pointer'}}>
             {/* Image */}
-            <div className="image-container relative">
+            <div className="image-container relative" onClick={handleViewDetail} >
                 <img src={room.image} alt={`Room ${room.roomNumber}`}></img>
                 <span className={`status-badge ${getSatusColor(room.status)}`}>
                     {room.status}
@@ -58,10 +74,10 @@ const RoomCard = ({ room, onEdit, onDelete, isLoading = false }) => {
             </div>
 
             {/* Detail Infor */}
-            <div className="detail-infor">
+            <div className="detail-infor" onClick={handleViewDetail} >
                 <p>Type: <strong>{room.type}</strong></p>
                 <p>Capacity: <strong>{room.capacity} guests</strong></p>
-                <p>Price: <strong>{room.price.toLocaleString()} VNĐ/night</strong></p>
+                <p>Price: <strong>{Number(room.price).toLocaleString()} VNĐ/night</strong></p>
             </div>
 
             {/* Button */}
