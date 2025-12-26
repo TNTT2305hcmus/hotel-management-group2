@@ -1,41 +1,42 @@
-.hm-nav{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  overflow:auto;
-  padding-bottom:2px;
+.hm-nav {
+    width: auto;
 }
 
-.hm-nav__item{
-  appearance:none;
-  border:0;
-  background:transparent;
-  color:rgba(255,255,255,.92);
-  padding:28px 12px;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  cursor:pointer;
-  white-space:nowrap;
-  font-size:24px;
-  font-weight:500;
+.hm-nav__list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 30px; /* Khoảng cách giữa các item */
 }
 
-.hm-nav__item:hover{
-  background:rgba(255,255,255,.12);
+.hm-nav__item-wrapper {
+    display: flex;
+    align-items: center;
 }
 
-.hm-nav__item.active{
-  background:#1ea7ff;        
-  color:#fff;
+.hm-nav__link {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-gray); /* Màu xám chữ thường */
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
-.hm-nav__icon{
-  font-size:24px;
-  line-height:1;
+/* Hiệu ứng Hover */
+.hm-nav__link:hover {
+    color: var(--primary-color);
+    background-color: rgba(109, 40, 217, 0.05);
 }
 
-.hm-nav__text{
-  line-height:1;
+/* Trạng thái Active */
+.hm-nav__link.active {
+    color: var(--primary-color);
+    font-weight: 700;
+    background-color: var(--primary-light); /* Nền tím rất nhạt */
 }

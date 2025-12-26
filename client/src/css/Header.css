@@ -1,99 +1,158 @@
 .hm-header {
-    height: 80px;
-    background: #2f4f99;
-    color: #fff;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 14px;
+    justify-content: space-between; /* Chia đều 3 phần trái/giữa/phải */
+    height: 70px;
+    padding: 0 40px;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'Inter', sans-serif; /* Font hiện đại */
 }
 
-.hm-header__left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-width: 0;
-}
-
-.hm-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-right: 12px;
-    border-right: 1px solid rgba(255, 255, 255, .22);
-}
-
-.hm-brand__logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    font-size: 52px;
-}
-
-.hm-brand__text {
-    line-height: 1;
-}
-
-.hm-brand__title {
-    font-weight: 650;
-    font-size: 25px;
-    letter-spacing: .6px;
-}
-
-.hm-header__right {
+/* --- LEFT: LOGO --- */
+.hm-header__brand {
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--primary-color);
+    font-weight: 800;
+    font-size: 1.2rem;
+    cursor: pointer;
 }
 
-.hm-userpill {
+.hm-logo-icon {
+    font-size: 1.5rem;
+}
+
+/* --- CENTER: NAV CONTAINER --- */
+.hm-header__nav {
+    flex: 1;
+    display: flex;
+    justify-content: center; /* Căn giữa menu */
+}
+
+/* --- RIGHT: ACTIONS --- */
+.hm-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.hm-action-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.hm-action-btn:hover {
+    color: var(--primary-color);
+}
+
+
+/* USER PROFILE & HOVER EFFECT */
+/* USER PROFILE CONTAINER */
+.hm-user-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 5px;
+    margin-right: 20px;
+}
+
+.hm-user-info-trigger {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fff;
-    color: #111;
-    border-radius: 999px;
-    padding: 6px 10px;
-    border: 1px solid rgba(0, 0, 0, .08);
 }
 
-.hm-userpill__avatar {
-    font-size: 40px;
-    color: #111;
-    opacity: .9;
+.hm-user-avatar {
+    font-size: 1.8rem;
+    color: var(--text-gray);
+    transition: color 0.3s;
 }
 
-.hm-userpill__info {
-    line-height: 1.05;
-    text-align: left;
+.hm-user-container:hover .hm-user-avatar {
+    color: var(--primary-color);
 }
 
-.hm-userpill__name {
-    font-weight: 750;
-    font-size: 20px;
+/* --- TOOLTIP / BADGE ROLE --- */
+.hm-role-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    
+    /* Căn giữa so với cha (hm-user-container) */
+    position: absolute;
+    top: 100%; /* Đẩy xuống dưới đáy của container */
+    left: 50%;  /* Điểm neo nằm giữa container */
+    transform: translate(-50%, 10px);
+    
+    background-color: #ffffff; /* Nền trắng */
+    color: #1f2937; /* Chữ đen/xám đậm */
+    border: 1px solid #e5e7eb; /* Viền xám nhạt */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Đổ bóng nổi bật */
+    
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 120px;
+    text-align: center;
+    z-index: 1001;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.hm-userpill__role {
-    margin-top: 2px;
-    font-size: 18px;
-    opacity: .9;
+/* Hiệu ứng khi Hover */
+.hm-user-container:hover .hm-role-tooltip {
+    visibility: visible;
+    opacity: 1;
+    /* Khi hover thì đưa về vị trí chuẩn (bỏ dịch 10px y) */
+    transform: translate(-50%, 0); 
 }
 
-.hm-bell {
-    width: 50px;
-    height: 50px;
-    font-size: 30px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, .25);
-    background: rgba(255, 255, 255, .10);
-    color: #fff;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
+/* Nội dung bên trong Tooltip */
+.tooltip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.hm-bell:hover {
-    background: rgba(255, 255, 255, .16);
+.user-display-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #000; /* Chữ đen rõ ràng */
 }
+
+.role-badge {
+    font-size: 0.75rem;
+    background-color: #f3e8ff; /* Nền tím rất nhạt cho role */
+    color: var(--primary-color); /* Chữ tím */
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    align-self: center; /* Căn giữa badge trong flex column */
+}
+
+/* Mũi tên trỏ lên (Arrow) */
+.tooltip-arrow {
+    position: absolute;
+    top: -6px; /* Đẩy lên trên tooltip */
+    left: 50%;
+    
+    /* Căn giữa mũi tên và xoay 45 độ để tạo hình tam giác */
+    transform: translateX(-50%) rotate(45deg);
+    
+    width: 12px;
+    height: 12px;
+    background-color: #ffffff;
+    border-left: 1px solid #e5e7eb; /* Viền khớp với tooltip */
+    border-top: 1px solid #e5e7eb;
+}
+
