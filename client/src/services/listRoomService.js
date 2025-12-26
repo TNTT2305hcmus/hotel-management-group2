@@ -48,3 +48,22 @@ export const updateRoomAPI = (id, data) => {
 export const createRoomAPI = (data) => {
     return axiosClient.post('/api/rooms', data);
 };
+
+// 6. Detail Info Room
+// GET /api/rooms/:id
+export const fetchRoomDetailAPI = async (id) => {
+    const response = await axiosClient.get(`/api/rooms/${id}`);
+    return response.data;
+}
+
+// 7. Guest info
+export const fetchRoomGuestsAPI = async (id) => {
+  try {
+    // Gọi API lấy danh sách guest theo room ID
+    const response = await axiosClient.get(`/api/room/${id}/guest`);
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching guests:", error);
+    return [];
+  }
+};

@@ -4,29 +4,28 @@ import '../css/Modal.css';
 
 const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
     const [formData, setFormData] = useState({
-        id: '', // Room Number
+        id: '', 
         typeId: '1',
-        capacity: '1',
+        status: 'Available',
         price: '',
         note: '',
-        image: '' // URL ảnh
+        image: '' 
     });
 
     // Reset form khi mở modal
     useEffect(() => {
         if (isOpen) {
             if (mode === 'EDIT' && initialData) {
-                // Map dữ liệu từ API vào form (chú ý khớp tên trường)
                 setFormData({
                     id: initialData.id,
                     typeId: initialData.type === 'Single Room' ? '1' : initialData.type === 'Double Room' ? '2' : '3',
-                    capacity: initialData.capacity,
+                    status: initialData.status,
                     note: initialData.note || '',
                     image: initialData.image || ''
                 });
             } else {
                 // Reset form cho Add
-                setFormData({ id: '', typeId: '1', capacity: '1', price: '', note: '', image: '' });
+                setFormData({ id: '', typeId: '1', status: 'Available', price: '', note: '', image: '' });
             }
         }
     }, [isOpen, mode, initialData]);
@@ -79,6 +78,16 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
                             <option value="2">Double Room</option>
                             <option value="3">Standard Room</option>
                             <option value="4">Luxury Room</option>
+                        </select>
+
+                        <label>Status</label>
+                        <select 
+                            value={formData.status} 
+                            onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        >
+                            <option value="Available">Available</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Maintanance">Maintanance</option>
                         </select>
                         
                         {/* Các input khác tương tự... */}
