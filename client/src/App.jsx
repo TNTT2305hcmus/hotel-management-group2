@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Header from "./pages/Header";
 import RequireAuth from "./api/RequireAuth";
 import RoomDetail from "./pages/roomDetail";
+import UserProfile from "./pages/userProfile";
 
 const MainLayout = () => (
   <>
@@ -30,6 +31,7 @@ const App = () => {
            {/* Mặc định vào Dashboard */}
            <Route path="/dashboard" element={<Dashboard />} />
            <Route path="/room/:id" element={<RoomDetail />} />
+           <Route path="/profile" element={<UserProfile />} />
         </Route>
       </Route>
       
