@@ -1,4 +1,3 @@
-// components/NavigationBar.js
 import "../css/NavigationBar.css";
 
 // Cập nhật danh sách menu theo yêu cầu mới
