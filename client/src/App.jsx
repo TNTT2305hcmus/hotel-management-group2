@@ -7,6 +7,8 @@ import Header from "./pages/Header";
 import RequireAuth from "./api/RequireAuth";
 import RoomDetail from "./pages/roomDetail";
 import UserProfile from "./pages/userProfile";
+import Checkout from "./pages/Checkout"; 
+import Settings from "./pages/Settings";
 
 const MainLayout = () => (
   <>
@@ -30,11 +32,16 @@ const App = () => {
         <Route element={<MainLayout />}>
            {/* Mặc định vào Dashboard */}
            <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/checkout" element={<Checkout />} />
            <Route path="/room/:id" element={<RoomDetail />} />
            <Route path="/profile" element={<UserProfile />} />
         </Route>
       </Route>
-      
+      <Route element={<RequireAuth allowedRoles={['Manager']} />}>
+         <Route element={<MainLayout />}>
+            <Route path="/settings" element={<Settings />} />
+         </Route>
+      </Route>
       {/* Catch all - 404 */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
