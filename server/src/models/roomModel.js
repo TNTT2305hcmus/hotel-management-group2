@@ -59,6 +59,7 @@ const RoomModel = {
         const [rows] = await pool.query(query);
         return rows;
     },
+
     // 5. Update Room
     update: async (currentId, roomData) => {
         const { newId, typeId, status, note, image } = roomData;
@@ -88,6 +89,33 @@ const RoomModel = {
         ]);
         
         return result.affectedRows > 0;
+    },
+
+    // 6. Detail Room
+    findById: async (id) => {
+        const query = `
+            SELECT 
+                R.RoomID AS id, 
+                CAST(R.RoomID AS CHAR) AS roomNumber,
+                RT.RoomTypeName AS type, 
+                RT.MaxGuests AS capacity,                
+                RT.Price AS price, 
+                R.Status AS status, 
+                R.ImageURL AS image,
+                R.Notes AS note
+            FROM ROOM R
+            INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
+            WHERE R.RoomID = ?
+        `;
+        const [rows] = await pool.query(query, [id]);
+        return rows[0]; // Trả về object đầu tiên (hoặc undefined nếu không tìm thấy)
+    },
+
+    // 7. Delete Room
+    delete: async (id) => {
+        const query = `DELETE FROM ROOM WHERE RoomID = ?`;
+        const [result] = await pool.query(query, [id]);
+        return result.affectedRows;
     }
 };
 

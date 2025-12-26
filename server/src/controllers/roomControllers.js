@@ -2,7 +2,9 @@ import {
     getAllRoomsService,
     createRoomService,
     getRoomStatsService,
-    updateRoomService 
+    updateRoomService,
+    deleteRoomService,
+    getRoomDetailService
 } from '../services/roomServices.js';
 
 
@@ -112,6 +114,44 @@ export const updateRoom = async (req, res) => {
         // Handle Room Not Found Error
         if (error.message.includes('not found')) {
             return res.status(404).json({ message: 'Room not found' });
+        }
+
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// API detail room
+export const getRoomDetail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const room = await getRoomDetailService(id);
+        res.status(200).json(room);
+    } catch (error) {
+        if (error.message === 'Room not found') {
+            return res.status(404).json({ message: error.message });
+        }
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// API Delete room
+export const deleteRoom = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await deleteRoomService(id);
+        
+        res.status(200).json({ message: `Room ${id} deleted successfully!` });
+    } catch (error) {
+        console.error("Delete Error:", error);
+
+        // Lỗi khách book phòng
+        if (error.message.includes('Cannot delete')) {
+             return res.status(409).json({ message: error.message });
+        }
+        
+        // Trả về 404 nếu không tìm thấy
+        if (error.message.includes('not found')) {
+            return res.status(404).json({ message: error.message });
         }
 
         res.status(500).json({ message: 'Server Error' });

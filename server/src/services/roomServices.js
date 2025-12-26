@@ -44,7 +44,6 @@ export const createRoomService = async (data) => {
     return await RoomModel.create(data);
 };
 
-
 export const getRoomStatsService = async () => {
     const rows = await RoomModel.getStats();
     
@@ -56,9 +55,13 @@ export const getRoomStatsService = async () => {
     };
 
     rows.forEach(row => {
-        const statusKey = row.Status.toLowerCase();
-        if (stats.hasOwnProperty(statusKey)) {
-            stats[statusKey] = row.total;
+        const statusRaw = row.Status || row.status; 
+        
+        if (statusRaw) {
+            const statusKey = statusRaw.toLowerCase(); 
+            if (stats.hasOwnProperty(statusKey)) {
+                stats[statusKey] = row.total;
+            }
         }
     });
 
@@ -79,4 +82,31 @@ export const updateRoomService = async (currentId, data) => {
         updatedId: data.newId || currentId,
         ...data
     };
+};
+
+export const deleteRoomService = async (id) => {
+    try {
+        // Gọi Model để xóa
+        const affectedRows = await RoomModel.delete(id);
+
+        if (affectedRows === 0) {
+            throw new Error('Room not found or already deleted');
+        }
+        
+        return true;
+    } catch (error) {
+        // Nếu khách đã đặt thì không xóa được
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            throw new Error('Cannot delete this room because it has associated bookings/invoices.');
+        }
+        throw error;
+    }
+};
+
+export const getRoomDetailService = async (id) => {
+    const room = await RoomModel.findById(id);
+    if (!room) {
+        throw new Error('Room not found');
+    }
+    return room;
 };
