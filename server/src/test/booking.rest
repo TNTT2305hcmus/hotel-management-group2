@@ -1,0 +1,61 @@
+### ========================================================================
+### CASE 1: CREATE BOOKING SUCCESSFULLY (With Phone Number)
+### ========================================================================
+# Purpose: Verify if API saves PhoneNumber into CUSTOMER table.
+# Data: Room 101, New Guest (not in DB) or Existing Guest (update phone number)
+POST http://localhost:5000/api/bookings
+Content-Type: application/json
+
+{
+    "roomId": 101,
+    "checkInDate": "2025-12-24",
+    "checkOutDate": "2025-12-26",
+    "guests": [
+        {
+            "fullName": "Nguyen Van Test",
+            "citizenId": "099123456789", 
+            "customerTypeId": 1, 
+            "phoneNumber": "0909888777",  
+            "address": "123 Duong Test, Quan 1, TP.HCM"
+        },
+        {
+            "fullName": "Le Thi Demo",
+            "citizenId": "099987654321",
+            "customerTypeId": 1,
+            "phoneNumber": "0912345678",
+            "address": "456 Duong Demo, Ha Noi"
+        }
+    ]
+}
+
+### ========================================================================
+### CASE 2: TEST VALIDATION ERROR (Missing Information)
+### ========================================================================
+# Purpose: Check if Backend blocks request when RoomID or Guests list is missing.
+POST http://localhost:5000/api/bookings
+Content-Type: application/json
+
+{
+    "checkInDate": "2025-12-24",
+    "guests": [] 
+}
+
+### ========================================================================
+### CASE 3: TEST LOGIC ERROR (Room does not exist)
+### ========================================================================
+# Purpose: Try booking Room ID 9999 (not in DB) to see how Server handles it.
+POST http://localhost:5000/api/bookings
+Content-Type: application/json
+
+{
+    "roomId": 9999,
+    "checkInDate": "2025-12-24",
+    "guests": [
+        {
+            "fullName": "Hacker",
+            "citizenId": "000000000000",
+            "customerTypeId": 1,
+            "address": "Unknown"
+        }
+    ]
+}

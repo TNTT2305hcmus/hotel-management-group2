@@ -64,3 +64,19 @@ export const getRoomStatsService = async () => {
 
     return stats;
 };
+
+export const updateRoomService = async (currentId, data) => {
+    // Call Model to update
+    const isUpdated = await RoomModel.update(currentId, data);
+
+    if (!isUpdated) {
+        throw new Error('Room not found or no changes made');
+    }
+
+    // Return the result for the controller to display
+    return {
+        originalId: currentId,
+        updatedId: data.newId || currentId,
+        ...data
+    };
+};

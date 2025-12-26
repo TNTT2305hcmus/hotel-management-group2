@@ -6,20 +6,20 @@ import pool from '../config/database.js';
 // Mock OTP Store
 const otpStore = new Map();
 
-async function register(username, password, email, accountTypeID = 2) {
+async function register(username, password, email, phone = null, accountTypeID = 2) {
     try {
         // 1. Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         
-        // 2. MySQL Query: Add Email column
+        // 2. MySQL Query: Add Phone column
         const query = `
-            INSERT INTO ACCOUNT (Username, Password, Email, AccountTypeID) 
-            VALUES (?, ?, ?, ?)
+            INSERT INTO ACCOUNT (Username, Password, Email, Phone, AccountTypeID) 
+            VALUES (?, ?, ?, ?, ?)
         `;
         
-        // 3. Execute query (Remember to pass all 4 parameters in correct order)
-        await pool.query(query, [username, hashedPassword, email, accountTypeID]);
+        // 3. Execute query (Remember to pass all 5 parameters in correct order)
+        await pool.query(query, [username, hashedPassword, email, phone, accountTypeID]);
         
         return { success: true, message: 'User registered successfully' };
     } catch (error) {

@@ -1,7 +1,8 @@
 import {
     getAllRoomsService,
     createRoomService,
-    getRoomStatsService 
+    getRoomStatsService,
+    updateRoomService 
 } from '../services/roomServices.js';
 
 
@@ -63,6 +64,56 @@ export const getRoomStats = async (req, res) => {
         res.status(200).json(stats);
     } catch (error) {
         console.error("Stats error:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// --- PUT: Update Room (Add this function to the end of the file) ---
+export const updateRoom = async (req, res) => {
+    try {
+        const { id } = req.params; // Old ID from URL parameters
+        
+        // Get data from request body
+        // roomNumber: New ID (if you want to rename the room)
+        // typeId: New Room Type (Capacity and Price will update automatically based on this)
+        const { roomNumber, typeId, status, description, image } = req.body;
+
+        // Basic Validation
+        if (!typeId) {
+            return res.status(400).json({ message: 'Missing required field: Room Type (typeId)' });
+        }
+
+        // Call Service
+        const updatedRoom = await updateRoomService(id, { 
+            newId: roomNumber, 
+            typeId, 
+            status, 
+            note: description, 
+            image 
+        });
+
+        res.status(200).json(updatedRoom);
+
+    } catch (error) {
+        console.error("Update Error:", error);
+
+        // Handle Duplicate ID Error (When renaming to an existing room number)
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ 
+                message: `Room Number ${req.body.roomNumber} already exists!` 
+            });
+        }
+
+        // Handle Invalid Room Type Error (Foreign Key Constraint)
+        if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+             return res.status(400).json({ message: 'Invalid Room Type ID!' });
+        }
+
+        // Handle Room Not Found Error
+        if (error.message.includes('not found')) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+
         res.status(500).json({ message: 'Server Error' });
     }
 };

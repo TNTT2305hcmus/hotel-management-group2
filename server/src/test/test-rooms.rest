@@ -1,21 +1,18 @@
-@url = http://localhost:5000
-@roomUrl = {{url}}/api/rooms
-
 ### 1. GET all rooms
-GET {{roomUrl}}
+GET http://localhost:5000/api/rooms
 
 ### ---------------------------------------------------
 ### FILTER BY STATUS
 ### ---------------------------------------------------
 
 ### 2. Filter - Available rooms
-GET {{roomUrl}}?status=Available
+GET http://localhost:5000/api/rooms?status=Available
 
 ### 3. Filter - Occupied rooms
-GET {{roomUrl}}?status=Occupied
+GET http://localhost:5000/api/rooms?status=Occupied
 
 ### 4. Filter - Maintenance rooms
-GET {{roomUrl}}?status=Maintenance
+GET http://localhost:5000/api/rooms?status=Maintenance
 
 ### ---------------------------------------------------
 ### FILTER BY TYPE
@@ -24,55 +21,211 @@ GET {{roomUrl}}?status=Maintenance
 ### ---------------------------------------------------
 
 ### 5. Filter - Single Room (Type ID = 1)
-GET {{roomUrl}}?type=1
+GET http://localhost:5000/api/rooms?type=1
 
 ### 6. Filter - Double Room (Type ID = 2)
-GET {{roomUrl}}?type=2
+GET http://localhost:5000/api/rooms?type=2
 
 ### 7. Filter - Standard Room (Type ID = 3)
-GET {{roomUrl}}?type=3
+GET http://localhost:5000/api/rooms?type=3
 
 ### 8. Filter - Luxury Room (Type ID = 4)
-GET {{roomUrl}}?type=4
+GET http://localhost:5000/api/rooms?type=4
 
 ### ---------------------------------------------------
 ### COMBINE FILTERS
 ### ---------------------------------------------------
 
 ### 9. Available AND Single Room (ID 1)
-GET {{roomUrl}}?status=Available&type=1
+GET http://localhost:5000/api/rooms?status=Available&type=1
 
 ### 10. Available AND Double Room (ID 2)
-GET {{roomUrl}}?status=Available&type=2
+GET http://localhost:5000/api/rooms?status=Available&type=2
 
 ### 11. Occupied AND Standard Room (ID 3)
-GET {{roomUrl}}?status=Occupied&type=3
+GET http://localhost:5000/api/rooms?status=Occupied&type=3
 
 ### 12. Maintenance AND Single Room (ID 1)
-GET {{roomUrl}}?status=Maintenance&type=1
+GET http://localhost:5000/api/rooms?status=Maintenance&type=1
 
 ### ---------------------------------------------------
 ### TEST EDGE CASES
 ### ---------------------------------------------------
 
 ### 13. Test invalid status (Should return an empty list [])
-GET {{roomUrl}}?status=InvalidStatusName
+GET http://localhost:5000/api/rooms?status=InvalidStatusName
 
 ### 14. Test missing parameters (Should return all rooms by default)
-GET {{roomUrl}}
+GET http://localhost:5000/api/rooms
 
 ### ---------------------------------------------------
-### ADD NEW ROOM
+### ADD NEW ROOM - SUCCESS CASES
 ### ---------------------------------------------------
 
-### 15. Add new room
-POST {{roomUrl}}
+### 15. Add new room - Double Room (Type 2)
+POST http://localhost:5000/api/rooms
 Content-Type: application/json
 
 {
-    "id": 401,
+    "id": 402,
+    "typeId": 2,
+    "status": "Occupied",
+    "note": "Guest requests extra pillows",
+    "image": "https://images.unsplash.com/photo-double-room.jpg"
+}
+
+### 16. Add new room - Deluxe Room (Type 3)
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 403,
+    "typeId": 3,
+    "status": "Available",
+    "note": "Ocean view",
+    "image": "https://images.unsplash.com/photo-deluxe.jpg"
+}
+
+### 17. Add new room - Luxury Room (Type 4) with Maintenance Status
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 404,
+    "typeId": 4,
+    "status": "Maintenance",
+    "note": "Painting walls",
+    "image": "https://images.unsplash.com/photo-luxury.jpg"
+}
+
+### ---------------------------------------------------
+### ADD NEW ROOM - ERROR CASES (Validation Testing)
+### ---------------------------------------------------
+
+### 19. ERROR: Duplicate Room ID (Should return 409 Conflict)
+# Trying to add ID 101 which presumably already exists
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 101,
     "typeId": 1,
     "status": "Available",
-    "note": "Full API Test Room",
-    "image": "https://images.unsplash.com/photo-1590490360182-c33d57733427"
+    "note": "Duplicate check"
+}
+
+### 20. ERROR: Invalid Room Type (Should return 400 Bad Request)
+# TypeId 999 does not exist in master data
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 405,
+    "typeId": 999,
+    "status": "Available",
+    "note": "Invalid type test"
+}
+
+### 21. ERROR: Missing Required Field (No Status)
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 406,
+    "typeId": 1,
+    "note": "Missing status field"
+}
+
+### 22. ERROR: Missing Required Field (No TypeId)
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 407,
+    "status": "Available",
+    "note": "Missing typeId field"
+}
+
+### 23. ERROR: Invalid Status Value
+# Status 'Unknown' is not allowed (Should be Available/Occupied/Maintenance)
+POST http://localhost:5000/api/rooms
+Content-Type: application/json
+
+{
+    "id": 408,
+    "typeId": 1,
+    "status": "Unknown",
+    "note": "Invalid status test"
+}
+
+
+### ---------------------------------------------------
+### PUT REQUESTS (EDIT ROOM) - SUCCESS CASES
+### ---------------------------------------------------
+
+### 24. UPDATE: Simple Update (Status & Note)
+# Target Room: 102
+PUT http://localhost:5000/api/rooms/102
+Content-Type: application/json
+
+{
+    "typeId": 1,
+    "status": "Maintenance",
+    "description": "Air conditioner repair",
+    "image": "https://example.com/maintenance.jpg"
+}
+
+### 25. UPDATE: Complex Update (Rename Room + Change Type)
+# Target Room: 103 (Renaming to 109)
+PUT http://localhost:5000/api/rooms/103
+Content-Type: application/json
+
+{
+    "roomNumber": 109,
+    "typeId": 2,
+    "status": "Available",
+    "description": "Renamed from 103 to 109 and upgraded to Double Room"
+}
+
+### ---------------------------------------------------
+### PUT REQUESTS (EDIT ROOM) - ERROR CASES
+### ---------------------------------------------------
+
+### 26. ERROR: Update Non-existent Room (Should return 404 Not Found)
+PUT http://localhost:5000/api/rooms/99999
+Content-Type: application/json
+
+{
+    "typeId": 1,
+    "status": "Available"
+}
+
+### 27. ERROR: Rename to an Existing ID (Should return 409 Conflict)
+# Trying to rename room 102 to 101 (101 already exists)
+PUT http://localhost:5000/api/rooms/102
+Content-Type: application/json
+
+{
+    "roomNumber": 101,
+    "typeId": 1,
+    "description": "Attempting to duplicate ID"
+}
+
+### 28. ERROR: Update with Invalid Room Type (Should return 400 Bad Request)
+# TypeId 999 is invalid
+PUT http://localhost:5000/api/rooms/102
+Content-Type: application/json
+
+{
+    "typeId": 999,
+    "status": "Available"
+}
+
+### 29. ERROR: Missing Required Field (No TypeId)
+PUT http://localhost:5000/api/rooms/102
+Content-Type: application/json
+
+{
+    "status": "Available",
+    "description": "Missing typeId"
 }

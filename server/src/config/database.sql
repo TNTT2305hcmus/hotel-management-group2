@@ -1,7 +1,12 @@
 -- =============================================
+-- 0. CLEANUP 
+-- =============================================
+DROP DATABASE IF EXISTS HOTEL_MANAGEMENT;
+
+-- =============================================
 -- I. CREATE DATABASE
 -- =============================================
-CREATE DATABASE IF NOT EXISTS HOTEL_MANAGEMENT;
+CREATE DATABASE HOTEL_MANAGEMENT;
 USE HOTEL_MANAGEMENT;
 
 -- =============================================
@@ -31,11 +36,12 @@ CREATE TABLE CUSTOMER_TYPE (
     CustomerTypeName VARCHAR(50) NOT NULL
 );
 
--- 4. Table: Customer
+-- 4. Table: Customer 
 CREATE TABLE CUSTOMER (
     CitizenID VARCHAR(12) PRIMARY KEY, 
     CustomerTypeID INT NOT NULL, 
     FullName VARCHAR(100) NOT NULL,
+    PhoneNumber VARCHAR(15), 
     Address VARCHAR(255)
 );
 
@@ -50,6 +56,7 @@ CREATE TABLE ACCOUNT (
     Username VARCHAR(50) PRIMARY KEY,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL,
+    Phone VARCHAR(15),
     AccountTypeID INT NOT NULL 
 );
 
@@ -71,7 +78,7 @@ CREATE TABLE BOOKING_DETAIL (
 );
 
 -- =============================================
--- III. FOREIGN KEYS (KHÓA NGOẠI)
+-- III. FOREIGN KEYS 
 -- =============================================
 
 ALTER TABLE ROOM
@@ -99,7 +106,7 @@ ADD CONSTRAINT FK_BookingDetail_Customer
 FOREIGN KEY (CitizenID) REFERENCES CUSTOMER(CitizenID);
 
 -- =============================================
--- IV. SEED DATA (DỮ LIỆU MẪU)
+-- IV. SEED DATA 
 -- =============================================
 
 -- 1. Insert Account Types
@@ -108,11 +115,10 @@ INSERT INTO ACCOUNT_TYPE (AccountTypeID, AccountTypeName) VALUES
 (2, 'Receptionist');
 
 -- 2. Insert Accounts
--- Lưu ý: Mật khẩu này chỉ là ví dụ hash, thực tế bạn cần dùng bcrypt trong code để tạo
-INSERT INTO ACCOUNT (Username, Email, Password, AccountTypeID) VALUES 
-('admin', 'admin@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 1), 
-('staff1', 'staff1@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2), 
-('staff2', 'staff2@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', 2);
+INSERT INTO ACCOUNT (Username, Email, Password, Phone, AccountTypeID) VALUES 
+('admin', 'admin@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0901234567', 1), 
+('staff1', 'staff1@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0912345678', 2), 
+('staff2', 'staff2@hotel.com', '$2a$10$X7V.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.j/p.', '0923456789', 2);
 
 -- 3. Insert Customer Types
 INSERT INTO CUSTOMER_TYPE (CustomerTypeID, CustomerTypeName) VALUES 
@@ -139,15 +145,31 @@ INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES
 (302, 3, 'Occupied', 'Group tour', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461'),
 (303, 3, 'Available', 'VIP Standard', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461');
 
--- 6. Insert Customers
-INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, Address) VALUES 
-('001200000001', 1, 'Nguyễn Văn An', '123 Cầu Giấy, Hà Nội'),
-('079200000002', 1, 'Trần Thị Bích', '45 Lê Lợi, Quận 1, TP.HCM'),
-('031200000003', 1, 'Lê Văn Cường', '78 Nguyễn Văn Linh, Đà Nẵng'),
-('098765432001', 2, 'John Smith', 'New York, USA'), 
-('001200000005', 1, 'Phạm Thị Duyên', '10 Lạch Tray, Hải Phòng'),
-('092200000006', 1, 'Hoàng Văn Em', 'Ninh Kiều, Cần Thơ'),
-('044200000007', 1, 'Vũ Thị Gấm', 'Hạ Long, Quảng Ninh'),
-('112233445566', 2, 'Akira Yamamoto', 'Tokyo, Japan'), 
-('001200000009', 1, 'Đặng Văn Hùng', 'Vinh, Nghệ An'),
-('001200000010', 1, 'Bùi Thị Kim', 'Huế, Thừa Thiên Huế');
+-- 6. Insert Customers 
+INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) VALUES 
+('001200000001', 1, 'Michael Johnson', '0909000001', '123 Main Street, New York, USA'),
+('079200000002', 1, 'Sarah Williams', '0909000002', '45 Oxford Street, London, UK'),
+('031200000003', 1, 'James Brown', '0909000003', '78 Rue de la Paix, Paris, France'),
+('098765432001', 2, 'John Smith', '0909000004', '456 Fifth Avenue, New York, USA'), 
+('001200000005', 1, 'Emma Davis', '0909000005', '10 Church Street, Toronto, Canada'),
+('092200000006', 1, 'Robert Miller', '0909000006', '99 George Street, Sydney, Australia'),
+('044200000007', 1, 'Lisa Anderson', '0909000007', '55 Champ-Élysées, Paris, France'),
+('112233445566', 2, 'Akira Yamamoto', '0909000008', '1-2-3 Shibuya, Tokyo, Japan'), 
+('001200000009', 1, 'David Martinez', '0909000009', '87 Gran Via, Madrid, Spain'),
+('001200000010', 1, 'Amy Robinson', '0909000010', '202 Brooklyn Bridge, Brooklyn, USA');
+
+-- 7. Insert Bookings
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) VALUES 
+(1, 101, '2025-12-20 14:00:00', '2025-12-22 11:00:00', NULL, 1000000),
+(2, 201, '2025-12-21 15:30:00', '2025-12-25 11:00:00', NULL, 3200000),
+(3, 301, '2025-12-22 16:00:00', NULL, NULL, 0),
+(4, 102, '2025-12-18 13:00:00', '2025-12-24 11:00:00', NULL, 1000000),
+(5, 202, '2025-12-19 14:00:00', '2025-12-23 11:00:00', NULL, 1600000);
+
+-- 8. Insert Booking Details
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES 
+(1, '001200000001'),
+(2, '079200000002'),
+(3, '031200000003'),
+(4, '098765432001'),
+(5, '001200000005');
