@@ -1,11 +1,11 @@
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
-import Login from "./components/Login";
-import ForgotPassword from "./components/ForgotPassword";
-import ResetPassword from "./components/ResetPassword";
-// Giả sử bạn đã có Dashboard và Header
-import Dashboard from "./components/Dashboard"; 
-import Header from "./components/Header";
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard"; 
+import Header from "./pages/Header";
 import RequireAuth from "./api/RequireAuth";
+import RoomDetail from "./pages/roomDetail";
 
 const MainLayout = () => (
   <>
@@ -29,6 +29,7 @@ const App = () => {
         <Route element={<MainLayout />}>
            {/* Mặc định vào Dashboard */}
            <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/room/:id" element={<RoomDetail />} />
         </Route>
       </Route>
       
