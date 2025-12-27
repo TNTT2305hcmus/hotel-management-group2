@@ -6,7 +6,7 @@ import {
 } from '../services/settingService';
 import { FaSave } from 'react-icons/fa';
 import ReceptionistView from '../components/ReceptionistView'; // Import từ file số 2
-import { EditValueModal, ConfirmationModal, StatusModal } from '../components/SharedSettingsComponents'; // Import từ file số 1
+import { EditValueModal, ConfirmationModal, StatusModal } from '../components/SettingUI'; // Import từ file số 1
 
 const FALLBACK_SURCHARGE = { foreignGuest: 1.5, extraPerson: 1.5, holiday: 1.5 };
 

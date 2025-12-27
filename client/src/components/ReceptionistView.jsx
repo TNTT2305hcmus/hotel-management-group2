@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { FaUserPlus, FaSearch, FaExclamationCircle } from 'react-icons/fa';
 import { fetchReceptionistsAPI, createReceptionistAPI } from '../services/settingService';
-import { InputGroup } from './SharedSettingsComponents';
+import { InputGroup } from './SettingUI';
 
 const ITEMS_PER_PAGE = 4;
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
