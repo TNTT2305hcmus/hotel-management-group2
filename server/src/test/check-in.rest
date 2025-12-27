@@ -13,4 +13,3 @@ Content-Type: application/json
 ### Search unpaid check-ins - empty query (should return error)
 GET http://localhost:5000/api/check-in/unpaid/search?q=
 Content-Type: application/json
-

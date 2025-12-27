@@ -2,12 +2,13 @@ import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard"; 
+import Dashboard from "./pages/Dashboard";
 import Header from "./pages/Header";
 import RequireAuth from "./api/RequireAuth";
 import RoomDetail from "./pages/roomDetail";
 import UserProfile from "./pages/userProfile";
-import Checkout from "./pages/Checkout"; 
+import Checkout from "./pages/Checkout";
+import CheckIn from "./pages/CheckIn";
 import Settings from "./pages/Settings";
 
 const MainLayout = () => (
@@ -30,17 +31,18 @@ const App = () => {
       {/* --- PRIVATE ROUTES (Cần đăng nhập) --- */}
       <Route element={<RequireAuth allowedRoles={['Manager', 'Receptionist']} />}>
         <Route element={<MainLayout />}>
-           {/* Mặc định vào Dashboard */}
-           <Route path="/dashboard" element={<Dashboard />} />
-           <Route path="/checkout" element={<Checkout />} />
-           <Route path="/room/:id" element={<RoomDetail />} />
-           <Route path="/profile" element={<UserProfile />} />
+          {/* Mặc định vào Dashboard */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkin" element={<CheckIn />} />
+          <Route path="/room/:id" element={<RoomDetail />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Route>
       </Route>
       <Route element={<RequireAuth allowedRoles={['Manager']} />}>
-         <Route element={<MainLayout />}>
-            <Route path="/settings" element={<Settings />} />
-         </Route>
+        <Route element={<MainLayout />}>
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Route>
       {/* Catch all - 404 */}
       <Route path="*" element={<Navigate to="/login" replace />} />
