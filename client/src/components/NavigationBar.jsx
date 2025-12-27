@@ -15,7 +15,7 @@ export default function NavigationBar({ activeKey, onNavigate }) {
   const navigate = useNavigate(); 
   const { user } = useAuth();     
 
-  // --- 1. LỌC MENU THEO QUYỀN (GIỮ NGUYÊN LOGIC CỦA BẠN) ---
+  // --- 1. LỌC MENU THEO QUYỀN --- 
   const filteredNavItems = NAV_ITEMS.filter(item => {
     if (item.key === 'settings') {
       return hasRole(user, ['Manager']);

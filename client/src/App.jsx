@@ -36,7 +36,7 @@ const App = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkin" element={<CheckIn />} />
           <Route path="/room/:id" element={<RoomDetail />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/settings/profile" element={<UserProfile />} />
         </Route>
       </Route>
       <Route element={<RequireAuth allowedRoles={['Manager']} />}>

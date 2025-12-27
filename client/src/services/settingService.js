@@ -1,16 +1,12 @@
-import axios from 'axios';
+import { axiosClient } from "../api/axiosClient"; 
 
 // URL cho các tính năng Setting (Lấy danh sách, xóa, chỉnh phụ phí...)
-const SETTING_API_URL = 'http://localhost:5000/api/settings';
-
-// URL cho tính năng Auth (Đăng ký/Thêm tài khoản)
-// Giả sử bên Backend bạn đã có route: POST /api/auth/register
-const AUTH_API_URL = 'http://localhost:5000/api/auth'; 
+const SETTING_API_URL = '/api/settings'; 
 
 // 1. Get Settings (GET)
 export const fetchSettings = async () => {
     try {
-        const res = await axios.get(`${SETTING_API_URL}`);
+        const res = await axiosClient.get(`${SETTING_API_URL}`);
         return res.data;
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Failed to fetch settings" };
@@ -20,7 +16,7 @@ export const fetchSettings = async () => {
 // 2. Update Surcharge (PUT)
 export const updateSurchargeAPI = async (surchargeData) => {
     try {
-        const res = await axios.put(`${SETTING_API_URL}/surcharge`, surchargeData);
+        const res = await axiosClient.put(`${SETTING_API_URL}/surcharge`, surchargeData);
         return res.data;
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Failed to update surcharge" };
@@ -30,7 +26,7 @@ export const updateSurchargeAPI = async (surchargeData) => {
 // 3. Reset Surcharge (POST)
 export const resetSurchargeAPI = async () => {
     try {
-        const res = await axios.post(`${SETTING_API_URL}/surcharge/reset`);
+        const res = await axiosClient.post(`${SETTING_API_URL}/surcharge/reset`);
         return res.data;
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Failed to reset surcharge" };
@@ -40,7 +36,7 @@ export const resetSurchargeAPI = async () => {
 // 4. Get Receptionist List (GET)
 export const fetchReceptionistsAPI = async () => {
     try {
-        const res = await axios.get(`${SETTING_API_URL}/receptionists`);
+        const res = await axiosClient.get(`${SETTING_API_URL}/receptionists`);
         return res.data;
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Failed to fetch receptionists" };
@@ -57,7 +53,7 @@ export const deleteReceptionistAPI = async (username) => {
     }
 };
 
-// // 6. Create Receptionist (SỬA ĐỔI QUAN TRỌNG TẠI ĐÂY)
+// // 6. Create Receptionist 
 export const createReceptionistAPI = async (userData) => {
     try {
         // Chuẩn bị dữ liệu để gửi cho controllersRegister
@@ -71,7 +67,7 @@ export const createReceptionistAPI = async (userData) => {
         };
 
         // Gọi vào route /register -> Nó sẽ chạy vào controllersRegister
-        const res = await axios.post(`${AUTH_API_URL}/register`, payload);
+        const res = await axiosClient.post(`/api/auth/register`, payload);
         
         return res.data;
     } catch (error) {

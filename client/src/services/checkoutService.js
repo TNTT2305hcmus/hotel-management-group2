@@ -2,11 +2,9 @@ import axios from 'axios';
 
 // --- CẤU HÌNH (CONFIGURATION) ---
 const API_URL = 'http://localhost:5000/api/checkout';
-const USE_MOCK_API = true; // <--- Đổi thành FALSE khi muốn gọi Server của backend
+const USE_MOCK_API = true; 
 
-// --- API SERVICES ---
-
-// 1. Lấy danh sách phòng đang thuê
+// Danh sách phòng đang thuê
 export const fetchRentedRoomsAPI = async () => {
     if (USE_MOCK_API) return mockFetchRentedRooms();
 

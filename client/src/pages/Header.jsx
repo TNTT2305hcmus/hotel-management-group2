@@ -53,13 +53,13 @@ export default function Header() {
 
     // Hàm xử lý khi click vào Avatar
     const handleProfileClick = () => {
-        navigate("/profile");
+        navigate("/settings/profile");
     };
 
     return (
         <header className="hm-header">
             {/* 1. Left: Logo */}
-            <div className="hm-header__brand" onClick={() => navigate("/")} style={{cursor: "pointer"}}>
+            <div className="hm-header__brand" onClick={() => navigate("/dashboard")} style={{cursor: "pointer"}}>
                 <div className="hm-logo-icon">
                     <FaHotel />
                 </div>
@@ -68,8 +68,6 @@ export default function Header() {
 
             {/* 2. Center: Navigation */}
             <div className="hm-header__nav">
-                {/* --- SỬA LỖI TẠI ĐÂY --- */}
-                {/* Truyền handleNavigate thay vì setActiveKey */}
                 <NavigationBar activeKey={activeKey} onNavigate={handleNavigate} />
             </div>
 

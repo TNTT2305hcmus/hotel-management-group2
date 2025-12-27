@@ -1,7 +1,5 @@
 import { axiosClient } from "../api/axiosClient";
 
-// Lưu ý: Đảm bảo Server bạn đang chạy route dạng: http://localhost:8888/auth/login
-
 // Register: /api/auth/register
 export const registerAPI = (data) => {
   return axiosClient.post("/api/auth/register", data);

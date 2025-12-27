@@ -1,229 +1,323 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../api/AuthContext";
-import "../css/UserProfile.css";
-import { FaUserShield, FaTrash, FaPlus } from "react-icons/fa";
-import { axiosClient } from "../api/axiosClient";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaUserPlus, FaSearch, FaExclamationCircle } from 'react-icons/fa';
+import { useAuth } from '../api/AuthContext';
+import { fetchUserProfile } from '../services/accountService';
 import { 
-    fetchUserProfile, 
-    fetchAccounts, 
-    createAccount, 
-    deleteAccount 
-} from "../services/accountService";
+    fetchReceptionistsAPI, 
+    createReceptionistAPI, 
+    deleteReceptionistAPI 
+} from '../services/settingService';
 
-// Component con: Hiển thị thông tin cá nhân (Dùng chung)
-const PersonalInfo = ({ user }) => {
-  return (
-    <div className="profile-card">
-      <h3 className="card-title">Personal Information</h3>
-      <div className="info-row">
-        <div className="info-group">
-          <label>Username</label>
-          <input type="text" value={user?.username || ""} disabled className="input-readonly" />
+import InputGroup from '../components/InputGroup';
+import ConfirmationModal from '../components/ConfirmationModal';
+import StatusModal from '../components/StatusModal';
+import '../css/userProfile.css'; 
+
+const ITEMS_PER_PAGE = 4;
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+// --- COMPONENT CON: PERSONAL INFO ---
+const PersonalInfo = ({ userProfile, loading }) => {
+    if (loading) return <div>Loading profile...</div>;
+    return (
+        <div className="recep-card" style={{ marginBottom: '40px' }}>
+            <h3 style={{ borderBottom: '2px solid #e5e7eb', paddingBottom: '15px', marginBottom: '20px' }}>
+                Personal Information
+            </h3>
+            <div className="account-form-grid">
+                <div className="form-group">
+                    <label>Username</label>
+                    <input type="text" value={userProfile?.username || ""} disabled className="input-styled" style={{backgroundColor: '#f3f4f6'}} />
+                </div>
+                <div className="form-group">
+                    <label>Role</label>
+                    <input type="text" value={userProfile?.accountTypeName || ""} disabled className="input-styled" style={{backgroundColor: '#f3f4f6'}} />
+                </div>
+                <div className="form-group">
+                    <label>Email</label>
+                    <input type="text" value={userProfile?.email || ""} disabled className="input-styled" style={{backgroundColor: '#f3f4f6'}} />
+                </div>
+                <div className="form-group">
+                    <label>Phone</label>
+                    <input type="text" value={userProfile?.phone || ""} disabled className="input-styled" style={{backgroundColor: '#f3f4f6'}} />
+                </div>
+            </div>
         </div>
-        <div className="info-group">
-          <label>Role</label>
-          <input type="text" value={user?.accountTypeName || ""} disabled className="input-readonly" />
-        </div>
-        {/* Các trường giả định thêm nếu có trong user object */}
-        <div className="info-group">
-          <label>Email</label>
-          <input type="text" value="user@example.com" disabled className="input-readonly" />
-        </div>
-        <div className="info-group">
-          <label>Phone</label>
-          <input type="text" value="0909xxxxxx" disabled className="input-readonly" />
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default function UserProfile() {
-  const { user } = useAuth();
-  const isManager = user?.accountTypeID === 1; 
+// --- MAIN COMPONENT ---
+const UserProfile = () => {
+    const navigate = useNavigate();
+    const { user } = useAuth(); // Lấy user từ context
+    
+    // Kiểm tra quyền Manager (AccountTypeID = 1)
+    const isManager = user?.accountTypeID === 1;
 
-  const [profileData, setProfileData] = useState(null);
-  const [loadingProfile, setLoadingProfile] = useState(false);
-  
-  // State quản lý danh sách account (Dành cho Manager)
-  const [accounts, setAccounts] = useState([
+    // --- STATE CHO PROFILE ---
+    const [profileData, setProfileData] = useState(null);
+    const [loadingProfile, setLoadingProfile] = useState(false);
 
+    // --- STATE CHO STAFF MANAGEMENT ---
+    const [staffList, setStaffList] = useState([]);
+    const [newStaff, setNewStaff] = useState({ username: '', password: '', email: '', phone: '' });
+    const [formError, setFormError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    
+    // Modals
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, data: null });
+    const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', message: '' });
 
-  ]);
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
+    // Search & Pagination
+    const [searchTerm, setSearchTerm] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const searchWrapperRef = useRef(null);
 
-  // State form thêm mới
-  const [newAcc, setNewAcc] = useState({
-    username: "", email: "", password: "", phone: "", role: "Receptionist"
-  });
+    // Fetch user profile
+    useEffect(() => {
+        const loadProfile = async () => {
+            if (!user?.username) return;
+            try {
+                setLoadingProfile(true);
+                // Gọi API lấy thông tin chi tiết user
+                const res = await fetchUserProfile(user.username);
+                
+                setProfileData(res.data || res); 
+            } catch (err) {
+                console.error("Error fetching profile", err);
+                setProfileData(user); 
+            } finally {
+                setLoadingProfile(false);
+            }
+        };
+        loadProfile();
+    }, [user]);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if(!user?.username) return;
-      try{
-        setLoadingProfile(true);
+    // Fetch list account (manager)
+    useEffect(() => {
+        if (isManager) {
+            loadStaffData();
+        }
+    }, [isManager]);
 
-        const userProfile = await fetchUserProfile(user.username);
-        setProfileData(userProfile);
-      } catch (err){
-        console.error("Error fetching profile data", err);
-        // fetch hỏng thì dùng tạm thông tin từ token
-        setProfileData(user);
-      } finally {
-        setLoadingProfile(false);
-      }
-    }
-    fetchProfile();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchAllAccounts = async () => {
-        if (!isManager) return;
+    const loadStaffData = async () => {
         try {
-            setLoadingAccounts(true);
-            const res = await fetchAccounts();
-            setAccounts(res.data);
+            const res = await fetchReceptionistsAPI();
+            if (res.success) setStaffList(res.data || []);
         } catch (error) {
-            console.error("Error fetching accounts list:", error);
-        } finally {
-            setLoadingAccounts(false);
+            console.error(error);
         }
     };
 
-    fetchAllAccounts();
-  }, [isManager]);
-
-
-  // Xử lý Input Change
-  const handleChange = (e) => {
-    setNewAcc({ ...newAcc, [e.target.name]: e.target.value });
-  };
-
-  const handleAddAccount = async (e) => {
-    e.preventDefault();
-    if (!newAcc.username || !newAcc.password) return alert("Vui lòng điền đủ thông tin!");
-
-    try {
-        const payload = {
-            ...newAcc,
-            accountTypeID: newAcc.role === "Manager" ? 1 : 2 
-        };
-        
-        const res = await createAccount(payload);
-        
-        setAccounts([...accounts, res.data]); 
-        setNewAcc({ username: "", email: "", password: "", phone: "", role: "Receptionist" });
-        alert("Thêm nhân viên thành công!");
-
-    } catch (error) {
-        console.error("Error adding account:", error);
-        alert("Lỗi khi thêm tài khoản.");
-    }
-  };
-
-  const handleDelete = async (username) => {
-    if (window.confirm(`Bạn có chắc muốn xóa tài khoản ${username}?`)) {
-        try {
-            await deleteAccount(username);
-            
-            setAccounts(accounts.filter(acc => acc.username !== username));
-        } catch (error) {
-            console.error("Error deleting account:", error);
-            alert("Không thể xóa tài khoản này.");
+    // Handler add, delete
+    const handleAddAccount = async (e) => {
+        e.preventDefault();
+        if (!newStaff.username || !newStaff.password || !newStaff.email) {
+            setFormError("Please fill in required fields!"); return;
         }
-    }
-  };
+        if (!isValidEmail(newStaff.email)) {
+            setFormError("Invalid email format!"); return;
+        }
+        try {
+            await createReceptionistAPI(newStaff);
+            setStatusModal({ isOpen: true, type: 'success', message: "Account added successfully!" });
+            setNewStaff({ username: '', password: '', email: '', phone: '' });
+            setFormError('');
+            loadStaffData(); 
+        } catch (error) {
+            const msg = error.response?.data?.message || "Failed to add account.";
+            setFormError(msg);
+        }
+    };
 
-  return (
-    <div className="profile-page-container">
-      <h1 className="page-header">User Profile</h1>
+    const handleDeleteClick = (username) => {
+        setConfirmModal({ isOpen: true, data: username });
+    };
+
+    const confirmDelete = async () => {
+        const username = confirmModal.data;
+        setConfirmModal({ ...confirmModal, isOpen: false });
+        try {
+            const res = await deleteReceptionistAPI(username);
+            if (res.success) {
+                setStatusModal({ isOpen: true, type: 'success', message: res.message });
+                loadStaffData();
+            } else {
+                setStatusModal({ isOpen: true, type: 'error', message: res.message });
+            }
+        } catch (error) {
+            setStatusModal({ isOpen: true, type: 'error', message: "Failed to delete account." });
+        }
+    };
+
+    // --- LOGIC SEARCH & PAGINATION ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const filteredStaff = useMemo(() => {
+        const term = searchTerm.toLowerCase();
+        return staffList.filter(staff => 
+            staff.Username.toLowerCase().includes(term) ||
+            staff.Email.toLowerCase().includes(term)
+        );
+    }, [staffList, searchTerm]);
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        if (value.trim().length > 0) {
+            setSuggestions(filteredStaff);
+            setShowSuggestions(true);
+        } else { setShowSuggestions(false); }
+        setCurrentPage(1);
+    };
+
+    const totalPages = Math.ceil(filteredStaff.length / ITEMS_PER_PAGE);
+    const displayedStaff = filteredStaff.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    return (
+        <div className="settings-page"> 
+            <div className="recep-edit-container">
+                <h1 className="recep-title">My Profile</h1>
       
-      {/* 1. Phần thông tin cá nhân */}
-      <PersonalInfo profileData={profileData} loading={loadingProfile} />
+                {/* 1. LUÔN HIỂN THỊ: Phần thông tin cá nhân */}
+                <PersonalInfo userProfile={profileData} loading={loadingProfile} />
+                
+                {/* 2. CHỈ HIỂN THỊ NẾU LÀ MANAGER: Phần quản lý Staff */}
+                {isManager && (
+                    <>
+                        {/* Add Form */}
+                        <div className="recep-card">
+                            <div className="card-header-flex">
+                                <h3>Create New Account</h3>
+                                {formError && <div className="error-message-inline"><FaExclamationCircle /> {formError}</div>}
+                                <button className="btn-add-account" onClick={handleAddAccount}><FaUserPlus /> Add</button>
+                            </div>
+                            <form className="account-form-grid" onSubmit={handleAddAccount} autoComplete="off">
+                                <InputGroup 
+                                    label="Username *" 
+                                    value={newStaff.username} 
+                                    onChange={v => setNewStaff({...newStaff, username: v})} 
+                                    onFocus={() => setFormError('')} 
+                                />
+                                
+                                <InputGroup 
+                                    label="Password *" 
+                                    type={showPassword ? "text" : "password"} 
+                                    value={newStaff.password} 
+                                    onChange={v => setNewStaff({...newStaff, password: v})} 
+                                    isPasswordField={true} 
+                                    showPassword={showPassword} 
+                                    onTogglePassword={() => setShowPassword(!showPassword)} 
+                                />
+                                
+                                <InputGroup 
+                                    label="Email *" 
+                                    type="email" 
+                                    value={newStaff.email} 
+                                    onChange={v => setNewStaff({...newStaff, email: v})} 
+                                    onFocus={() => setFormError('')} 
+                                />
+                                
+                                <InputGroup 
+                                    label="Phone" 
+                                    value={newStaff.phone} 
+                                    onChange={v => setNewStaff({...newStaff, phone: v})} 
+                                    onFocus={() => setFormError('')} 
+                                    placeholder="Optional" 
+                                />
 
-      {/* 2. Phần quản lý */}
-      {isManager && (
-        <>
-          <div className="manager-section-grid">
-            {/* Form Thêm Nhân Viên */}
-            <div className="profile-card">
-              <h3 className="card-title"><FaUserShield /> Create New Account</h3>
-              <form onSubmit={handleAddAccount} className="create-acc-form">
-                <div className="form-grid">
-                   <div className="form-group">
-                      <label>Username</label>
-                      <input name="username" value={newAcc.username} onChange={handleChange} placeholder="Enter username" />
-                   </div>
-                   <div className="form-group">
-                      <label>Password</label>
-                      <input name="password" type="password" value={newAcc.password} onChange={handleChange} placeholder="Enter password" />
-                   </div>
-                   <div className="form-group">
-                      <label>Email</label>
-                      <input name="email" value={newAcc.email} onChange={handleChange} placeholder="Enter email" />
-                   </div>
-                   <div className="form-group">
-                      <label>Phone</label>
-                      <input name="phone" value={newAcc.phone} onChange={handleChange} placeholder="Enter phone" />
-                   </div>
-                   <div className="form-group full-width">
-                      <label>Role</label>
-                      <select name="role" value={newAcc.role} onChange={handleChange}>
-                        <option value="Receptionist">Receptionist</option>
-                        <option value="Manager">Manager</option>
-                      </select>
-                   </div>
-                </div>
-                <button type="submit" className="btn-add-acc"><FaPlus /> Create Account</button>
-              </form>
+                                {/* New Select Implementation */}
+                                <InputGroup 
+                                    label="Role" 
+                                    type="select"
+                                    value={newStaff.role || "Receptionist"} // Ensure a default value exists
+                                    onChange={v => setNewStaff({...newStaff, role: v})} 
+                                    options={[
+                                        { value: 'Receptionist', label: 'Receptionist' },
+                                        { value: 'Manager', label: 'Manager' }
+                                    ]}
+                                />
+                            </form>
+                        </div>
+
+                        {/* List Table */}
+                        <div className="recep-card mt-20">
+                            <h3>Staff List</h3>
+                            <div className="search-bar-wrapper" ref={searchWrapperRef}>
+                                <FaSearch className="search-icon"/>
+                                <input type="text" autoComplete="off" placeholder="Search by username or email" 
+                                    value={searchTerm} onChange={handleSearchChange} onFocus={() => searchTerm && setShowSuggestions(true)} />
+                                {showSuggestions && suggestions.length > 0 && (
+                                    <ul className="search-suggestions">
+                                        {suggestions.map((staff, index) => (
+                                            <li key={index} className="suggestion-item" onClick={() => { setSearchTerm(staff.Username); setShowSuggestions(false); }}>
+                                                <span className="sugg-username">{staff.Username}</span>
+                                                <span className="sugg-email">{staff.Email}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            <table className="recep-table">
+                                <thead>
+                                    <tr>
+                                        <th style={{width: '25%'}}>Username</th>
+                                        <th style={{width: '25%'}}>Phone</th>
+                                        <th style={{width: '40%'}}>Email</th>
+                                        <th style={{width: '10%'}}>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {displayedStaff.length > 0 ? (
+                                        displayedStaff.map((staff) => (
+                                            <tr key={staff.Username}>
+                                                <td style={{fontWeight: 'bold'}}>{staff.Username}</td>
+                                                <td>{staff.Phone || ''}</td>
+                                                <td>{staff.Email}</td>
+                                                <td style={{textAlign: 'right'}}>
+                                                    {staff.Username !== user.username && (
+                                                        <button className="btn-delete-pill" onClick={() => handleDeleteClick(staff.Username)}>delete</button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (<tr><td colSpan="4" className="empty-state">No accounts found.</td></tr>)}
+                                </tbody>
+                            </table>
+                            {totalPages > 1 && (
+                                <div className="pagination">
+                                    <button className="page-nav-btn" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>Prev</button>
+                                    <span>{currentPage} / {totalPages}</span>
+                                    <button className="page-nav-btn" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>Next</button>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
-            
-            {/* Bảng Danh Sách Nhân Viên */}
-            <div className="profile-card">
-               <h3 className="card-title">Existing Accounts</h3>
-               {loadingAccounts ? <p>Loading list...</p> : (
-                   <div className="table-responsive">
-                     <table className="acc-table">
-                       <thead>
-                         <tr>
-                           <th>Username</th>
-                           <th>Email</th>
-                           <th>Phone</th>
-                           <th>Role</th>
-                           <th>Action</th>
-                         </tr>
-                       </thead>
-                       <tbody>
-                         {accounts.length > 0 ? accounts.map((acc, index) => (
-                           <tr key={acc.username || index}>
-                             <td>{acc.username}</td>
-                             <td>{acc.email}</td>
-                             <td>{acc.phone}</td>
-                             <td>
-                               <span className={`role-tag ${acc.accountTypeName?.toLowerCase() || 'receptionist'}`}>
-                                 {acc.accountTypeName || "N/A"}
-                               </span>
-                             </td>
-                             <td>
-                               {/* Không cho phép tự xóa chính mình */}
-                               {acc.username !== user.username && (
-                                   <button className="btn-delete" onClick={() => handleDelete(acc.username)}>
-                                     <FaTrash />
-                                   </button>
-                               )}
-                             </td>
-                           </tr>
-                         )) : (
-                             <tr><td colSpan="5" style={{textAlign:"center"}}>No accounts found.</td></tr>
-                         )}
-                       </tbody>
-                     </table>
-                   </div>
-               )}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
+
+            {/* MODALS */}
+            {confirmModal.isOpen && (
+                <ConfirmationModal 
+                    data={{ type: 'DELETE', title: 'Delete Account', message: `Are you sure you want to delete "${confirmModal.data}"?` }} 
+                    onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })} 
+                    onConfirm={confirmDelete} 
+                />
+            )}
+            {statusModal.isOpen && <StatusModal data={statusModal} onClose={() => setStatusModal({ ...statusModal, isOpen: false })} />}
+        </div>
+    );
+};
+
+export default UserProfile;
