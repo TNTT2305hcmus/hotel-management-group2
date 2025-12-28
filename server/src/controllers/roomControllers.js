@@ -157,3 +157,14 @@ export const deleteRoom = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// API lấy danh sách khách đã thuê phòng
+export const getRoomGuests = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const guests = await RoomModel.getRoomGuestHistory(id);
+        res.status(200).json(guests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

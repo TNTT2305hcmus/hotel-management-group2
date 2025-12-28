@@ -3,7 +3,7 @@ import pool from '../config/database.js';
 export const createBookingService = async (data) => {
     const { roomId, checkInDate, checkOutDate, guests } = data;
     
-    // 1. Calculate check-out date (Default to 1 day if not provided)
+    // 1. Calculate check-out date
     let finalCheckOut = checkOutDate;
     if (!finalCheckOut) {
         const date = new Date(checkInDate);

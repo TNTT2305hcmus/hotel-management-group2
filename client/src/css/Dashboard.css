@@ -1,6 +1,11 @@
+:root{
+  --ci-bg-page: #f8fafc;
+}
+
 .room-management-page {
   padding: 2rem 4rem; 
   min-height: 100vh;
+  background-color: var(--ci-bg-page);
 }
 
 .header{

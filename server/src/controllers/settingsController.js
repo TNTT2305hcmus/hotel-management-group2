@@ -1,5 +1,6 @@
 import SettingsService from '../services/settingsService.js';
 
+// Lấy thông tin cài đặt chung (Surcharge + Số lượng Account)
 export const getSettings = async (req, res) => {
     try {
         const settings = await SettingsService.getSettings();
@@ -18,6 +19,7 @@ export const getSettings = async (req, res) => {
     }
 };
 
+// Cập nhật quy định phụ thu
 export const updateSurcharge = async (req, res) => {
     try {
         const { foreignGuest, extraPerson, holiday } = req.body;
@@ -59,6 +61,7 @@ export const updateSurcharge = async (req, res) => {
     }
 };
 
+// Reset phụ thu về mặc định
 export const resetSurcharge = async (req, res) => {
     try {
         const result = await SettingsService.resetSurcharge();
@@ -78,52 +81,24 @@ export const resetSurcharge = async (req, res) => {
     }
 };
 
-export const getReceptionists = async (req, res) => {
+export const getAccounts = async (req, res) => {
     try {
-        const receptionists = await SettingsService.getReceptionists();
-        
-        res.status(200).json({
-            success: true,
-            data: receptionists
-        });
+        const accounts = await SettingsService.getAccounts();
+        res.status(200).json({ success: true, data: accounts });
     } catch (error) {
-        console.error('Error fetching receptionists:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch receptionist list',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Failed to fetch account list', error: error.message });
     }
 };
 
-export const deleteReceptionist = async (req, res) => {
+export const deleteAccount = async (req, res) => {
     try {
         const { username } = req.params;
+        if (!username) return res.status(400).json({ success: false, message: 'Username is required' });
         
-        if (!username) {
-            return res.status(400).json({
-                success: false,
-                message: 'Username is required'
-            });
-        }
-        
-        const result = await SettingsService.deleteReceptionist(username);
-        
-        res.status(200).json({
-            success: true,
-            message: result.message,
-            data: result
-        });
+        const result = await SettingsService.deleteAccount(username);
+        res.status(200).json({ success: true, message: result.message, data: result });
     } catch (error) {
-        console.error('Error deleting receptionist:', error.message);
-        
-        // Return appropriate status code
-        const statusCode = error.message.includes('not found') ? 404 : 
-                          error.message.includes('Can only delete') ? 403 : 500;
-        
-        res.status(statusCode).json({
-            success: false,
-            message: error.message
-        });
+        const statusCode = error.message.includes('not found') ? 404 : 500;
+        res.status(statusCode).json({ success: false, message: error.message });
     }
 };

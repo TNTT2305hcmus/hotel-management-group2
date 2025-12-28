@@ -1,18 +1,9 @@
 import { FaSearch } from 'react-icons/fa';
 
-const getStatusClass = (status) => {
-    switch (status?.toLowerCase()) {
-        case 'confirmed': return 'status-confirmed';
-        case 'pending': return 'status-pending';
-        default: return '';
-    }
-};
-
 const ReservationsTable = ({
     reservations,
     searchTerm,
     onSearchChange,
-    onCheckInClick
 }) => {
     return (
         <div className="checkin-card reservations-card">
@@ -23,42 +14,37 @@ const ReservationsTable = ({
                 <input
                     type="text"
                     className="search-input"
-                    placeholder="Search by name or room number..."
+                    placeholder="Search by name, room, or phone..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
             </div>
 
             <div className="reservations-table">
+                {/* HEADERS */}
                 <div className="table-header">
-                    <span className="col-name">Guest Name</span>
                     <span className="col-room">Room</span>
-                    <span className="col-status">Status</span>
-                    <span className="col-action">Action</span>
+                    <span className="col-name">Guest Name</span>
+                    <span className="col-id">ID/Passport</span>
+                    <span className="col-phone">Phone</span>
+                    <span className="col-address">Address</span>
                 </div>
 
+                {/* DATA ROWS */}
                 {reservations.length > 0 ? (
                     reservations.map((reservation) => (
                         <div key={reservation.bookingId} className="table-row">
-                            <span className="col-name">{reservation.guestName}</span>
-                            <span className="col-room">{reservation.roomNumber}</span>
-                            <span className="col-status">
-                                <span className={`status-badge ${getStatusClass(reservation.status)}`}>
-                                    {reservation.status}
-                                </span>
-                            </span>
-                            <span className="col-action">
-                                <button
-                                    className="btn-checkin"
-                                    onClick={() => onCheckInClick(reservation)}
-                                >
-                                    Check-in
-                                </button>
+                            <span className="col-room font-bold">{reservation.roomNumber}</span>
+                            <span className="col-name font-bold">{reservation.fullName || reservation.guestName}</span>
+                            <span className="col-id">{reservation.citizenId || "N/A"}</span>
+                            <span className="col-phone">{reservation.phoneNumber || "N/A"}</span>
+                            <span className="col-address truncate" title={reservation.address}>
+                                {reservation.address || "N/A"}
                             </span>
                         </div>
                     ))
                 ) : (
-                    <div className="empty-state">No reservations for today</div>
+                    <div className="empty-state">No reservations found for today</div>
                 )}
             </div>
         </div>

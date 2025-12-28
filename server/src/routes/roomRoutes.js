@@ -1,5 +1,5 @@
 import express from 'express';
-import { getRooms, createRoom, getRoomStats, updateRoom, deleteRoom, getRoomDetail } from '../controllers/roomControllers.js'; 
+import { getRooms, createRoom, getRoomStats, updateRoom, deleteRoom, getRoomDetail, getRoomGuests } from '../controllers/roomControllers.js'; 
 
 const router = express.Router();
 
@@ -21,5 +21,8 @@ router.delete('/:id', deleteRoom);
 
 // 6. Detail room
 router.get('/:id', getRoomDetail);
+
+// 7. Guest list
+router.get('/:id/guest', getRoomGuests);
 
 export default router;

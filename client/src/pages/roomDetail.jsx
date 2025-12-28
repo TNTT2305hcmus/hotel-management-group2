@@ -52,6 +52,10 @@ const RoomDetail = () => {
     </div>
   );
 
+  const handleBookNowClick = () => {
+    navigate('/checkin');
+  }
+
   return (
     <div className="room-detail-container">
       <div className="detail-card">
@@ -84,7 +88,7 @@ const RoomDetail = () => {
 
             {/* Các nút hành động nhanh (nếu cần) */}
             <div className="detail-actions">
-                 <button className="btn-action primary">Book Now</button>
+                 <button className="btn-action" onClick={handleBookNowClick}>Book Now</button>
             </div>
         </div>
       </div>

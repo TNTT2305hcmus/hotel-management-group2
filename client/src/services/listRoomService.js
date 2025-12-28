@@ -57,13 +57,12 @@ export const fetchRoomDetailAPI = async (id) => {
 }
 
 // 7. Guest info
-export const fetchRoomGuestsAPI = async (id) => {
-  try {
-    // Gọi API lấy danh sách guest theo room ID
-    const response = await axiosClient.get(`/api/room/${id}/guest`);
-    return response.data; 
-  } catch (error) {
-    console.error("Error fetching guests:", error);
-    return [];
-  }
+export const fetchRoomGuestsAPI = async (roomId) => {
+    try {
+        const response = await axiosClient.get(`/api/room/${roomId}/guest`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching room guests:", error);
+        return [];
+    }
 };

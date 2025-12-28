@@ -8,6 +8,7 @@ import roomRoutes from "./routes/roomRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import checkInRoutes from "./routes/checkInRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import userRoutes from './routes/userRoutes.js';
 // Load environment variables at the very beginning
 dotenv.config();
 
@@ -40,6 +41,9 @@ app.use("/api/check-in", checkInRoutes);
 
 //Booking Routes
 app.use("/api/bookings", bookingRoutes);
+
+// User Profile
+app.use('/api/users', userRoutes);
 
 // 4. Start Server
 app.listen(PORT, () => {

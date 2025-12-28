@@ -11,13 +11,10 @@ const SettingsService = {
     // Get all settings data
     getSettings: async () => {
         try {
-            // Get receptionist count from database
-            const receptionistCount = await SettingsModel.countReceptionists();
-            
-            // Combine with surcharge data
+            const accountCount = await SettingsModel.countAccounts();
             return {
                 surcharge: surcharge,
-                receptionistCount: receptionistCount
+                receptionistCount: accountCount 
             };
         } catch (error) {
             throw new Error('Failed to fetch settings: ' + error.message);
@@ -124,30 +121,24 @@ export { surchargeDefault };
         }
     },
 
-    // Get list of Receptionist accounts
-    getReceptionists: async () => {
+    // Get list of accounts
+    getAccounts: async () => {
         try {
-            const receptionists = await SettingsModel.getReceptionists();
-            return receptionists;
+            const accounts = await SettingsModel.getAllAccounts();
+            return accounts;
         } catch (error) {
-            throw new Error('Failed to fetch receptionists: ' + error.message);
+            throw new Error('Failed to fetch accounts: ' + error.message);
         }
     },
 
-    // Delete Receptionist account
-    deleteReceptionist: async (username) => {
+    // Delete account
+    deleteAccount: async (username) => {
         try {
-            const deleted = await SettingsModel.deleteReceptionist(username);
+            const deleted = await SettingsModel.deleteAccount(username);
             if (deleted) {
-                return {
-                    deleted: true,
-                    message: `Receptionist account '${username}' deleted successfully`
-                };
+                return { deleted: true, message: `Account '${username}' deleted successfully` };
             }
-            return {
-                deleted: false,
-                message: 'Failed to delete account'
-            };
+            return { deleted: false, message: 'Failed to delete account' };
         } catch (error) {
             throw new Error(error.message);
         }

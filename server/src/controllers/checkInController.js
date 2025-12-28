@@ -30,3 +30,27 @@ export const searchUnpaidCheckInsController = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+// GET /api/check-in/today-reservations
+export const getTodayReservations = async (req, res) => {
+  try {
+    const data = await CheckInModel.getTodayReservations();
+    res.status(200).json({ success: true, data }); // Trả về format { success, data } chuẩn
+  } catch (error) {
+    console.error("Get today reservations error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// GET /api/check-in/today-reservations/search
+export const searchTodayReservationsController = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.status(400).json({ success: false, message: "Query required" });
+
+    const data = await CheckInModel.searchTodayReservations(q);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

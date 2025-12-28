@@ -121,13 +121,12 @@
     cursor: pointer;
     border: none;
     font-size: 16px;
-}
-
-.btn-action.primary {
     background-color: #000;
     color: white;
+    transition: 1s ease;
 }
-.btn-action.secondary {
+
+.btn-action:hover {
     background-color: #f0f0f0;
     color: #333;
 }

@@ -4,9 +4,9 @@ import { FaUserPlus, FaSearch, FaExclamationCircle } from 'react-icons/fa';
 import { useAuth } from '../api/AuthContext';
 import { fetchUserProfile } from '../services/accountService';
 import { 
-    fetchReceptionistsAPI, 
-    createReceptionistAPI, 
-    deleteReceptionistAPI 
+    fetchAccountsAPI, 
+    createAccountsAPI, 
+    deleteAccount, 
 } from '../services/settingService';
 
 import InputGroup from '../components/InputGroup';
@@ -61,7 +61,7 @@ const UserProfile = () => {
 
     // --- STATE CHO STAFF MANAGEMENT ---
     const [staffList, setStaffList] = useState([]);
-    const [newStaff, setNewStaff] = useState({ username: '', password: '', email: '', phone: '' });
+    const [newStaff, setNewStaff] = useState({ username: '', password: '', email: '', phone: '', role: 'Receptionist' });
     const [formError, setFormError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     
@@ -85,7 +85,7 @@ const UserProfile = () => {
                 // Gọi API lấy thông tin chi tiết user
                 const res = await fetchUserProfile(user.username);
                 
-                setProfileData(res.data || res); 
+                setProfileData(res.data);
             } catch (err) {
                 console.error("Error fetching profile", err);
                 setProfileData(user); 
@@ -105,7 +105,7 @@ const UserProfile = () => {
 
     const loadStaffData = async () => {
         try {
-            const res = await fetchReceptionistsAPI();
+            const res = await fetchAccountsAPI();
             if (res.success) setStaffList(res.data || []);
         } catch (error) {
             console.error(error);
@@ -122,9 +122,15 @@ const UserProfile = () => {
             setFormError("Invalid email format!"); return;
         }
         try {
-            await createReceptionistAPI(newStaff);
+            const accountTypeID = newStaff.role === 'Manager' ? 1 : 2;
+            const payload = {
+                ...newStaff,
+                accountTypeID: accountTypeID
+            };
+
+            await createAccountsAPI(payload);
             setStatusModal({ isOpen: true, type: 'success', message: "Account added successfully!" });
-            setNewStaff({ username: '', password: '', email: '', phone: '' });
+            setNewStaff({ username: '', password: '', email: '', phone: '', role: 'Receptionist' });
             setFormError('');
             loadStaffData(); 
         } catch (error) {
@@ -141,7 +147,7 @@ const UserProfile = () => {
         const username = confirmModal.data;
         setConfirmModal({ ...confirmModal, isOpen: false });
         try {
-            const res = await deleteReceptionistAPI(username);
+            const res = await deleteAccount(username);
             if (res.success) {
                 setStatusModal({ isOpen: true, type: 'success', message: res.message });
                 loadStaffData();
@@ -190,10 +196,8 @@ const UserProfile = () => {
             <div className="recep-edit-container">
                 <h1 className="recep-title">My Profile</h1>
       
-                {/* 1. LUÔN HIỂN THỊ: Phần thông tin cá nhân */}
                 <PersonalInfo userProfile={profileData} loading={loadingProfile} />
                 
-                {/* 2. CHỈ HIỂN THỊ NẾU LÀ MANAGER: Phần quản lý Staff */}
                 {isManager && (
                     <>
                         {/* Add Form */}
@@ -205,43 +209,29 @@ const UserProfile = () => {
                             </div>
                             <form className="account-form-grid" onSubmit={handleAddAccount} autoComplete="off">
                                 <InputGroup 
-                                    label="Username *" 
-                                    value={newStaff.username} 
-                                    onChange={v => setNewStaff({...newStaff, username: v})} 
-                                    onFocus={() => setFormError('')} 
+                                    label="Username *" value={newStaff.username} 
+                                    onChange={v => setNewStaff({...newStaff, username: v})} onFocus={() => setFormError('')} 
                                 />
-                                
                                 <InputGroup 
-                                    label="Password *" 
-                                    type={showPassword ? "text" : "password"} 
-                                    value={newStaff.password} 
-                                    onChange={v => setNewStaff({...newStaff, password: v})} 
-                                    isPasswordField={true} 
-                                    showPassword={showPassword} 
+                                    label="Password *" type={showPassword ? "text" : "password"} 
+                                    value={newStaff.password} onChange={v => setNewStaff({...newStaff, password: v})} 
+                                    isPasswordField={true} showPassword={showPassword} 
                                     onTogglePassword={() => setShowPassword(!showPassword)} 
                                 />
-                                
                                 <InputGroup 
-                                    label="Email *" 
-                                    type="email" 
-                                    value={newStaff.email} 
-                                    onChange={v => setNewStaff({...newStaff, email: v})} 
-                                    onFocus={() => setFormError('')} 
+                                    label="Email *" type="email" value={newStaff.email} 
+                                    onChange={v => setNewStaff({...newStaff, email: v})} onFocus={() => setFormError('')} 
                                 />
-                                
                                 <InputGroup 
-                                    label="Phone" 
-                                    value={newStaff.phone} 
-                                    onChange={v => setNewStaff({...newStaff, phone: v})} 
-                                    onFocus={() => setFormError('')} 
+                                    label="Phone" value={newStaff.phone} 
+                                    onChange={v => setNewStaff({...newStaff, phone: v})} onFocus={() => setFormError('')} 
                                     placeholder="Optional" 
                                 />
-
-                                {/* New Select Implementation */}
                                 <InputGroup 
                                     label="Role" 
                                     type="select"
-                                    value={newStaff.role || "Receptionist"} // Ensure a default value exists
+                                    wrapperClass="full-width" 
+                                    value={newStaff.role}
                                     onChange={v => setNewStaff({...newStaff, role: v})} 
                                     options={[
                                         { value: 'Receptionist', label: 'Receptionist' },
@@ -272,9 +262,10 @@ const UserProfile = () => {
                             <table className="recep-table">
                                 <thead>
                                     <tr>
-                                        <th style={{width: '25%'}}>Username</th>
-                                        <th style={{width: '25%'}}>Phone</th>
-                                        <th style={{width: '40%'}}>Email</th>
+                                        <th style={{width: '20%'}}>Username</th>
+                                        <th style={{width: '20%'}}>Phone</th>
+                                        <th style={{width: '30%'}}>Email</th>
+                                        <th style={{width: '20%'}}>Role</th> {/* <-- Thêm cột Role */}
                                         <th style={{width: '10%'}}>Action</th>
                                     </tr>
                                 </thead>
@@ -285,14 +276,23 @@ const UserProfile = () => {
                                                 <td style={{fontWeight: 'bold'}}>{staff.Username}</td>
                                                 <td>{staff.Phone || ''}</td>
                                                 <td>{staff.Email}</td>
+                                                
+                                                {/* Hiển thị Role */}
+                                                <td>
+                                                    <span className={staff.AccountTypeName === 'Manager' ? 'role-badge-manager' : 'role-badge-receptionist'}>
+                                                        {staff.AccountTypeName}
+                                                    </span>
+                                                </td>
+
                                                 <td style={{textAlign: 'right'}}>
+                                                    {/* Không cho tự xóa chính mình */}
                                                     {staff.Username !== user.username && (
                                                         <button className="btn-delete-pill" onClick={() => handleDeleteClick(staff.Username)}>delete</button>
                                                     )}
                                                 </td>
                                             </tr>
                                         ))
-                                    ) : (<tr><td colSpan="4" className="empty-state">No accounts found.</td></tr>)}
+                                    ) : (<tr><td colSpan="5" className="empty-state">No accounts found.</td></tr>)} {/* Sửa colSpan từ 4 lên 5 */}
                                 </tbody>
                             </table>
                             {totalPages > 1 && (

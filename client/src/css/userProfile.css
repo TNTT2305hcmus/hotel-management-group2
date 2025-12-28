@@ -260,3 +260,22 @@ button { cursor: pointer; transition: background 0.2s; }
 .page-btn:disabled, .page-nav-btn:disabled { color: #9ca3af; cursor: not-allowed; }
 
 .footer-center { display: flex; justify-content: center; margin-top: 30px; }
+
+/* Role Badges */
+.role-badge-manager {
+    background-color: #e0e7ff; /* Xanh tím nhạt */
+    color: #4338ca;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.role-badge-receptionist {
+    background-color: #d1fae5; /* Xanh lá nhạt */
+    color: #047857;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}

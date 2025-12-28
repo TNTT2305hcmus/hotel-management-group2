@@ -33,45 +33,40 @@ export const resetSurchargeAPI = async () => {
     }
 };
 
-// 4. Get Receptionist List (GET)
-export const fetchReceptionistsAPI = async () => {
+// Get Accounts List
+export const fetchAccountsAPI = async () => {
     try {
-        const res = await axiosClient.get(`${SETTING_API_URL}/receptionists`);
+        const res = await axiosClient.get(`${SETTING_API_URL}/accounts`);
         return res.data;
     } catch (error) {
-        return { success: false, message: error.response?.data?.message || "Failed to fetch receptionists" };
+        return { success: false, message: error.response?.data?.message || "Failed to fetch accounts" };
     }
 };
 
-// 5. Delete Receptionist (DELETE)
-export const deleteReceptionistAPI = async (username) => {
+// Delete Account
+export const deleteAccount = async (username) => {
     try {
-        const res = await axios.delete(`${SETTING_API_URL}/receptionists/${username}`);
+        const res = await axiosClient.delete(`${SETTING_API_URL}/accounts/${username}`);
         return res.data;
     } catch (error) {
         return { success: false, message: error.response?.data?.message || "Failed to delete account" };
     }
 };
 
-// // 6. Create Receptionist 
-export const createReceptionistAPI = async (userData) => {
+// Create Account (Gọi API Register của Auth)
+export const createAccountsAPI = async (userData) => {
     try {
-        // Chuẩn bị dữ liệu để gửi cho controllersRegister
         const payload = {
             username: userData.username,
             password: userData.password,
             email: userData.email,
             phone: userData.phone,        
-            // Gán cứng ID 2 để Controller biết đây là Lễ tân
-            accountTypeID: 2 
+            accountTypeID: userData.accountTypeID
         };
-
-        // Gọi vào route /register -> Nó sẽ chạy vào controllersRegister
-        const res = await axiosClient.post(`/api/auth/register`, payload);
-        
+        // Giả sử bạn có route auth riêng
+        const res = await axiosClient.post(`/api/auth/register`, payload); 
         return res.data;
     } catch (error) {
-        // Controller trả về lỗi 400 (err.message), ta hứng ở đây để hiện thông báo
         throw error;
     }
 };
