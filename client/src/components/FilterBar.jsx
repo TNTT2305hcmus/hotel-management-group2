@@ -17,8 +17,7 @@ const FilterBar = ({ onSearch, onFilterType, onFilterStatus }) => {
         <option value="">All Room Types</option>
         <option value="1">Single</option>
         <option value="2">Double</option>
-        <option value="3">Standard</option>
-        <option value="4">Luxury</option>
+        <option value="3">Luxury</option>
       </select>
 
       {/* Dropdown Trạng thái */}
