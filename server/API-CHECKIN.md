@@ -1,199 +1,204 @@
-# Check-in API Documentation
+# CHECK-IN API DOCUMENTATION
 
-## 1. Get Unpaid Check-ins
+This document describes the Check-in API endpoints for the Hotel Management System.
 
-```http
-GET /check-in/unpaid
+## Base URL
+```
+http://localhost:5000/api/check-in
 ```
 
-**Description:** Get list of all unpaid check-ins (bookings where PaymentDate IS NULL). Returns only customer name and room number.
-
-**Response:**
-
-```json
-{
-  "data": [
-    {
-      "fullName": "Michael Johnson",
-      "roomNumber": "101"
-    },
-    {
-      "fullName": "Sarah Williams",
-      "roomNumber": "201"
-    }
-  ]
-}
-```
-
-**Response Fields:**
-
-- `fullName`: Customer's full name
-- `roomNumber`: Room number (as string)
-
-**Error Responses:**
-
-- `500 Internal Server Error`: Server error occurred
-  ```json
-  {
-    "message": "Server Error",
-    "error": "Error message details"
-  }
-  ```
+## Authentication
+All endpoints require Bearer token authentication.
 
 ---
 
-## 2. Search Unpaid Check-ins
+## Endpoints
 
-```http
-GET /check-in/unpaid/search?q={searchTerm}
-```
+### 1. Create Booking
 
-**Description:** Search unpaid check-ins by customer name or room number. Returns only customer name and room number.
+**Endpoint:** `POST /booking`  
+**Description:** Create a new booking with room status validation  
+**Authentication:** Required
 
-**Query Parameters:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| q | String | Yes | Search term (customer name or room number) |
-
-**Examples:**
-
-- `/check-in/unpaid/search?q=Michael` - Search by customer name
-- `/check-in/unpaid/search?q=101` - Search by room number
-- `/check-in/unpaid/search?q=John` - Partial name search
-
-**Response:**
-
+#### Request Body
 ```json
 {
-  "data": [
-    {
-      "fullName": "Michael Johnson",
-      "roomNumber": "101"
-    },
-    {
-      "fullName": "John Smith",
-      "roomNumber": "102"
-    }
-  ]
+    "roomId": 101,
+    "checkInDate": "2025-12-30 14:00:00",
+    "checkOutDate": "2025-12-31 11:00:00",
+    "totalPrice": 500000,
+    "customers": [
+        {
+            "citizenId": "123456789000",
+            "customerTypeId": 1,
+            "fullName": "Nguyễn Văn A",
+            "phoneNumber": "0901234567",
+            "address": "123 Lê Lợi, Q1, TP.HCM"
+        },
+        {
+            "citizenId": "111222333444",
+            "customerTypeId": 2,
+            "fullName": "John Smith",
+            "phoneNumber": "0901111111",
+            "address": "456 Main Street, New York, USA"
+        }
+    ]
 }
 ```
 
-**Response Fields:**
+#### Required Fields
+- `roomId` (integer): Room ID to book
+- `checkInDate` (string): Check-in date in YYYY-MM-DD HH:mm:ss format
+- `customers` (array): Array of customer objects (minimum 1)
+- `customers[].citizenId` (string): Customer's citizen ID
 
-- `fullName`: Customer's full name
-- `roomNumber`: Room number (as string)
+#### Optional Fields
+- `checkOutDate` (string): Check-out date
+- `totalPrice` (number): Total booking price (default: 0)
+- `customers[].customerTypeId` (integer): Customer type (default: 1 - Domestic)
+- `customers[].fullName` (string): Customer's full name
+- `customers[].phoneNumber` (string): Customer's phone number
+- `customers[].address` (string): Customer's address
 
-**Error Responses:**
+#### Success Response (201 Created)
+```json
+{
+    "success": true,
+    "message": "Room booked successfully",
+    "data": {
+        "bookingId": 6,
+        "roomId": 101,
+        "roomStatus": "Occupied",
+        "customers": [
+            {
+                "citizenId": "123456789000",
+                "customerTypeId": 1,
+                "fullName": "Nguyễn Văn A",
+                "phoneNumber": "0901234567",
+                "address": "123 Lê Lợi, Q1, TP.HCM"
+            },
+            {
+                "citizenId": "111222333444",
+                "customerTypeId": 2,
+                "fullName": "John Smith",
+                "phoneNumber": "0901111111",
+                "address": "456 Main Street, New York, USA"
+            }
+        ],
+        "customerCount": 2,
+        "booking": {
+            "roomId": 101,
+            "checkInDate": "2025-12-30 14:00:00",
+            "checkOutDate": "2025-12-31 11:00:00",
+            "totalPrice": 500000
+        }
+    }
+}
+```
 
-- `400 Bad Request`: Search term is missing or empty
-  ```json
-  {
-    "message": "Search term is required",
-    "error": "Query parameter 'q' cannot be empty"
-  }
-  ```
-- `500 Internal Server Error`: Server error occurred
-  ```json
-  {
-    "message": "Server Error",
-    "error": "Error message details"
-  }
-  ```
+#### Error Responses
 
-**Notes:**
+**400 Bad Request - Missing Required Fields**
+```json
+{
+    "success": false,
+    "message": "Missing required fields: roomId, checkInDate, customers"
+}
+```
 
-- Search is case-insensitive
-- Supports partial matching (LIKE query)
-- Only returns unpaid bookings (PaymentDate IS NULL)
-- Results are ordered by check-in date (most recent first)
+**400 Bad Request - Invalid Customers Array**
+```json
+{
+    "success": false,
+    "message": "customers must be a non-empty array"
+}
+```
+
+**400 Bad Request - Missing Customer CitizenID**
+```json
+{
+    "success": false,
+    "message": "Customer at index 0 is missing required field: citizenId"
+}
+```
+
+**400 Bad Request - No Customers**
+```json
+{
+    "success": false,
+    "message": "At least one customer is required"
+}
+```
+
+**400 Bad Request - Room Not Available**
+```json
+{
+    "success": false,
+    "message": "Room 103 is currently Occupied, cannot book"
+}
+```
+
+**400 Bad Request - Room Does Not Exist**
+```json
+{
+    "success": false,
+    "message": "Room does not exist"
+}
+```
+
+**500 Internal Server Error**
+```json
+{
+    "success": false,
+    "message": "Server error when creating booking",
+    "error": "Database connection failed"
+}
+```
 
 ---
 
-## Error Responses
+## Business Logic
 
-### 400 Bad Request
+### Booking Creation Process
+1. **Room Status Validation**: Check if room exists and has 'Available' status
+2. **Customers Validation**: Validate customers array (minimum 1 customer required)
+3. **Booking Creation**: Insert new booking record
+4. **Customer Processing**: For each customer:
+   - Check if customer exists, create new one if needed
+   - Create booking detail linking customer to booking
+5. **Room Status Update**: Change room status from 'Available' to 'Occupied'
 
-```json
-{
-  "message": "Search term is required",
-  "error": "Query parameter 'q' cannot be empty"
-}
-```
+### Multiple Customers Support
+- One booking can have multiple customers (group booking)
+- Each customer is linked to the booking via `BOOKING_DETAIL` table
+- All customers share the same room and booking dates
+- Customer validation and creation is done individually for each customer
 
-### 500 Internal Server Error
+### Room Status Values
+- `Available`: Room can be booked
+- `Occupied`: Room is currently booked
+- `Maintenance`: Room is under maintenance
 
-```json
-{
-  "message": "Server Error",
-  "error": "Error message details"
-}
-```
+### Customer Types
+- `1`: Domestic
+- `2`: Foreign
 
-## 3. Create Booking
+---
 
-```http
-POST /api/bookings
+## Database Tables Affected
+- `BOOKING`: New booking record created
+- `BOOKING_DETAIL`: Links customer to booking
+- `CUSTOMER`: New customer created if not exists
+- `ROOM`: Status updated to 'Occupied'
 
-```
+---
 
-**Description:** Create a new booking transaction. This API automatically handles creating or updating customer information (including phone number), calculating total price, creating booking details, and updating room status to 'Occupied'.
-
-**Request Body:**
-
-```json
-{
-  "roomId": 101,
-  "checkInDate": "2025-12-24",
-  "checkOutDate": "2025-12-26",
-  "guests": [
-    {
-      "fullName": "Nguyen Van A",
-      "citizenId": "079200012345",
-      "customerTypeId": 1,
-      "phoneNumber": "0909123456",
-      "address": "123 Street, City"
-    },
-    {
-      "fullName": "Le Thi B",
-      "citizenId": "079200098765",
-      "customerTypeId": 1,
-      "address": "456 Avenue"
-    }
-  ]
-}
-```
-
-**Response:**
-
-```json
-{
-  "bookingId": 15,
-  "totalPrice": 1000000,
-  "status": "Success"
-}
-```
-
-**Response Fields:**
-
-- `bookingId`: The unique ID generated for this booking
-- `totalPrice`: Total calculated cost (Price per night \* Number of nights)
-- `status`: Transaction status message
-
-**Error Responses:**
-
-- `400 Bad Request`: Missing required fields (Room ID, Check-in Date, or Guest List)
-
-```json
-{
-  "message": "Missing required fields: Room ID, Check-in Date, or Guest List."
-}
-```
-
-- `500 Internal Server Error`: Server error, invalid Room ID, or transaction failed
-
-```json
-{
-  "message": "Server Error during booking creation",
-  "error": "Error message details"
-}
-```
+## Testing
+Use the test file: `src/test/checkin.rest` for API testing with various scenarios including:
+- Single customer booking
+- Multiple customers booking (group booking)
+- Booking occupied room (should fail)
+- Booking with existing customer
+- Missing data validation
+- Empty customers array validation
+- Non-existent room validation

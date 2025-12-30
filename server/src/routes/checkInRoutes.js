@@ -1,19 +1,11 @@
-import express from "express";
-import { getUnpaidCheckIns, 
-        searchUnpaidCheckInsController,
-        getTodayReservations, 
-        searchTodayReservationsController
-} from "../controllers/checkInController.js";
+import express from 'express';
+import * as checkInController from '../controllers/checkInController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/today-reservations", getTodayReservations);
-router.get("/today-reservations/search", searchTodayReservationsController);
-
-// Get list of unpaid check-ins (PaymentDate = NULL)
-router.get("/unpaid", getUnpaidCheckIns);
-
-// Search unpaid check-ins by customer name or room name
-router.get("/unpaid/search", searchUnpaidCheckInsController);
+// Route to create new booking
+// POST /api/check-in/booking
+router.post('/booking', checkInController.createBooking);
 
 export default router;

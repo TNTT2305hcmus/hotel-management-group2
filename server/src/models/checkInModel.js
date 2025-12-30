@@ -1,96 +1,55 @@
-import pool from "../config/database.js";
+import pool from '../config/database.js';
 
 const CheckInModel = {
-  // Get list of unpaid check-ins (PaymentDate IS NULL) - returns only customer name and room number
-  findUnpaidCheckIns: async () => {
-    const query = `
-            SELECT
-                c.FullName AS fullName,
-                CAST(b.RoomID AS CHAR) AS roomNumber
-            FROM BOOKING b
-            INNER JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
-            INNER JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
-            WHERE b.PaymentDate IS NULL
-            ORDER BY b.CheckInDate DESC
+    // Check room status
+    checkRoomStatus: async (roomId) => {
+        const sql = 'SELECT Status FROM ROOM WHERE RoomID = ?';
+        const [results] = await pool.query(sql, [roomId]);
+        return results[0];
+    },
+
+    // Create new booking
+    createBooking: async (bookingData) => {
+        const { roomId, checkInDate, checkOutDate, totalPrice } = bookingData;
+        const sql = `
+            INSERT INTO BOOKING (RoomID, CheckInDate, CheckOutDate, TotalPrice) 
+            VALUES (?, ?, ?, ?)
         `;
+        const [results] = await pool.query(sql, [roomId, checkInDate, checkOutDate, totalPrice]);
+        return { bookingId: results.insertId, ...bookingData };
+    },
 
-    const [rows] = await pool.query(query);
-    return rows;
-  },
+    // Update room status to Occupied
+    updateRoomStatus: async (roomId, status) => {
+        const sql = 'UPDATE ROOM SET Status = ? WHERE RoomID = ?';
+        const [results] = await pool.query(sql, [status, roomId]);
+        return results;
+    },
 
-  // Search unpaid check-ins by customer name or room name - returns only customer name and room number
-  searchUnpaidCheckIns: async (searchTerm) => {
-    const query = `
-            SELECT
-                c.FullName AS fullName,
-                CAST(b.RoomID AS CHAR) AS roomNumber
-            FROM BOOKING b
-            INNER JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
-            INNER JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
-            WHERE b.PaymentDate IS NULL
-            AND (
-                c.FullName LIKE ? 
-                OR CAST(b.RoomID AS CHAR) LIKE ?
-            )
-            ORDER BY b.CheckInDate DESC
+    // Create booking detail (link customer with booking)
+    createBookingDetail: async (bookingId, citizenId) => {
+        const sql = 'INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (?, ?)';
+        const [results] = await pool.query(sql, [bookingId, citizenId]);
+        return results;
+    },
+
+    // Check if customer exists
+    checkCustomerExists: async (citizenId) => {
+        const sql = 'SELECT CitizenID FROM CUSTOMER WHERE CitizenID = ?';
+        const [results] = await pool.query(sql, [citizenId]);
+        return results.length > 0;
+    },
+
+    // Create new customer if not exists
+    createCustomer: async (customerData) => {
+        const { citizenId, customerTypeId, fullName, phoneNumber, address } = customerData;
+        const sql = `
+            INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) 
+            VALUES (?, ?, ?, ?, ?)
         `;
-
-    const searchPattern = `%${searchTerm}%`;
-    const [rows] = await pool.query(query, [searchPattern, searchPattern]);
-    return rows;
-  },
-
-  // Lấy danh sách Booking CHECK-IN HÔM NAY
-  getTodayReservations: async () => {
-    const query = `
-      SELECT 
-        b.BookingID as bookingId,
-        CAST(b.RoomID AS CHAR) as roomNumber,
-        c.FullName as guestName, -- hoặc fullName tuỳ client mapping
-        c.CitizenID as citizenId,
-        c.PhoneNumber as phoneNumber,
-        c.Address as address,
-        CASE 
-           WHEN b.PaymentDate IS NOT NULL THEN 'Confirmed' -- Đã thanh toán (hoặc logic khác tuỳ bạn)
-           ELSE 'Pending' -- Chưa thanh toán (mới check-in)
-        END as status
-      FROM BOOKING b
-      INNER JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
-      INNER JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
-      -- Lọc theo ngày check-in bằng hôm nay
-      WHERE DATE(b.CheckInDate) = CURDATE()
-      ORDER BY b.BookingID DESC -- Mới nhất lên đầu
-    `;
-    const [rows] = await pool.query(query);
-    return rows;
-  },
-
-  // Tìm kiếm trong danh sách hôm nay
-  searchTodayReservations: async (searchTerm) => {
-    const query = `
-      SELECT 
-        b.BookingID as bookingId,
-        CAST(b.RoomID AS CHAR) as roomNumber,
-        c.FullName as guestName,
-        c.CitizenID as citizenId,
-        c.PhoneNumber as phoneNumber,
-        c.Address as address,
-        'Pending' as status -- Đơn giản hóa hoặc dùng CASE như trên
-      FROM BOOKING b
-      INNER JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
-      INNER JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
-      WHERE DATE(b.CheckInDate) = CURDATE()
-      AND (
-        c.FullName LIKE ? 
-        OR CAST(b.RoomID AS CHAR) LIKE ?
-        OR c.PhoneNumber LIKE ? -- Thêm tìm kiếm theo SĐT
-      )
-      ORDER BY b.BookingID DESC
-    `;
-    const pattern = `%${searchTerm}%`;
-    const [rows] = await pool.query(query, [pattern, pattern, pattern]);
-    return rows;
-  },
+        const [results] = await pool.query(sql, [citizenId, customerTypeId, fullName, phoneNumber, address]);
+        return results;
+    }
 };
 
 export default CheckInModel;

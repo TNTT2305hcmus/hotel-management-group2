@@ -1,0 +1,164 @@
+### ===========================================
+### API CHECK-IN TEST
+### ===========================================
+
+
+
+### ========================================
+### 2. CREATE BOOKING WITH SINGLE CUSTOMER
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 101,
+    "checkInDate": "2025-12-30 14:00:00",
+    "checkOutDate": "2025-12-31 11:00:00",
+    "totalPrice": 500000,
+    "customers": [
+        {
+            "citizenId": "123456789000",
+            "customerTypeId": 1,
+            "fullName": "Nguyễn Văn A",
+            "phoneNumber": "0901234567",
+            "address": "123 Lê Lợi, Q1, TP.HCM"
+        }
+    ]
+}
+
+### ========================================
+### 3. CREATE BOOKING WITH MULTIPLE CUSTOMERS
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 102,
+    "checkInDate": "2025-12-30 15:00:00",
+    "checkOutDate": "2026-01-02 11:00:00",
+    "totalPrice": 1000000,
+    "customers": [
+        {
+            "citizenId": "111222333444",
+            "customerTypeId": 1,
+            "fullName": "Nguyễn Văn B",
+            "phoneNumber": "0901111111",
+            "address": "456 Trần Hưng Đạo, Q1, TP.HCM"
+        },
+        {
+            "citizenId": "555666777888",
+            "customerTypeId": 1,
+            "fullName": "Trần Thị C",
+            "phoneNumber": "0902222222",
+            "address": "789 Lý Tự Trọng, Q1, TP.HCM"
+        },
+        {
+            "citizenId": "999000111222",
+            "customerTypeId": 2,
+            "fullName": "John Smith",
+            "phoneNumber": "0903333333",
+            "address": "123 Main St, New York, USA"
+        }
+    ]
+}
+
+### ========================================
+### 4. TRY TO BOOK OCCUPIED ROOM (Should fail)
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 103,
+    "checkInDate": "2025-12-30 14:00:00",
+    "checkOutDate": "2025-12-31 11:00:00",
+    "totalPrice": 500000,
+    "customers": [
+        {
+            "citizenId": "123456789001",
+            "customerTypeId": 1,
+            "fullName": "Trần Thị B",
+            "phoneNumber": "0901234568",
+            "address": "456 Nguyễn Huệ, Q1, TP.HCM"
+        }
+    ]
+}
+
+### ========================================
+### 5. BOOK WITH EXISTING CUSTOMER
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 201,
+    "checkInDate": "2025-12-30 15:00:00",
+    "checkOutDate": "2026-01-01 11:00:00",
+    "totalPrice": 1600000,
+    "customers": [
+        {
+            "citizenId": "001200000001",
+            "customerTypeId": 1,
+            "fullName": "Michael Johnson",
+            "phoneNumber": "0909000001",
+            "address": "123 Main Street, New York, USA"
+        }
+    ]
+}
+
+### ========================================
+### 6. MISSING DATA TEST (Should fail)
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 202,
+    "checkInDate": "2025-12-30 15:00:00",
+    "customers": [
+        {
+            "fullName": "Lê Văn C"
+        }
+    ]
+}
+
+### ========================================
+### 7. EMPTY CUSTOMERS ARRAY (Should fail)
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 301,
+    "checkInDate": "2025-12-30 15:00:00",
+    "totalPrice": 200000,
+    "customers": []
+}
+
+### ========================================
+### 8. NON-EXISTENT ROOM (Should fail)
+### ========================================
+
+POST http://localhost:5000/api/check-in/booking
+Content-Type: application/json
+
+{
+    "roomId": 999,
+    "checkInDate": "2025-12-30 15:00:00",
+    "totalPrice": 500000,
+    "customers": [
+        {
+            "citizenId": "123456789999",
+            "customerTypeId": 1,
+            "fullName": "Phạm Văn D",
+            "phoneNumber": "0901234569",
+            "address": "789 Pasteur, Q3, TP.HCM"
+        }
+    ]
+}
