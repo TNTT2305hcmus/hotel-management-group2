@@ -78,8 +78,7 @@ export const updateRoomService = async (currentId, data) => {
 
     // Return the result for the controller to display
     return {
-        originalId: currentId,
-        updatedId: data.newId || currentId,
+        id: currentId,
         ...data
     };
 };
@@ -109,4 +108,8 @@ export const getRoomDetailService = async (id) => {
         throw new Error('Room not found');
     }
     return room;
+};
+
+export const getRoomGuestsService = async (roomId) => {
+    return await RoomModel.getRoomGuestHistory(roomId);
 };

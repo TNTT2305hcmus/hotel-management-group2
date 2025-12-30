@@ -22,32 +22,30 @@ GET http://localhost:5000/api/rooms?status=Maintenance
 ### Mapping: 1=Single, 2=Double, 3=Deluxe, 4=Luxury
 ### ---------------------------------------------------
 
-### 5. Filter - Single Room (Type ID = 1)
+### 5. Filter - Standard Room (Type ID = 1)
 GET http://localhost:5000/api/rooms?type=1
 
-### 6. Filter - Double Room (Type ID = 2)
+### 6. Filter - VIP Room (Type ID = 2)
 GET http://localhost:5000/api/rooms?type=2
 
-### 7. Filter - Standard Room (Type ID = 3)
+### 7. Filter - Luxury Room (Type ID = 3)
 GET http://localhost:5000/api/rooms?type=3
 
-### 8. Filter - Luxury Room (Type ID = 4)
-GET http://localhost:5000/api/rooms?type=4
 
 ### ---------------------------------------------------
 ### COMBINE FILTERS
 ### ---------------------------------------------------
 
-### 9. Available AND Single Room (ID 1)
+### 9. Available AND Standard Room (ID 1)
 GET http://localhost:5000/api/rooms?status=Available&type=1
 
-### 10. Available AND Double Room (ID 2)
+### 10. Available AND VIP Room (ID 2)
 GET http://localhost:5000/api/rooms?status=Available&type=2
 
-### 11. Occupied AND Standard Room (ID 3)
+### 11. Occupied AND Luxury Room (ID 3)
 GET http://localhost:5000/api/rooms?status=Occupied&type=3
 
-### 12. Maintenance AND Single Room (ID 1)
+### 12. Maintenance AND Standard Room (ID 1)
 GET http://localhost:5000/api/rooms?status=Maintenance&type=1
 
 ### ---------------------------------------------------
@@ -64,7 +62,7 @@ GET http://localhost:5000/api/rooms
 ### ADD NEW ROOM - SUCCESS CASES
 ### ---------------------------------------------------
 
-### 15. Add new room - Double Room (Type 2)
+### 15. Add new room - VIP Room (Type 2)
 POST http://localhost:5000/api/rooms
 Content-Type: application/json
 
@@ -76,7 +74,7 @@ Content-Type: application/json
     "image": "https://images.unsplash.com/photo-double-room.jpg"
 }
 
-### 16. Add new room - Deluxe Room (Type 3)
+### 16. Add new room - Luxury Room (Type 3)
 POST http://localhost:5000/api/rooms
 Content-Type: application/json
 
@@ -88,13 +86,13 @@ Content-Type: application/json
     "image": "https://images.unsplash.com/photo-deluxe.jpg"
 }
 
-### 17. Add new room - Luxury Room (Type 4) with Maintenance Status
+### 17. Add new room - Luxury Room (Type 3) with Maintenance Status
 POST http://localhost:5000/api/rooms
 Content-Type: application/json
 
 {
     "id": 404,
-    "typeId": 4,
+    "typeId": 3,
     "status": "Maintenance",
     "note": "Painting walls",
     "image": "https://images.unsplash.com/photo-luxury.jpg"
@@ -236,4 +234,8 @@ Content-Type: application/json
 # Kịch bản: Lấy thông tin phòng 101 (đã tồn tại trong DB)
 # Mong đợi: 200 OK - Trả về object thông tin phòng
 GET {{url}}/api/rooms/101
+Content-Type: application/json
+
+### 34. [SUCCESS] Guest History for Room
+GET {{url}}/api/rooms/101/guest
 Content-Type: application/json

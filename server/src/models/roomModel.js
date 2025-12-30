@@ -122,18 +122,19 @@ const RoomModel = {
     getRoomGuestHistory: async (roomId) => {
         const query = `
             SELECT 
-                c.FullName as name,
-                c.CitizenID as idCard,    
+                c.FullName as name,          
+                c.CitizenID as idCard,       
+                c.CitizenID as passport,     
                 c.PhoneNumber as phone,
-                c.Address as address,     
-                b.CheckInDate as checkIn,
-                b.CheckOutDate as checkOut,
+                c.Address as address,
+                b.CheckInDate as checkIn,    
+                b.CheckOutDate as checkOut,  
                 b.PaymentDate
             FROM BOOKING b
             JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
             JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
             WHERE b.RoomID = ?
-            ORDER BY b.CheckInDate DESC 
+            ORDER BY b.CheckInDate DESC
         `;
         const [rows] = await pool.query(query, [roomId]);
         return rows;

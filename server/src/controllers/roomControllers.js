@@ -4,7 +4,8 @@ import {
     getRoomStatsService,
     updateRoomService,
     deleteRoomService,
-    getRoomDetailService
+    getRoomDetailService,
+    getRoomGuestsService
 } from '../services/roomServices.js';
 
 
@@ -59,7 +60,7 @@ export const createRoom = async (req, res) => {
     }
 };
 
-// API thống kê
+// API statistical
 export const getRoomStats = async (req, res) => {
     try {
         const stats = await getRoomStatsService();
@@ -70,24 +71,54 @@ export const getRoomStats = async (req, res) => {
     }
 };
 
-// --- PUT: Update Room (Add this function to the end of the file) ---
+// PUT: Update Room 
 export const updateRoom = async (req, res) => {
     try {
-        const { id } = req.params; // Old ID from URL parameters
+        const { id } = req.params; 
         
         // Get data from request body
-        // roomNumber: New ID (if you want to rename the room)
-        // typeId: New Room Type (Capacity and Price will update automatically based on this)
-        const { roomNumber, typeId, status, description, image } = req.body;
+        const { typeId, status, description, image } = req.body;
 
         // Basic Validation
         if (!typeId) {
             return res.status(400).json({ message: 'Missing required field: Room Type (typeId)' });
         }
 
-        // Call Service
+        // --- SECURITY & LOGIC CHECK START ---
+        
+        // 1. Fetch current room 
+        let currentRoom;
+        try {
+            currentRoom = await getRoomDetailService(id);
+        } catch (err) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+
+        // 2. Rule: Cannot edit a room that is currently Occupied
+        if (currentRoom.status === 'Occupied') {
+            return res.status(400).json({ 
+                message: 'Action denied: Cannot update room details while it is Occupied.' 
+            });
+        }
+
+        // 3. Rule: Prevent changing status TO 'Occupied' manually
+        if (status === 'Occupied') {
+            return res.status(400).json({ 
+                message: 'Action denied: Cannot manually change status to Occupied. Please use the Check-in feature.' 
+            });
+        }
+
+        // 4. Rule: Allow only 'Available' or 'Maintenance'
+        const validStatuses = ['Available', 'Maintenance'];
+        if (status && !validStatuses.includes(status)) {
+            return res.status(400).json({ 
+                message: 'Invalid status. Only "Available" or "Maintenance" are allowed for update.' 
+            });
+        }
+
+        // --- SECURITY & LOGIC CHECK END ---
+        // Call Service to update
         const updatedRoom = await updateRoomService(id, { 
-            newId: roomNumber, 
             typeId, 
             status, 
             note: description, 
@@ -98,25 +129,14 @@ export const updateRoom = async (req, res) => {
 
     } catch (error) {
         console.error("Update Error:", error);
-
-        // Handle Duplicate ID Error (When renaming to an existing room number)
-        if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ 
-                message: `Room Number ${req.body.roomNumber} already exists!` 
-            });
-        }
-
-        // Handle Invalid Room Type Error (Foreign Key Constraint)
         if (error.code === 'ER_NO_REFERENCED_ROW_2') {
              return res.status(400).json({ message: 'Invalid Room Type ID!' });
         }
-
-        // Handle Room Not Found Error
-        if (error.message.includes('not found')) {
+        if (error.message && error.message.includes('not found')) {
             return res.status(404).json({ message: 'Room not found' });
         }
 
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
@@ -144,12 +164,12 @@ export const deleteRoom = async (req, res) => {
     } catch (error) {
         console.error("Delete Error:", error);
 
-        // Lỗi khách book phòng
+        // Error: Cannot delete room due to existing bookings/constraints
         if (error.message.includes('Cannot delete')) {
              return res.status(409).json({ message: error.message });
         }
         
-        // Trả về 404 nếu không tìm thấy
+        // Return 404 if room is not found
         if (error.message.includes('not found')) {
             return res.status(404).json({ message: error.message });
         }
@@ -158,13 +178,15 @@ export const deleteRoom = async (req, res) => {
     }
 };
 
-// API lấy danh sách khách đã thuê phòng
+// API to retrieve guest history for a specific room
 export const getRoomGuests = async (req, res) => {
     try {
         const { id } = req.params;
-        const guests = await RoomModel.getRoomGuestHistory(id);
+        
+        const guests = await getRoomGuestsService(id);
+        
         res.status(200).json(guests);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};
+}

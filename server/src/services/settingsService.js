@@ -41,18 +41,18 @@ const SettingsService = {
             // Update the file
             const filePath = path.join(__dirname, '../config/surchargeRegulations.js');
             const fileContent = `const surcharge = {
-    foreignGuest: ${newSurcharge.foreignGuest},
-    extraPerson: ${newSurcharge.extraPerson},
-    holiday: ${newSurcharge.holiday}
-};
-const surchargeDefault = {
-    foreignGuest: ${surchargeDefault.foreignGuest},
-    extraPerson: ${surchargeDefault.extraPerson},
-    holiday: ${surchargeDefault.holiday}
-};
-export default surcharge;
-export { surchargeDefault };
-`;
+                                foreignGuest: ${newSurcharge.foreignGuest},
+                                extraPerson: ${newSurcharge.extraPerson},
+                                holiday: ${newSurcharge.holiday}
+                                };
+            const surchargeDefault = {
+                                foreignGuest: ${surchargeDefault.foreignGuest},
+                                extraPerson: ${surchargeDefault.extraPerson},
+                                holiday: ${surchargeDefault.holiday}
+                                };
+            export default surcharge;
+            export { surchargeDefault };
+            `;
 
             await fs.writeFile(filePath, fileContent, 'utf8');
 
@@ -91,18 +91,18 @@ export { surchargeDefault };
             // Update the file
             const filePath = path.join(__dirname, '../config/surchargeRegulations.js');
             const fileContent = `const surcharge = {
-    foreignGuest: ${surchargeDefault.foreignGuest},
-    extraPerson: ${surchargeDefault.extraPerson},
-    holiday: ${surchargeDefault.holiday}
-};
-const surchargeDefault = {
-    foreignGuest: ${surchargeDefault.foreignGuest},
-    extraPerson: ${surchargeDefault.extraPerson},
-    holiday: ${surchargeDefault.holiday}
-};
-export default surcharge;
-export { surchargeDefault };
-`;
+                                foreignGuest: ${surchargeDefault.foreignGuest},
+                                extraPerson: ${surchargeDefault.extraPerson},
+                                holiday: ${surchargeDefault.holiday}
+                                };
+            const surchargeDefault = {
+                                foreignGuest: ${surchargeDefault.foreignGuest},
+                                extraPerson: ${surchargeDefault.extraPerson},
+                                holiday: ${surchargeDefault.holiday}
+                                };
+            export default surcharge;
+            export { surchargeDefault };
+            `;
 
             await fs.writeFile(filePath, fileContent, 'utf8');
 
