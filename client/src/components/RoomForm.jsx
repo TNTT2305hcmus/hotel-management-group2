@@ -12,19 +12,19 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
         image: '' 
     });
 
-    // Reset form khi mở modal
+    // Reset form when modal opens
     useEffect(() => {
         if (isOpen) {
             if (mode === 'EDIT' && initialData) {
                 setFormData({
                     id: initialData.id,
-                    typeId: initialData.type === 'Single Room' ? '1' : initialData.type === 'Double Room' ? '2' : '3',
+                    typeId: initialData.type === 'Standard' ? '1' : initialData.type === 'VIP' ? '2' : '3', 
                     status: initialData.status,
                     note: initialData.note || '',
                     image: initialData.image || ''
                 });
             } else {
-                // Reset form cho Add
+                // Reset form for Add mode
                 setFormData({ id: '', typeId: '1', status: 'Available', price: '', note: '', image: '' });
             }
         }
@@ -36,16 +36,18 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
         onSubmit(formData);
     };
 
+    const isOccupied = formData.status === 'Occupied';
+
     return (
         <div className="modal-overlay">
             <div className="modal-content form-modal" style={{maxWidth: '800px'}}>
                 <div className="modal-header">
-                    <h2>{mode === 'ADD' ? 'Add New Room' : `Room ${formData.id} Edit`}</h2>
+                    <h2>{mode === 'ADD' ? 'Add New Room' : `Edit Room ${formData.id}`}</h2>
                     <button className="close-btn" onClick={onClose}>&times;</button>
                 </div>
 
                 <div className="modal-body-split">
-                    {/* Cột trái: Ảnh */}
+                    {/* Left Column: Image */}
                     <div className="image-uploader">
                         {formData.image ? (
                             <img src={formData.image} alt="Room Preview" />
@@ -60,12 +62,14 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
                         />
                     </div>
 
-                    {/* Cột phải: Form */}
+                    {/* Right Column: Form Fields */}
                     <div className="form-fields">
-                        <label>Room Number</label>
+                        <label>Room Number {mode === 'EDIT' && <small>(Read Only)</small>}</label>
                         <input 
                             type="text" 
                             value={formData.id} 
+                            disabled={mode === 'EDIT'} 
+                            style={mode === 'EDIT' ? { backgroundColor: '#e9ecef', cursor: 'not-allowed' } : {}}
                             onChange={(e) => setFormData({...formData, id: e.target.value})}
                         />
 
@@ -74,23 +78,24 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
                             value={formData.typeId} 
                             onChange={(e) => setFormData({...formData, typeId: e.target.value})}
                         >
-                            <option value="1">Single Room</option>
-                            <option value="2">Double Room</option>
-                            <option value="3">Standard Room</option>
-                            <option value="4">Luxury Room</option>
+                            <option value="1">Standard</option>
+                            <option value="2">VIP</option>
+                            <option value="3">Luxury</option>
                         </select>
 
                         <label>Status</label>
                         <select 
                             value={formData.status} 
                             onChange={(e) => setFormData({...formData, status: e.target.value})}
+                            disabled={isOccupied} 
+                            style={isOccupied ? {backgroundColor: '#e9ecef', cursor: 'not-allowed'} : {}}
                         >
                             <option value="Available">Available</option>
-                            <option value="Occupied">Occupied</option>
-                            <option value="Maintanance">Maintanance</option>
+                            <option value="Maintenance">Maintenance</option>
+                            {isOccupied && <option value="Occupied">Occupied</option>}
                         </select>
+                        {isOccupied && <small style={{color: 'red'}}>* Cannot change status of an occupied room.</small>}
                         
-                        {/* Các input khác tương tự... */}
                         <label>Description</label>
                         <textarea 
                             value={formData.note}
@@ -101,7 +106,7 @@ const RoomForm = ({ isOpen, onClose, onSubmit, initialData, mode = 'ADD' }) => {
 
                 <div className="modal-actions">
                     <button className="btn-submit" onClick={handleSubmit}>
-                        {mode === 'ADD' ? 'Add Room' : 'Change'}
+                        {mode === 'ADD' ? 'Add Room' : 'Save Changes'}
                     </button>
                     <button className="btn-cancel" onClick={onClose}>Cancel</button>
                 </div>
