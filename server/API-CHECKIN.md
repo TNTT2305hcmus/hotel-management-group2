@@ -14,7 +14,84 @@ All endpoints require Bearer token authentication.
 
 ## Endpoints
 
-### 1. Create Booking
+### 1. Get Today's Bookings
+
+**Endpoint:** `GET /today`  
+**Description:** Get all bookings with customer information for today  
+**Authentication:** Required
+
+#### Success Response (200 OK)
+```json
+{
+    "success": true,
+    "count": 2,
+    "data": [
+        {
+            "bookingId": 6,
+            "roomId": 101,
+            "roomStatus": "Occupied",
+            "roomType": "Single Room",
+            "checkInDate": "2025-12-30T07:00:00.000Z",
+            "checkOutDate": "2025-12-31T04:00:00.000Z",
+            "totalPrice": 500000,
+            "customers": [
+                {
+                    "citizenId": "123456789000",
+                    "fullName": "Nguyễn Văn A",
+                    "phoneNumber": "0901234567",
+                    "address": "123 Lê Lợi, Q1, TP.HCM",
+                    "customerType": "Domestic"
+                }
+            ]
+        },
+        {
+            "bookingId": 7,
+            "roomId": 102,
+            "roomStatus": "Occupied",
+            "roomType": "Single Room",
+            "checkInDate": "2025-12-30T08:00:00.000Z",
+            "checkOutDate": "2026-01-02T04:00:00.000Z",
+            "totalPrice": 1000000,
+            "customers": [
+                {
+                    "citizenId": "111222333444",
+                    "fullName": "Nguyễn Văn B",
+                    "phoneNumber": "0901111111",
+                    "address": "456 Trần Hưng Đạo, Q1, TP.HCM",
+                    "customerType": "Domestic"
+                },
+                {
+                    "citizenId": "555666777888",
+                    "fullName": "Trần Thị C",
+                    "phoneNumber": "0902222222",
+                    "address": "789 Lý Tự Trọng, Q1, TP.HCM",
+                    "customerType": "Domestic"
+                },
+                {
+                    "citizenId": "999000111222",
+                    "fullName": "John Smith",
+                    "phoneNumber": "0903333333",
+                    "address": "123 Main St, New York, USA",
+                    "customerType": "Foreign"
+                }
+            ]
+        }
+    ]
+}
+```
+
+#### Error Response (500 Internal Server Error)
+```json
+{
+    "success": false,
+    "message": "Server error when getting today bookings",
+    "error": "Database connection failed"
+}
+```
+
+---
+
+### 2. Create Booking
 
 **Endpoint:** `POST /booking`  
 **Description:** Create a new booking with room status validation  

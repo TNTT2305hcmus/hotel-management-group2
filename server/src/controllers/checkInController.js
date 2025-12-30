@@ -1,5 +1,20 @@
 import * as CheckInService from '../services/checkInServices.js';
 
+// Controller to get today's bookings
+export const getTodayBookings = async (req, res) => {
+    try {
+        const result = await CheckInService.getTodayBookingsWithCustomers();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting today bookings:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error when getting today bookings',
+            error: error.message
+        });
+    }
+};
+
 // Controller to create booking
 export const createBooking = async (req, res) => {
     try {

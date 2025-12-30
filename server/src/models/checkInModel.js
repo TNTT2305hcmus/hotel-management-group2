@@ -49,6 +49,35 @@ const CheckInModel = {
         `;
         const [results] = await pool.query(sql, [citizenId, customerTypeId, fullName, phoneNumber, address]);
         return results;
+    },
+
+    // Get today's bookings with customer information
+    getTodayBookings: async () => {
+        const sql = `
+            SELECT 
+                B.BookingID as bookingId,
+                B.RoomID as roomId,
+                R.Status as roomStatus,
+                RT.RoomTypeName as roomType,
+                B.CheckInDate as checkInDate,
+                B.CheckOutDate as checkOutDate,
+                B.TotalPrice as totalPrice,
+                C.CitizenID as citizenId,
+                C.FullName as fullName,
+                C.PhoneNumber as phoneNumber,
+                C.Address as address,
+                CT.CustomerTypeName as customerType
+            FROM BOOKING B
+            INNER JOIN ROOM R ON B.RoomID = R.RoomID
+            INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
+            INNER JOIN BOOKING_DETAIL BD ON B.BookingID = BD.BookingID
+            INNER JOIN CUSTOMER C ON BD.CitizenID = C.CitizenID
+            INNER JOIN CUSTOMER_TYPE CT ON C.CustomerTypeID = CT.CustomerTypeID
+            WHERE DATE(B.CheckInDate) = CURDATE()
+            ORDER BY B.CheckInDate DESC
+        `;
+        const [results] = await pool.query(sql);
+        return results;
     }
 };
 

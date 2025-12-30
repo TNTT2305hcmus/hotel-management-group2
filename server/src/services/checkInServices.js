@@ -1,5 +1,42 @@
 import CheckInModel from '../models/checkInModel.js';
 
+// Service to get today's bookings with customer information
+export const getTodayBookingsWithCustomers = async () => {
+    const bookings = await CheckInModel.getTodayBookings();
+    
+    // Group customers by bookingId
+    const groupedBookings = {};
+    
+    bookings.forEach(row => {
+        if (!groupedBookings[row.bookingId]) {
+            groupedBookings[row.bookingId] = {
+                bookingId: row.bookingId,
+                roomId: row.roomId,
+                roomStatus: row.roomStatus,
+                roomType: row.roomType,
+                checkInDate: row.checkInDate,
+                checkOutDate: row.checkOutDate,
+                totalPrice: row.totalPrice,
+                customers: []
+            };
+        }
+        
+        groupedBookings[row.bookingId].customers.push({
+            citizenId: row.citizenId,
+            fullName: row.fullName,
+            phoneNumber: row.phoneNumber,
+            address: row.address,
+            customerType: row.customerType
+        });
+    });
+    
+    return {
+        success: true,
+        count: Object.keys(groupedBookings).length,
+        data: Object.values(groupedBookings)
+    };
+};
+
 // Service to create booking with room status validation
 export const createBookingWithValidation = async (bookingData, customersData) => {
     const { roomId } = bookingData;

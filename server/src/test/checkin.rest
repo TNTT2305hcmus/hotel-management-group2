@@ -2,7 +2,12 @@
 ### API CHECK-IN TEST
 ### ===========================================
 
+### ========================================
+### 1. GET TODAY'S BOOKINGS
+### ========================================
 
+GET http://localhost:5000/api/check-in/today
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### ========================================
 ### 2. CREATE BOOKING WITH SINGLE CUSTOMER
