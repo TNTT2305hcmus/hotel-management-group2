@@ -62,25 +62,19 @@ const RoomModel = {
 
     // 5. Update Room
     update: async (currentId, roomData) => {
-        const { newId, typeId, status, note, image } = roomData;
+        const { typeId, status, note, image } = roomData;
         
-        // If newId is not provided, keep the current ID
-        const finalId = newId || currentId;
-
         const query = `
             UPDATE ROOM 
             SET 
-                RoomID = ?,       -- Allow changing Room ID
-                RoomTypeID = ?,   -- Change Type (Updates Price & Capacity)
-                Status = ?, 
-                Notes = ?, 
-                ImageURL = ?
-            WHERE RoomID = ?      -- Find by old ID
+                RoomTypeID = ?,   
+                Status = ?,      
+                Notes = ?,        
+                ImageURL = ?      
+            WHERE RoomID = ?      
         `;
 
-        // Parameter order is critical: NewID -> Type -> Status -> Note -> Image -> OldID
         const [result] = await pool.query(query, [
-            finalId, 
             typeId, 
             status, 
             note, 
@@ -118,7 +112,7 @@ const RoomModel = {
         return result.affectedRows;
     },
 
-    // Lấy lịch sử khách hàng của một phòng cụ thể
+    // 8. Retrieve customer history for a specific department
     getRoomGuestHistory: async (roomId) => {
         const query = `
             SELECT 
@@ -128,7 +122,13 @@ const RoomModel = {
                 c.Address as address,     
                 b.CheckInDate as checkIn,
                 b.CheckOutDate as checkOut,
-                b.PaymentDate
+                
+                -- SỬA Ở ĐÂY: Tự tính status dựa trên ngày CheckOut
+                CASE 
+                    WHEN b.CheckOutDate IS NULL THEN 'CheckedIn'
+                    ELSE 'CheckedOut'
+                END as status
+                
             FROM BOOKING b
             JOIN BOOKING_DETAIL bd ON b.BookingID = bd.BookingID
             JOIN CUSTOMER c ON bd.CitizenID = c.CitizenID
@@ -138,8 +138,6 @@ const RoomModel = {
         const [rows] = await pool.query(query, [roomId]);
         return rows;
     }
-
-
 };
 
 export default RoomModel;
