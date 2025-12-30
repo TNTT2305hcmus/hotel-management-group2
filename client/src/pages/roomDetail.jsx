@@ -25,12 +25,15 @@ const RoomDetail = () => {
 
         if (roomData) {
             setRoom(roomData);
-        } else {
-            throw new Error("Data is empty");
         }
 
-        if (guestsData) {
+        // Kiểm tra dữ liệu guestsData trả về
+        if (Array.isArray(guestsData)) {
             setGuests(guestsData);
+        } else if (guestsData && Array.isArray(guestsData.data)) {
+            setGuests(guestsData.data);
+        } else {
+             setGuests([]);
         }
 
       } catch (err) {
@@ -52,20 +55,26 @@ const RoomDetail = () => {
     </div>
   );
 
+  const isAvailable = room.status === 'Available';
+
   const handleBookNowClick = () => {
-    navigate('/checkin');
+    navigate('/checkin', { 
+      state: { 
+        selectedRoomId: room.roomNumber || room.id 
+      } 
+    });
   }
 
   return (
     <div className="room-detail-container">
       <div className="detail-card">
-        {/* Cột trái: Ảnh lớn */}
+        {/* Cột trái: Ảnh lớn & Trạng thái */}
         <div className="detail-image">
            <img src={room.image || "https://via.placeholder.com/600x400"} alt="Room View" />
            <span className={`status-tag ${room.status?.toLowerCase()}`}>{room.status}</span>
         </div>
 
-        {/* Cột phải: Thông tin */}
+        {/* Cột phải: Thông tin chi tiết */}
         <div className="detail-info">
             <h1>Room {room.roomNumber}</h1>
             <h3 className="text-type">{room.type}</h3>
@@ -86,13 +95,23 @@ const RoomDetail = () => {
                 <p>{room.note || "No description available for this room."}</p>
             </div>
 
-            {/* Các nút hành động nhanh (nếu cần) */}
             <div className="detail-actions">
-                 <button className="btn-action" onClick={handleBookNowClick}>Book Now</button>
+                 <button 
+                    className="btn-action" 
+                    onClick={handleBookNowClick}
+                    disabled={!isAvailable} 
+                    style={{
+                        cursor: isAvailable ? 'pointer' : 'not-allowed',
+                        opacity: isAvailable ? 1 : 0.6 
+                    }}
+                 >
+                    {isAvailable ? 'Book Now' : 'Not Available'}
+                 </button>
             </div>
         </div>
       </div>
       
+      {/* Bảng lịch sử khách hàng */}
       <div className="guest-history-section">
         <h3>Guest History</h3>
         <div className="table-responsive">
@@ -105,31 +124,45 @@ const RoomDetail = () => {
                         <th>Phone</th>
                         <th>Address</th>
                         <th>Check-in</th>
-                        <th>Check-out</th>
+                        <th>Status / Check-out</th>
                     </tr>
                 </thead>
                 <tbody>
                     {guests.length > 0 ? (
-                        guests.map((guest, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td className="guest-name">{guest.name}</td>
-                                <td>{guest.passport || guest.idCard || "N/A"}</td>
-                                <td>{guest.phone}</td>
-                                <td>
-                                    {/* Xử lý hiển thị địa chỉ linh hoạt */}
-                                    {guest.address?.city 
-                                        ? `${guest.address.city}, ${guest.address.country}` 
-                                        : (guest.address || "N/A")}
-                                </td>
-                                <td>{new Date(guest.checkIn).toLocaleDateString("vi-VN")}</td>
-                                <td>
-                                    {guest.checkOut 
-                                        ? new Date(guest.checkOut).toLocaleDateString("vi-VN") 
-                                        : <span className="status-staying">Staying</span>}
-                                </td>
-                            </tr>
-                        ))
+                        guests.map((guest, index) => {
+                            const isStaying = (guest.status === 'CheckedIn' || guest.status === 'Occupied') || !guest.checkOut;
+
+                            return (
+                                <tr key={index} className={isStaying ? "row-staying" : ""}>
+                                    <td>{index + 1}</td>
+                                    
+                                    <td className="guest-name">
+                                        {guest.name}
+                                        {/* Đã XÓA đoạn hiển thị badge Current tại đây */}
+                                    </td>
+                                    
+                                    <td>{guest.passport || guest.idCard || "N/A"}</td>
+                                    <td>{guest.phone}</td>
+                                    <td>
+                                        {guest.address?.city 
+                                            ? `${guest.address.city}, ${guest.address.country}` 
+                                            : (guest.address || "N/A")}
+                                    </td>
+                                    <td>{new Date(guest.checkIn).toLocaleDateString("vi-VN")}</td>
+                                    
+                                    <td>
+                                        {isStaying ? (
+                                            <div className="status-staying-container">
+                                                <span className="status-dot"></span>
+                                                <span className="status-text">Staying</span>
+                                            </div>
+                                        ) : (
+                                            new Date(guest.checkOut).toLocaleDateString("vi-VN")
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })
                     ) : (
                         <tr>
                             <td colSpan="7" className="no-data">No booking history found for this room.</td>

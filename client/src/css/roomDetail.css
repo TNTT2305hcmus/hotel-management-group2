@@ -181,19 +181,65 @@
     color: #2c3e50;
 }
 
-.status-staying {
-    background-color: #e3fcef;
-    color: #00a854;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
 .no-data {
     text-align: center !important;
     color: #888;
     padding: 30px !important;
+    font-style: italic;
+}
+
+/* --- CÁC STYLE MỚI CHO TRẠNG THÁI STAYING --- */
+
+/* 1. Highlight dòng đang ở (màu xanh lá nhạt) */
+.row-staying {
+    background-color: #f0fdf4 !important;
+}
+
+/* Khi hover vào dòng đang ở thì đậm hơn xíu */
+.row-staying:hover {
+    background-color: #dcfce7 !important; 
+}
+
+/* 2. Badge "Current" cạnh tên */
+.badge-current {
+    display: inline-block;
+    font-size: 0.7rem;
+    background-color: #28a745; /* Màu xanh success */
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* 3. Cột trạng thái Status/Staying */
+.status-staying-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #28a745;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-text {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.expected-date {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 2px;
     font-style: italic;
 }
 
