@@ -1,27 +1,25 @@
 import '../css/FilterBar.css';
 
-
 const FilterBar = ({ onSearch, onFilterType, onFilterStatus }) => {
 
   return (
     <div className="filter-bar">
-      {/* Ô tìm kiếm */}
+      {/* Search Input */}
       <input 
         type="text" 
         placeholder="Search by room number..." 
         onChange={(e) => onSearch(e.target.value)}
       />
 
-      {/* Dropdown Loại phòng */}
+      {/* Room Type Dropdown */}
       <select onChange={(e) => onFilterType(e.target.value)}>
         <option value="">All Room Types</option>
-        <option value="1">Single</option>
-        <option value="2">Double</option>
-        <option value="3">Standard</option>
-        <option value="4">Luxury</option>
+        <option value="1">Standard</option>
+        <option value="2">VIP</option>
+        <option value="3">Luxury</option>
       </select>
 
-      {/* Dropdown Trạng thái */}
+      {/* Status Dropdown */}
       <select onChange={(e) => onFilterStatus(e.target.value)}>
         <option value="">All Statuses</option>
         <option value="Available">Available</option>
