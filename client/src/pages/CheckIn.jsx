@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom'; 
+
 import '../css/CheckIn.css';
 import {
     fetchAvailableRoomsAPI,
@@ -21,10 +23,10 @@ const getTodayDate = () => {
 };
 
 const getNextDay = (dateString = new Date()) => {
-        const date = new Date(dateString);
-        date.setDate(date.getDate() + 1);
-        return date.toISOString().split('T')[0];
-    };
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+};
 
 // --- GUEST TEMPLATE ---
 const createEmptyGuest = () => ({
@@ -37,6 +39,8 @@ const createEmptyGuest = () => ({
 });
 
 const CheckIn = () => {
+    const location = useLocation();
+
     // --- DATA STATES ---
     const [availableRooms, setAvailableRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState('');
@@ -64,6 +68,12 @@ const CheckIn = () => {
         loadAvailableRooms();
         loadTodayReservations();
     }, []);
+
+    useEffect(() => {
+        if (location.state && location.state.selectedRoomId) {
+            setSelectedRoom(String(location.state.selectedRoomId));
+        }
+    }, [location]); 
 
     // --- SEARCH EFFECT ---
     useEffect(() => {
@@ -152,7 +162,7 @@ const CheckIn = () => {
 
         if (res.success) {
             handleReset();
-            loadAvailableRooms(); // Load lại phòng để thấy phòng vừa book đã mất khỏi list (hoặc cập nhật status)
+            loadAvailableRooms(); 
             loadTodayReservations();
             setStatusModal({ isOpen: true, type: 'success', message: 'Booking created & Room occupied!' });
         } else {
@@ -236,7 +246,6 @@ const CheckIn = () => {
                                 type="date"
                                 className="form-input date-input"
                                 value={checkOutDate}
-                                // Min của checkout luôn là ngày sau của checkin
                                 min={getNextDay(checkInDate)} 
                                 onChange={(e) => setCheckOutDate(e.target.value)}
                             />
@@ -251,7 +260,6 @@ const CheckIn = () => {
                     <h3 className="section-title">Guest Information</h3>
                 </div>
 
-                {/* Chỉ hiển thị form cho khách đầu tiên */}
                 <GuestFormCard
                     key={0}
                     guest={guests[0]}
