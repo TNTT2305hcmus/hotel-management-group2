@@ -6,6 +6,15 @@ const router = express.Router();
 // Route to get today's bookings with customer information
 // GET /api/check-in/today
 router.get('/today', checkInController.getTodayBookings);
+
+// Route to get today's reservations (alias for /today)
+// GET /api/check-in/today-reservations
+router.get('/today-reservations', checkInController.getTodayBookings);
+
+// Route to search today's reservations
+// GET /api/check-in/today-reservations/search?q=search_term
+router.get('/today-reservations/search', checkInController.searchTodayReservations);
+
 // Route to create new booking
 // POST /api/check-in/booking
 router.post('/booking', checkInController.createBooking);

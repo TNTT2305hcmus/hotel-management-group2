@@ -3,37 +3,28 @@ import CheckInModel from '../models/checkInModel.js';
 // Service to get today's bookings with customer information
 export const getTodayBookingsWithCustomers = async () => {
     const bookings = await CheckInModel.getTodayBookings();
-    
-    // Group customers by bookingId
-    const groupedBookings = {};
-    
-    bookings.forEach(row => {
-        if (!groupedBookings[row.bookingId]) {
-            groupedBookings[row.bookingId] = {
-                bookingId: row.bookingId,
-                roomId: row.roomId,
-                roomStatus: row.roomStatus,
-                roomType: row.roomType,
-                checkInDate: row.checkInDate,
-                checkOutDate: row.checkOutDate,
-                totalPrice: row.totalPrice,
-                customers: []
-            };
-        }
-        
-        groupedBookings[row.bookingId].customers.push({
-            citizenId: row.citizenId,
-            fullName: row.fullName,
-            phoneNumber: row.phoneNumber,
-            address: row.address,
-            customerType: row.customerType
-        });
-    });
-    
+
+    // Transform to flat structure with each customer as a separate row
+    const flatBookings = bookings.map(row => ({
+        bookingId: row.bookingId,
+        roomId: row.roomId,
+        roomNumber: row.roomId, // Add roomNumber field for UI
+        roomStatus: row.roomStatus,
+        roomType: row.roomType,
+        checkInDate: row.checkInDate,
+        checkOutDate: row.checkOutDate,
+        totalPrice: row.totalPrice,
+        citizenId: row.citizenId,
+        fullName: row.fullName,
+        phoneNumber: row.phoneNumber,
+        address: row.address,
+        customerType: row.customerType
+    }));
+
     return {
         success: true,
-        count: Object.keys(groupedBookings).length,
-        data: Object.values(groupedBookings)
+        count: flatBookings.length,
+        data: flatBookings
     };
 };
 
@@ -43,11 +34,11 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
 
     // 1. Check room status
     const roomStatus = await CheckInModel.checkRoomStatus(roomId);
-    
+
     if (!roomStatus) {
         throw new Error('Room does not exist');
     }
-    
+
     if (roomStatus.Status !== 'Available') {
         throw new Error(`Room ${roomId} is currently ${roomStatus.Status}, cannot book`);
     }
@@ -64,17 +55,17 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
     const processedCustomers = [];
     for (const customerData of customersData) {
         const { citizenId } = customerData;
-        
+
         // Check and create customer if needed
         const customerExists = await CheckInModel.checkCustomerExists(citizenId);
-        
+
         if (!customerExists) {
             await CheckInModel.createCustomer(customerData);
         }
 
         // Create booking detail for each customer
         await CheckInModel.createBookingDetail(booking.bookingId, citizenId);
-        
+
         processedCustomers.push(customerData);
     }
 
@@ -98,7 +89,7 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
 // Service to get available rooms
 export const getAvailableRooms = async () => {
     const rooms = await CheckInModel.getAvailableRooms();
-    
+
     return {
         success: true,
         count: rooms.length,
@@ -109,7 +100,7 @@ export const getAvailableRooms = async () => {
 // Service to get maximum guests for a specific room
 export const getRoomMaxGuests = async (roomId) => {
     const roomInfo = await CheckInModel.getRoomMaxGuests(roomId);
-    
+
     if (!roomInfo) {
         return {
             success: false,
@@ -117,7 +108,7 @@ export const getRoomMaxGuests = async (roomId) => {
             data: null
         };
     }
-    
+
     return {
         success: true,
         data: {
@@ -127,5 +118,33 @@ export const getRoomMaxGuests = async (roomId) => {
             status: roomInfo.Status,
             price: roomInfo.Price
         }
+    };
+};
+
+// Service to search today's reservations
+export const searchTodayReservations = async (searchTerm) => {
+    const bookings = await CheckInModel.searchTodayBookings(searchTerm);
+
+    // Transform to flat structure with each customer as a separate row
+    const flatBookings = bookings.map(row => ({
+        bookingId: row.bookingId,
+        roomId: row.roomId,
+        roomNumber: row.roomId, // Add roomNumber field for UI
+        roomStatus: row.roomStatus,
+        roomType: row.roomType,
+        checkInDate: row.checkInDate,
+        checkOutDate: row.checkOutDate,
+        totalPrice: row.totalPrice,
+        citizenId: row.citizenId,
+        fullName: row.fullName,
+        phoneNumber: row.phoneNumber,
+        address: row.address,
+        customerType: row.customerType
+    }));
+
+    return {
+        success: true,
+        count: flatBookings.length,
+        data: flatBookings
     };
 };

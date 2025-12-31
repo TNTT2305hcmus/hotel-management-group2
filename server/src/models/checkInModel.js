@@ -73,7 +73,7 @@ const CheckInModel = {
             INNER JOIN BOOKING_DETAIL BD ON B.BookingID = BD.BookingID
             INNER JOIN CUSTOMER C ON BD.CitizenID = C.CitizenID
             INNER JOIN CUSTOMER_TYPE CT ON C.CustomerTypeID = CT.CustomerTypeID
-            WHERE DATE(B.CheckInDate) = CURDATE()
+            WHERE DATE(B.CheckInDate) <= CURDATE() AND DATE(B.CheckOutDate) >= CURDATE()
             ORDER BY B.CheckInDate DESC
         `;
         const [results] = await pool.query(sql);
@@ -113,6 +113,37 @@ const CheckInModel = {
         `;
         const [results] = await pool.query(sql, [roomId]);
         return results[0];
+    },
+
+    // Search today's bookings by guest name, room number, or phone
+    searchTodayBookings: async (searchTerm) => {
+        const sql = `
+            SELECT 
+                B.BookingID as bookingId,
+                B.RoomID as roomId,
+                R.Status as roomStatus,
+                RT.RoomTypeName as roomType,
+                B.CheckInDate as checkInDate,
+                B.CheckOutDate as checkOutDate,
+                B.TotalPrice as totalPrice,
+                C.CitizenID as citizenId,
+                C.FullName as fullName,
+                C.PhoneNumber as phoneNumber,
+                C.Address as address,
+                CT.CustomerTypeName as customerType
+            FROM BOOKING B
+            INNER JOIN ROOM R ON B.RoomID = R.RoomID
+            INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
+            INNER JOIN BOOKING_DETAIL BD ON B.BookingID = BD.BookingID
+            INNER JOIN CUSTOMER C ON BD.CitizenID = C.CitizenID
+            INNER JOIN CUSTOMER_TYPE CT ON C.CustomerTypeID = CT.CustomerTypeID
+            WHERE DATE(B.CheckInDate) <= CURDATE() AND DATE(B.CheckOutDate) >= CURDATE()
+            AND (C.FullName LIKE ? OR B.RoomID LIKE ? OR C.PhoneNumber LIKE ?)
+            ORDER BY B.CheckInDate DESC
+        `;
+        const searchPattern = `%${searchTerm}%`;
+        const [results] = await pool.query(sql, [searchPattern, searchPattern, searchPattern]);
+        return results;
     }
 };
 

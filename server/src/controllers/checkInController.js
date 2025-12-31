@@ -76,9 +76,9 @@ export const createBooking = async (req, res) => {
 
     } catch (error) {
         console.error('Error creating booking:', error.message);
-        
+
         // Handle different types of errors
-        if (error.message.includes('cannot book') || 
+        if (error.message.includes('cannot book') ||
             error.message.includes('does not exist') ||
             error.message.includes('At least one customer')) {
             return res.status(400).json({
@@ -114,7 +114,7 @@ export const getAvailableRooms = async (req, res) => {
 export const getRoomMaxGuests = async (req, res) => {
     try {
         const { maphong } = req.params;
-        
+
         if (!maphong) {
             return res.status(400).json({
                 success: false,
@@ -123,7 +123,7 @@ export const getRoomMaxGuests = async (req, res) => {
         }
 
         const result = await CheckInService.getRoomMaxGuests(maphong);
-        
+
         if (!result.data) {
             return res.status(404).json({
                 success: false,
@@ -137,6 +137,30 @@ export const getRoomMaxGuests = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error when getting room max guests',
+            error: error.message
+        });
+    }
+};
+
+// Controller to search today's reservations
+export const searchTodayReservations = async (req, res) => {
+    try {
+        const { q } = req.query;
+
+        if (!q || q.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Search term is required'
+            });
+        }
+
+        const result = await CheckInService.searchTodayReservations(q.trim());
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error searching today reservations:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error when searching reservations',
             error: error.message
         });
     }
