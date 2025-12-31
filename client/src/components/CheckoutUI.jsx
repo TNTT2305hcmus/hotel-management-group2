@@ -29,39 +29,26 @@ export const InvoiceRow = ({ label, value }) => (
     </div>
 );
 
-// --- MODALS (Đã cập nhật theo Modal.css) ---
-
+// --- MODALS---
 export const ConfirmCheckoutModal = ({ data, onClose, onConfirm }) => (
     <div className="modal-overlay">
-        {/* Sử dụng 'modal-content' và 'delete-modal' để căn giữa nội dung */}
         <div className="modal-content delete-modal">
-            
-            {/* Icon dấu hỏi lớn */}
             <div style={{ marginBottom: '15px' }}>
                 <FaQuestionCircle size={70} color="#0f172a"/>
             </div>
-
-            {/* Tiêu đề */}
             <h2>Confirm Checkout</h2>
-
-            {/* Nội dung thông báo */}
             <p style={{ margin: '15px 0', fontSize: '16px', color: '#555', lineHeight: '1.5' }}>
                 Confirm checkout for <b>{data.roomName}</b>?<br/>
                 Payment method: <b>{data.paymentMethod}</b>
             </p>
-
-            {/* Các nút hành động */}
             <div className="modal-actions" style={{ justifyContent: 'center', gap: '20px' }}>
-                {/* Nút Confirm - dùng style tối màu như ảnh mẫu hoặc class btn-submit */}
                 <button 
                     className="btn-submit" 
                     onClick={onConfirm}
-                    style={{ backgroundColor: '#0f172a' }} // Override màu tím mặc định để giống ảnh mẫu
+                    style={{ backgroundColor: '#0f172a' }}
                 >
                     Confirm
                 </button>
-                
-                {/* Nút Back */}
                 <button 
                     className="btn-cancel" 
                     onClick={onClose} 

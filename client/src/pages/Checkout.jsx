@@ -98,8 +98,7 @@ const Checkout = () => {
                 isFormValid={isFormValid}
             />
 
-            {/* --- MODALS --- */}
-            
+            {/* --- MODALS --- */}   
             {showConfirmModal && (
                 <ConfirmCheckoutModal 
                     data={{ roomName: selectedRoom, paymentMethod: paymentMethod }}
