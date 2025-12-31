@@ -56,7 +56,7 @@
 
 .checkin-page .top-form-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr; 
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 20px;
     align-items: flex-end;
 }
@@ -79,6 +79,16 @@
     font-weight: 700;
     color: #111;
     margin: 0;
+}
+
+.checkin-page .guest-count {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #dbeafe;
+    color: #0369a1;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 /* --- FORM ELEMENTS --- */
@@ -166,6 +176,23 @@
     border-radius: var(--ci-radius-md);
     padding: 20px 25px;
     margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.checkin-page .guest-form-card.warning {
+    border-color: #f59e0b;
+    background-color: #fffbeb;
+}
+
+.checkin-page .form-warning {
+    background-color: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    color: #92400e;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .checkin-page .guest-form-header {
@@ -193,6 +220,30 @@
 
 .checkin-page .btn-remove-guest:hover {
     color: var(--ci-error);
+}
+
+.checkin-page .btn-add-guest {
+    display: inline-block;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    background-color: #e0f2fe;
+    border: 2px dashed #0369a1;
+    color: #0369a1;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkin-page .btn-add-guest:hover:not(:disabled) {
+    background-color: #0369a1;
+    color: white;
+}
+
+.checkin-page .btn-add-guest:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .checkin-page .guest-form-grid {
@@ -300,7 +351,8 @@
 .checkin-page .reservations-table {
     border: 1px solid var(--ci-border);
     border-radius: var(--ci-radius-md);
-    overflow: hidden; /* Bo góc cho cả header */
+    overflow: hidden;
+    /* Bo góc cho cả header */
     background-color: white;
 }
 
@@ -309,7 +361,7 @@
 .reservations-table .table-row {
     display: grid;
     /* Tinh chỉnh tỷ lệ cột cho cân đối */
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr; 
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr;
     gap: 15px;
     align-items: center;
     padding: 15px 20px;
@@ -340,7 +392,7 @@
 }
 
 .checkin-page .table-row:hover {
-    background-color: #f1f5f9; 
+    background-color: #f1f5f9;
 }
 
 /* Column Specifics */
@@ -357,7 +409,7 @@
     padding: 4px 8px;
     border-radius: 6px;
     width: fit-content;
-    margin: 0 auto; 
+    margin: 0 auto;
 }
 
 .checkin-page .col-address {
@@ -557,9 +609,13 @@
 
     .reservations-table .table-header,
     .reservations-table .table-row {
-        grid-template-columns: 0.8fr 1.5fr 1.2fr; 
+        grid-template-columns: 0.8fr 1.5fr 1.2fr;
     }
-    .col-address, .col-id { display: none; }
+
+    .col-address,
+    .col-id {
+        display: none;
+    }
 
     .checkin-page .form-actions {
         flex-direction: column;
