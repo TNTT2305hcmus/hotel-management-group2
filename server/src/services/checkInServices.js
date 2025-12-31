@@ -94,3 +94,38 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
         }
     };
 };
+
+// Service to get available rooms
+export const getAvailableRooms = async () => {
+    const rooms = await CheckInModel.getAvailableRooms();
+    
+    return {
+        success: true,
+        count: rooms.length,
+        data: rooms
+    };
+};
+
+// Service to get maximum guests for a specific room
+export const getRoomMaxGuests = async (roomId) => {
+    const roomInfo = await CheckInModel.getRoomMaxGuests(roomId);
+    
+    if (!roomInfo) {
+        return {
+            success: false,
+            message: 'Room not found',
+            data: null
+        };
+    }
+    
+    return {
+        success: true,
+        data: {
+            roomId: roomInfo.RoomID,
+            roomType: roomInfo.RoomTypeName,
+            maxGuests: roomInfo.MaxGuests,
+            status: roomInfo.Status,
+            price: roomInfo.Price
+        }
+    };
+};
