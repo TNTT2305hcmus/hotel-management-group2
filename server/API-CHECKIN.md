@@ -279,3 +279,155 @@ Use the test file: `src/test/checkin.rest` for API testing with various scenario
 - Missing data validation
 - Empty customers array validation
 - Non-existent room validation
+- Getting available rooms
+- Getting room maximum guests information
+
+---
+
+### 3. Get Available Rooms
+
+**Endpoint:** `GET /rooms/available`  
+**Description:** Get list of all available rooms with their details  
+**Authentication:** Required
+
+#### Success Response (200 OK)
+```json
+{
+    "success": true,
+    "count": 5,
+    "data": [
+        {
+            "roomId": 101,
+            "roomType": "Single Room",
+            "price": 500000,
+            "maxGuests": 2,
+            "status": "Available"
+        },
+        {
+            "roomId": 102,
+            "roomType": "Single Room",
+            "price": 500000,
+            "maxGuests": 2,
+            "status": "Available"
+        },
+        {
+            "roomId": 201,
+            "roomType": "Double Room",
+            "price": 800000,
+            "maxGuests": 4,
+            "status": "Available"
+        },
+        {
+            "roomId": 202,
+            "roomType": "Double Room",
+            "price": 800000,
+            "maxGuests": 4,
+            "status": "Available"
+        },
+        {
+            "roomId": 301,
+            "roomType": "Suite",
+            "price": 1500000,
+            "maxGuests": 6,
+            "status": "Available"
+        }
+    ]
+}
+```
+
+#### Response Fields
+- `roomId` (integer): Unique room identifier
+- `roomType` (string): Type/category of the room
+- `price` (number): Room price per night
+- `maxGuests` (integer): Maximum number of guests allowed
+- `status` (string): Current room status (always "Available" in this endpoint)
+
+#### Error Response (500 Internal Server Error)
+```json
+{
+    "success": false,
+    "message": "Server error when getting available rooms",
+    "error": "Database connection failed"
+}
+```
+
+---
+
+### 4. Get Room Maximum Guests
+
+**Endpoint:** `GET /room/:maphong`  
+**Description:** Get detailed information about a specific room including maximum guests allowed  
+**Authentication:** Required
+
+#### Path Parameters
+- `maphong` (integer): Room ID
+
+#### Success Response (200 OK)
+```json
+{
+    "success": true,
+    "data": {
+        "roomId": 101,
+        "roomType": "Single Room",
+        "maxGuests": 2,
+        "status": "Available",
+        "price": 500000
+    }
+}
+```
+
+#### Response Fields
+- `roomId` (integer): Unique room identifier
+- `roomType` (string): Type/category of the room
+- `maxGuests` (integer): Maximum number of guests allowed in this room
+- `status` (string): Current room status (Available, Occupied, Maintenance)
+- `price` (number): Room price per night
+
+#### Error Responses
+
+**400 Bad Request - Missing Room ID**
+```json
+{
+    "success": false,
+    "message": "Room ID is required"
+}
+```
+
+**404 Not Found - Room Not Found**
+```json
+{
+    "success": false,
+    "message": "Room not found"
+}
+```
+
+**500 Internal Server Error**
+```json
+{
+    "success": false,
+    "message": "Server error when getting room max guests",
+    "error": "Database connection failed"
+}
+```
+
+---
+
+## API Usage Examples
+
+### Example 1: Check Available Rooms Before Booking
+```http
+GET /api/check-in/rooms/available
+```
+Use this endpoint to display a list of available rooms to users before they create a booking.
+
+### Example 2: Validate Guest Count
+```http
+GET /api/check-in/room/101
+```
+Before allowing users to add guests to a booking, check the maximum guests allowed for the selected room.
+
+### Example 3: Complete Booking Flow
+1. Get available rooms: `GET /rooms/available`
+2. Select a room and get its details: `GET /room/{roomId}`
+3. Validate number of guests against `maxGuests`
+4. Create booking: `POST /booking` with customer details
