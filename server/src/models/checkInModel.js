@@ -78,6 +78,41 @@ const CheckInModel = {
         `;
         const [results] = await pool.query(sql);
         return results;
+    },
+
+    // Get available rooms
+    getAvailableRooms: async () => {
+        const sql = `
+            SELECT 
+                R.RoomID as roomId,
+                RT.RoomTypeName as roomType,
+                RT.Price as price,
+                RT.MaxGuests as maxGuests,
+                R.Status as status
+            FROM ROOM R
+            INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
+            WHERE R.Status = 'Available'
+            ORDER BY R.RoomID
+        `;
+        const [results] = await pool.query(sql);
+        return results;
+    },
+
+    // Get maximum guests for a specific room
+    getRoomMaxGuests: async (roomId) => {
+        const sql = `
+            SELECT 
+                R.RoomID,
+                RT.RoomTypeName,
+                RT.MaxGuests,
+                RT.Price,
+                R.Status
+            FROM ROOM R
+            INNER JOIN ROOM_TYPE RT ON R.RoomTypeID = RT.RoomTypeID
+            WHERE R.RoomID = ?
+        `;
+        const [results] = await pool.query(sql, [roomId]);
+        return results[0];
     }
 };
 

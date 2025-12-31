@@ -10,4 +10,12 @@ router.get('/today', checkInController.getTodayBookings);
 // POST /api/check-in/booking
 router.post('/booking', checkInController.createBooking);
 
+// Route to get available rooms
+// GET /api/check-in/rooms/available
+router.get('/rooms/available', checkInController.getAvailableRooms);
+
+// Route to get maximum guests for a specific room
+// GET /api/check-in/room/:maphong
+router.get('/room/:maphong', checkInController.getRoomMaxGuests);
+
 export default router;

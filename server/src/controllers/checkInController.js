@@ -94,3 +94,50 @@ export const createBooking = async (req, res) => {
         });
     }
 };
+
+// Controller to get available rooms
+export const getAvailableRooms = async (req, res) => {
+    try {
+        const result = await CheckInService.getAvailableRooms();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting available rooms:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error when getting available rooms',
+            error: error.message
+        });
+    }
+};
+
+// Controller to get maximum guests for a specific room
+export const getRoomMaxGuests = async (req, res) => {
+    try {
+        const { maphong } = req.params;
+        
+        if (!maphong) {
+            return res.status(400).json({
+                success: false,
+                message: 'Room ID is required'
+            });
+        }
+
+        const result = await CheckInService.getRoomMaxGuests(maphong);
+        
+        if (!result.data) {
+            return res.status(404).json({
+                success: false,
+                message: 'Room not found'
+            });
+        }
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting room max guests:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Server error when getting room max guests',
+            error: error.message
+        });
+    }
+};
