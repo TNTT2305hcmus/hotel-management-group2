@@ -5,9 +5,11 @@ const GUEST_TYPES = [
     { id: 2, label: 'Foreign' }
 ];
 
-const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove }) => {
+const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove, maxGuests, guestCount }) => {
+    const showWarning = maxGuests && guestCount > maxGuests;
+
     return (
-        <div className="guest-form-card">
+        <div className={`guest-form-card ${showWarning ? 'warning' : ''}`}>
             <div className="guest-form-header">
                 <span className="guest-number">Guest #{index + 1}</span>
                 {canRemove && (
@@ -19,6 +21,12 @@ const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove }) => 
                     </button>
                 )}
             </div>
+
+            {showWarning && (
+                <div className="form-warning">
+                    ⚠️ Number of guests exceeds room capacity ({maxGuests} max allowed)
+                </div>
+            )}
 
             <div className="guest-form-grid">
                 <div className="form-group">

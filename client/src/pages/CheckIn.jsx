@@ -5,7 +5,8 @@ import {
     createCheckInAPI,
     fetchTodayReservationsAPI,
     searchTodayReservationsAPI,
-    checkInFromReservationAPI
+    checkInFromReservationAPI,
+    fetchRoomMaxGuestsAPI
 } from '../services/checkinService';
 import useDebounce from '../hooks/useDebounce';
 
@@ -21,10 +22,18 @@ const getTodayDate = () => {
 };
 
 const getNextDay = (dateString = new Date()) => {
-        const date = new Date(dateString);
-        date.setDate(date.getDate() + 1);
-        return date.toISOString().split('T')[0];
-    };
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+};
+
+/**
+ * Format date from YYYY-MM-DD format to YYYY-MM-DD HH:mm:ss format
+ */
+const formatDateTimeForAPI = (dateString, timeString = '00:00:00') => {
+    if (!dateString) return '';
+    return `${dateString} ${timeString}`;
+};
 
 // --- GUEST TEMPLATE ---
 const createEmptyGuest = () => ({
@@ -40,6 +49,7 @@ const CheckIn = () => {
     // --- DATA STATES ---
     const [availableRooms, setAvailableRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState('');
+    const [selectedRoomMaxGuests, setSelectedRoomMaxGuests] = useState(null);
 
     // --- DATE STATES ---
     const [checkInDate, setCheckInDate] = useState(getTodayDate());
@@ -53,6 +63,7 @@ const CheckIn = () => {
 
     // --- UI STATES ---
     const [submitting, setSubmitting] = useState(false);
+    const [loadingRoom, setLoadingRoom] = useState(false);
 
     // --- MODAL STATES ---
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -81,6 +92,26 @@ const CheckIn = () => {
         }
     };
 
+    /**
+     * Handle room selection and fetch maxGuests
+     */
+    const handleRoomSelect = async (roomId) => {
+        setSelectedRoom(roomId);
+
+        if (!roomId) {
+            setSelectedRoomMaxGuests(null);
+            return;
+        }
+
+        setLoadingRoom(true);
+        const res = await fetchRoomMaxGuestsAPI(roomId);
+        setLoadingRoom(false);
+
+        if (res.success && res.data) {
+            setSelectedRoomMaxGuests(res.data.maxGuests);
+        }
+    };
+
     const loadTodayReservations = async () => {
         const res = await fetchTodayReservationsAPI();
         if (res.success) {
@@ -102,12 +133,37 @@ const CheckIn = () => {
         setGuests(updatedGuests);
     };
 
+    const handleAddGuest = () => {
+        if (selectedRoomMaxGuests && guests.length >= selectedRoomMaxGuests) {
+            setStatusModal({
+                isOpen: true,
+                type: 'error',
+                message: `Cannot add more guests. Room capacity is ${selectedRoomMaxGuests}.`
+            });
+            return;
+        }
+        setGuests([...guests, createEmptyGuest()]);
+    };
+
+    const handleRemoveGuest = (index) => {
+        if (guests.length <= 1) {
+            setStatusModal({
+                isOpen: true,
+                type: 'error',
+                message: 'At least one guest is required.'
+            });
+            return;
+        }
+        const updatedGuests = guests.filter((_, i) => i !== index);
+        setGuests(updatedGuests);
+    };
+
     // --- VALIDATION ---
     const validateForm = () => {
         if (!selectedRoom) return false;
         if (!checkInDate) return false;
         if (!checkOutDate) return false;
-        
+
         // Kiểm tra ngày checkout phải sau ngày checkin
         if (new Date(checkOutDate) <= new Date(checkInDate)) return false;
 
@@ -116,6 +172,13 @@ const CheckIn = () => {
         if (!mainGuest.fullName.trim() || !mainGuest.citizenId.trim()) {
             return false;
         }
+
+        // Validate guest count against maxGuests
+        const validGuests = guests.filter(g => g.fullName.trim() && g.citizenId.trim());
+        if (selectedRoomMaxGuests && validGuests.length > selectedRoomMaxGuests) {
+            return false;
+        }
+
         return true;
     };
 
@@ -134,20 +197,22 @@ const CheckIn = () => {
 
         setSubmitting(true);
 
-        const checkInData = {
+        const bookingData = {
             roomId: parseInt(selectedRoom),
-            checkInDate,
-            checkOutDate,
-            guests: guests.map(g => ({
-                fullName: g.fullName.trim(),
-                citizenId: g.citizenId.trim(),
-                phoneNumber: g.phone?.trim() || null,
-                address: g.address?.trim() || null,
-                customerTypeId: g.customerTypeId || 1
-            }))
+            checkInDate: formatDateTimeForAPI(checkInDate, '14:00:00'),
+            checkOutDate: formatDateTimeForAPI(checkOutDate, '11:00:00'),
+            customers: guests
+                .filter(g => g.fullName.trim() && g.citizenId.trim())
+                .map(g => ({
+                    fullName: g.fullName.trim(),
+                    citizenId: g.citizenId.trim(),
+                    phoneNumber: g.phone?.trim() || '',
+                    address: g.address?.trim() || '',
+                    customerTypeId: g.customerTypeId || 1
+                }))
         };
 
-        const res = await createCheckInAPI(checkInData);
+        const res = await createCheckInAPI(bookingData);
         setSubmitting(false);
 
         if (res.success) {
@@ -186,6 +251,7 @@ const CheckIn = () => {
 
     const handleReset = () => {
         setSelectedRoom('');
+        setSelectedRoomMaxGuests(null);
         setCheckInDate(getTodayDate());
         setCheckOutDate(getNextDay());
         setGuests([createEmptyGuest()]);
@@ -206,15 +272,17 @@ const CheckIn = () => {
                             <select
                                 className="form-select"
                                 value={selectedRoom}
-                                onChange={(e) => setSelectedRoom(e.target.value)}
+                                onChange={(e) => handleRoomSelect(e.target.value)}
+                                disabled={loadingRoom}
                             >
                                 <option value="">Choose an empty room..</option>
                                 {availableRooms.map(room => (
-                                    <option key={room.id} value={room.id}>
-                                        Room {room.roomNumber} - {room.type}
+                                    <option key={room.roomId} value={room.roomId}>
+                                        Room {room.roomId} - {room.roomType} (Max: {room.maxGuests} guests)
                                     </option>
                                 ))}
                             </select>
+                            {loadingRoom && <small>Loading room details...</small>}
                         </div>
 
                         {/* 2. CHECK-IN DATE */}
@@ -237,7 +305,7 @@ const CheckIn = () => {
                                 className="form-input date-input"
                                 value={checkOutDate}
                                 // Min của checkout luôn là ngày sau của checkin
-                                min={getNextDay(checkInDate)} 
+                                min={getNextDay(checkInDate)}
                                 onChange={(e) => setCheckOutDate(e.target.value)}
                             />
                         </div>
@@ -249,17 +317,33 @@ const CheckIn = () => {
             <div className="checkin-card guest-card">
                 <div className="guest-header">
                     <h3 className="section-title">Guest Information</h3>
+                    <span className="guest-count">
+                        {guests.filter(g => g.fullName.trim() && g.citizenId.trim()).length} / {selectedRoomMaxGuests || '?'} guests
+                    </span>
                 </div>
 
-                {/* Chỉ hiển thị form cho khách đầu tiên */}
-                <GuestFormCard
-                    key={0}
-                    guest={guests[0]}
-                    index={0}
-                    onGuestChange={(field, value) => handleGuestChange(0, field, value)}
-                    onRemove={null} 
-                    canRemove={false}
-                />
+                {/* Hiển thị tất cả các form khách */}
+                {guests.map((guest, index) => (
+                    <GuestFormCard
+                        key={index}
+                        guest={guest}
+                        index={index}
+                        onGuestChange={(field, value) => handleGuestChange(index, field, value)}
+                        onRemove={() => handleRemoveGuest(index)}
+                        canRemove={guests.length > 1}
+                        maxGuests={selectedRoomMaxGuests}
+                        guestCount={guests.filter(g => g.fullName.trim() && g.citizenId.trim()).length}
+                    />
+                ))}
+
+                {/* Add Guest Button */}
+                <button
+                    className="btn-add-guest"
+                    onClick={handleAddGuest}
+                    disabled={selectedRoomMaxGuests && guests.length >= selectedRoomMaxGuests}
+                >
+                    + Add Guest
+                </button>
 
                 <div className="form-actions">
                     <button className="btn-cancel" onClick={handleReset}>

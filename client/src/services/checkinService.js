@@ -68,7 +68,7 @@ export const searchUnpaidCheckInsAPI = async (searchTerm) => {
 
 // ============================================
 // 3. CREATE BOOKING
-// POST /api/bookings
+// POST /api/check-in/booking
 // ============================================
 /**
  * Create a new booking transaction
@@ -77,39 +77,50 @@ export const searchUnpaidCheckInsAPI = async (searchTerm) => {
  * 
  * @param {Object} bookingData - Booking information
  * @param {number} bookingData.roomId - Room ID
- * @param {string} bookingData.checkInDate - Check-in date (YYYY-MM-DD)
- * @param {string} bookingData.checkOutDate - Check-out date (YYYY-MM-DD)
- * @param {Array<Object>} bookingData.guests - List of guests
- * @param {string} bookingData.guests[].fullName - Guest's full name
- * @param {string} bookingData.guests[].citizenId - Guest's citizen ID
- * @param {number} bookingData.guests[].customerTypeId - Customer type ID (1: Domestic, 2: Foreign)
- * @param {string} [bookingData.guests[].phoneNumber] - Guest's phone number (optional)
- * @param {string} [bookingData.guests[].address] - Guest's address (optional)
+ * @param {string} bookingData.checkInDate - Check-in date (YYYY-MM-DD HH:mm:ss)
+ * @param {string} bookingData.checkOutDate - Check-out date (YYYY-MM-DD HH:mm:ss)
+ * @param {number} [bookingData.totalPrice] - Total price (optional)
+ * @param {Array<Object>} bookingData.customers - List of customers
+ * @param {string} bookingData.customers[].fullName - Customer's full name
+ * @param {string} bookingData.customers[].citizenId - Customer's citizen ID
+ * @param {number} [bookingData.customers[].customerTypeId] - Customer type ID (1: Domestic, 2: Foreign)
+ * @param {string} [bookingData.customers[].phoneNumber] - Customer's phone number (optional)
+ * @param {string} [bookingData.customers[].address] - Customer's address (optional)
  * 
- * @returns {Promise<{success: boolean, data?: {bookingId: number, totalPrice: number, status: string}, message?: string}>}
+ * @returns {Promise<{success: boolean, data?: {bookingId: number, roomStatus: string, customerCount: number}, message?: string}>}
  */
 export const createBookingAPI = async (bookingData) => {
     try {
-        const { roomId, checkInDate, checkOutDate, guests } = bookingData;
+        const { roomId, checkInDate, checkOutDate, totalPrice, customers } = bookingData;
 
         // Validate required fields
         if (roomId === undefined || roomId === null || roomId === '') {
             return {
                 success: false,
-                message: "Missing required field: Room ID"
+                message: "Missing required field: roomId"
             };
         }
         if (!checkInDate) {
             return {
                 success: false,
-                message: "Missing required field: Check-in Date"
+                message: "Missing required field: checkInDate"
             };
         }
-        if (!guests || !Array.isArray(guests) || guests.length === 0) {
+        if (!customers || !Array.isArray(customers) || customers.length === 0) {
             return {
                 success: false,
-                message: "Missing required field: Guest List"
+                message: "customers must be a non-empty array"
             };
+        }
+
+        // Validate each customer has required fields
+        for (let i = 0; i < customers.length; i++) {
+            if (!customers[i].citizenId) {
+                return {
+                    success: false,
+                    message: `Customer at index ${i} is missing required field: citizenId`
+                };
+            }
         }
 
         // Format request body according to API spec
@@ -117,23 +128,24 @@ export const createBookingAPI = async (bookingData) => {
             roomId: Number(roomId),
             checkInDate,
             checkOutDate,
-            guests: guests.map(guest => ({
-                fullName: guest.fullName,
-                citizenId: guest.citizenId,
-                customerTypeId: guest.customerTypeId || 1,
-                phoneNumber: guest.phoneNumber || guest.phone || null,
-                address: guest.address || null
+            totalPrice: totalPrice || 0,
+            customers: customers.map(customer => ({
+                fullName: customer.fullName || '',
+                citizenId: customer.citizenId,
+                customerTypeId: customer.customerTypeId || 1,
+                phoneNumber: customer.phoneNumber || customer.phone || '',
+                address: customer.address || ''
             }))
         };
 
-        const response = await axiosClient.post('/api/bookings', requestBody);
+        const response = await axiosClient.post('/api/check-in/booking', requestBody);
 
         return {
             success: true,
             data: {
-                bookingId: response.data.bookingId,
-                totalPrice: response.data.totalPrice,
-                status: response.data.status || "Success"
+                bookingId: response.data?.data?.bookingId,
+                roomStatus: response.data?.data?.roomStatus,
+                customerCount: response.data?.data?.customerCount
             }
         };
     } catch (error) {
@@ -152,14 +164,13 @@ export const createBookingAPI = async (bookingData) => {
 
 /**
  * Get list of available rooms for check-in
+ * GET /api/check-in/rooms/available
  * @returns {Promise<{success: boolean, data: Array, message?: string}>}
  */
 export const fetchAvailableRoomsAPI = async () => {
     try {
-        const response = await axiosClient.get('/api/rooms', {
-            params: { status: 'Available' }
-        });
-        return { success: true, data: response.data || [] };
+        const response = await axiosClient.get('/api/check-in/rooms/available');
+        return { success: true, data: response.data?.data || [] };
     } catch (error) {
         console.error("API Error (Available Rooms):", error);
         return {
@@ -171,16 +182,24 @@ export const fetchAvailableRoomsAPI = async () => {
 };
 
 /**
- * Get room details by ID
- * @param {number} roomId - Room ID
+ * Get room details including maxGuests by room ID
+ * GET /api/check-in/room/:maphong
+ * @param {number} maphong - Room ID
  * @returns {Promise<{success: boolean, data: Object|null, message?: string}>}
  */
-export const fetchRoomDetailsAPI = async (roomId) => {
+export const fetchRoomMaxGuestsAPI = async (maphong) => {
     try {
-        const response = await axiosClient.get(`/api/rooms/${roomId}`);
-        return { success: true, data: response.data };
+        if (!maphong) {
+            return {
+                success: false,
+                data: null,
+                message: "Room ID is required"
+            };
+        }
+        const response = await axiosClient.get(`/api/check-in/room/${maphong}`);
+        return { success: true, data: response.data?.data };
     } catch (error) {
-        console.error("API Error (Room Details):", error);
+        console.error("API Error (Room Max Guests):", error);
         return {
             success: false,
             data: null,
@@ -256,4 +275,4 @@ export const checkInFromReservationAPI = async (bookingId) => {
 // LEGACY ALIASES (for backward compatibility)
 // ============================================
 export const createCheckInAPI = createBookingAPI;
-export const fetchRoomForCheckInAPI = fetchRoomDetailsAPI;
+export const fetchRoomForCheckInAPI = fetchRoomMaxGuestsAPI;
