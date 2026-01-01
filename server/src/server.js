@@ -10,6 +10,7 @@ import checkInRoutes from "./routes/checkInRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import userRoutes from './routes/userRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
+import checkoutRoutes from "./routes/checkoutRoutes.js";
 // Load environment variables at the very beginning
 dotenv.config();
 
@@ -40,7 +41,7 @@ app.use("/api/settings", settingsRoutes);
 // Check-in Routes
 app.use("/api/check-in", checkInRoutes);
 
-//Booking Routes
+// Booking Routes
 app.use("/api/bookings", bookingRoutes);
 
 // User Profile
@@ -49,6 +50,8 @@ app.use('/api/users', userRoutes);
 // Report
 app.use('/api/report', reportRoutes);
 
+// Checkout Routes
+app.use("/api/checkout", checkoutRoutes);
 // 4. Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running at http://localhost:${PORT}`);

@@ -1,30 +1,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-/* --- SCOPED VARIABLES: Chỉ ảnh hưởng bên trong .checkout-page --- */
 .checkout-page {
-  /* Colors*/
-  --ck-primary: #0f172a;    
+     /* 1. Colors */
+  /* Main Brand Colors */
+  --ck-primary: #0f172a;
   --ck-primary-hover: #1e293b;
-  --ck-secondary: #0d9488;  
-  --ck-success: #166534;    
+  --ck-secondary: #0d9488;
+  
+  /* Status Colors */
+  --ck-success: #166534;
   --ck-success-hover: #15803d;
-  --ck-error: #9f1239;      
+  --ck-error: #9f1239;
   --ck-error-hover: #be123c;
+  --ck-warning: #d97706;
+  --ck-warning-bg: #fff7ed;
+  --ck-warning-border: #f97316;
+  --ck-warning-text: #c2410c;
+
+  /* Text Colors */
   --ck-text-dark: #1e293b;
   --ck-text-medium: #475569;
   --ck-text-light: #94a3b8;
-  --ck-bg-page: #f8fafc;    
+
+  /* Backgrounds & Borders */
+  --ck-bg-page: #f8fafc;
   --ck-bg-card: #ffffff;
   --ck-border: #e2e8f0;
-  
-  /* Dimensions & Effects */
+
+  /* Dimensions & Radius */
   --ck-radius-lg: 20px;
   --ck-radius-md: 12px;
   --ck-radius-sm: 8px;
+
+  /* Shadows */
   --ck-shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   --ck-shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
-  /* Layout Base */
+  /* Surcharge Tags Colors */
+  --ck-tag-foreign-bg: #e0f2fe; --ck-tag-foreign-text: #0369a1;
+  --ck-tag-guest-bg: #f3e8ff;   --ck-tag-guest-text: #7e22ce;
+  --ck-tag-holiday-bg: #fee2e2; --ck-tag-holiday-text: #b91c1c;
+
+     /* 2. LAYOUT BASE */
   padding: 4rem 2rem;
   min-height: 100vh;
   background-color: var(--ck-bg-page);
@@ -34,35 +51,12 @@
   align-items: center;
 }
 
-/* --- TYPOGRAPHY --- */
 .checkout-page .page-title {
   font-size: 42px;
   font-weight: 800;
   margin-bottom: 50px;
   color: var(--ck-primary);
   letter-spacing: -0.025em;
-}
-
-/* --- LAYOUT CONTAINER --- */
-.checkout-page .checkout-container {
-  display: grid;
-  grid-template-columns: 500px 600px; /* Tối ưu cho PC */
-  gap: 40px;
-  justify-content: center;
-  width: 100%;
-  max-width: 1200px;
-}
-
-.checkout-page .mt-40 { margin-top: 40px; }
-
-/* --- CARD STYLES --- */
-.checkout-page .checkout-card {
-  background: var(--ck-bg-card);
-  border-radius: var(--ck-radius-lg);
-  padding: 45px;
-  box-shadow: var(--ck-shadow-card);
-  height: fit-content;
-  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .checkout-page .card-title {
@@ -74,7 +68,27 @@
   letter-spacing: 0.05em;
 }
 
-/* --- FORM ELEMENTS --- */
+.checkout-page .mt-40 { margin-top: 40px; }
+
+.checkout-page .checkout-container {
+  display: grid;
+  grid-template-columns: 500px 600px; 
+  gap: 40px;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.checkout-page .checkout-card {
+  background: var(--ck-bg-card);
+  border-radius: var(--ck-radius-lg);
+  padding: 45px;
+  box-shadow: var(--ck-shadow-card);
+  height: fit-content;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+   /* 3. FORM & INPUTS */
 .checkout-page .room-select {
   width: 100%;
   padding: 18px;
@@ -82,7 +96,7 @@
   border: 2px solid var(--ck-border);
   border-radius: var(--ck-radius-md);
   outline: none;
-  background-color: #f8fafc;
+  background-color: var(--ck-bg-page);
   font-weight: 600;
   color: var(--ck-text-dark);
   transition: all 0.3s ease;
@@ -94,7 +108,7 @@
   box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1);
 }
 
-/* --- INVOICE DETAILS --- */
+   /* 4. INVOICE DETAILS */
 .checkout-page .invoice-details { margin-top: 20px; }
 
 .checkout-page .invoice-row {
@@ -124,7 +138,46 @@
 .checkout-page .value-total { color: var(--ck-secondary); font-size: 30px; font-weight: 900; }
 .checkout-page .value-extra { color: var(--ck-text-medium); font-weight: 700; font-size: 18px; }
 
-/* --- PAYMENT METHODS (GRID 2 CỘT) --- */
+   /* 5. SURCHARGE STYLES  */
+.checkout-page .surcharge-container {
+  background-color: var(--ck-warning-bg);
+  border: 1px dashed var(--ck-warning-border);
+  padding: 15px;
+  border-radius: var(--ck-radius-md);
+  margin-bottom: 20px;
+}
+
+.checkout-page .highlight-warning,
+.checkout-page .surcharge-container .invoice-row {
+  color: var(--ck-warning-text);
+  font-weight: 700;
+}
+
+.checkout-page .surcharge-container .invoice-row { margin-bottom: 5px; }
+
+.checkout-page .surcharge-tags {
+  display: flex;
+  flex-direction: column; 
+  gap: 6px;
+  align-items: flex-end; 
+  margin-top: 8px;
+}
+
+.checkout-page .tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.checkout-page .tag-foreign { background-color: var(--ck-tag-foreign-bg); color: var(--ck-tag-foreign-text); }
+.checkout-page .tag-guest   { background-color: var(--ck-tag-guest-bg);   color: var(--ck-tag-guest-text); }
+.checkout-page .tag-holiday { background-color: var(--ck-tag-holiday-bg); color: var(--ck-tag-holiday-text); }
+
+   /* 6. PAYMENT METHODS */
 .checkout-page .payment-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -153,7 +206,7 @@
 
 .checkout-page .payment-option.active {
   border: 2px solid var(--ck-primary);
-  background-color: #f8fafc;
+  background-color: var(--ck-bg-page);
 }
 
 .checkout-page .payment-icon { margin-bottom: 12px; }
@@ -161,13 +214,12 @@
 
 .checkout-page .check-icon {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 10px; right: 10px;
   color: var(--ck-primary);
   font-size: 22px;
 }
 
-/* --- FOOTER BUTTONS --- */
+   /* 7. BUTTONS & ACTIONS */
 .checkout-page .checkout-footer {
   margin-top: 60px;
   display: flex;
@@ -186,6 +238,7 @@
   letter-spacing: 0.05em;
 }
 
+/* Nút Confirm */
 .checkout-page .btn-confirm {
   background-color: var(--ck-primary);
   color: white;
@@ -205,6 +258,7 @@
   opacity: 0.7;
 }
 
+/* Nút Cancel */
 .checkout-page .btn-cancel {
   background-color: transparent;
   color: var(--ck-text-medium);
@@ -217,7 +271,7 @@
   color: var(--ck-text-dark);
 }
 
-/* --- MODAL STYLES (Scoped inside overlay) --- */
+   /* 8. MODAL & ANIMATION */
 .checkout-page .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
