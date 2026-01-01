@@ -1,22 +1,29 @@
 import pool from '../config/database.js';
 
 const ReportModel = {
-    // 1. Tổng doanh thu (Chỉ tính đơn ĐÃ THANH TOÁN)
-    getTotalRevenueByMonth: async (month, year) => {
+    // Lấy các Booking có thời gian ở nằm trong tháng báo cáo VÀ đã thanh toán
+    getRevenueBookings: async (month, year) => {
+        const startDate = `${year}-${month}-01`;
+        const endDate = new Date(year, month, 0).toISOString().slice(0, 10);
+
         const query = `
-            SELECT SUM(TotalPrice) as totalRevenue
-            FROM BOOKING
-            WHERE MONTH(PaymentDate) = ? 
-              AND YEAR(PaymentDate) = ?
-              AND PaymentDate IS NOT NULL 
+            SELECT 
+                b.BookingID, b.RoomID, b.CheckInDate, b.CheckOutDate, b.TotalPrice,
+                rt.RoomTypeName
+            FROM BOOKING b
+            JOIN ROOM r ON b.RoomID = r.RoomID
+            JOIN ROOM_TYPE rt ON r.RoomTypeID = rt.RoomTypeID
+            WHERE 
+                b.CheckInDate <= ?          -- CheckIn trước khi tháng kết thúc
+                AND b.CheckOutDate >= ?     -- CheckOut sau khi tháng bắt đầu
+                AND b.PaymentDate IS NOT NULL -- Chỉ tính đơn đã thanh toán
         `;
-        const [rows] = await pool.query(query, [month, year]);
-        return rows[0].totalRevenue || 0;
+        const [rows] = await pool.query(query, [endDate, startDate]);
+        return rows;
     },
 
-    // 2. Booking để tính mật độ 
+    // 2. Giữ nguyên booking cho Density
     getBookingsForDensity: async (month, year) => {
-        // Ngày đầu tháng và cuối tháng
         const startDate = `${year}-${month}-01`;
         const endDate = new Date(year, month, 0).toISOString().slice(0, 10);
 
@@ -29,25 +36,7 @@ const ReportModel = {
         return rows;
     },
 
-    // 3. Doanh thu theo loại phòng 
-    getRevenueByRoomType: async (month, year) => {
-        const query = `
-            SELECT 
-                rt.RoomTypeName,
-                SUM(b.TotalPrice) as Revenue
-            FROM BOOKING b
-            JOIN ROOM r ON b.RoomID = r.RoomID
-            JOIN ROOM_TYPE rt ON r.RoomTypeID = rt.RoomTypeID
-            WHERE MONTH(b.PaymentDate) = ? 
-              AND YEAR(b.PaymentDate) = ?
-              AND b.PaymentDate IS NOT NULL
-            GROUP BY rt.RoomTypeID, rt.RoomTypeName
-        `;
-        const [rows] = await pool.query(query, [month, year]);
-        return rows;
-    },
-
-    // 4. Lấy tất cả phòng
+    // 3. Lấy danh sách phòng để làm khung báo cáo
     getAllRooms: async () => {
         const query = `SELECT RoomID FROM ROOM`;
         const [rows] = await pool.query(query);
