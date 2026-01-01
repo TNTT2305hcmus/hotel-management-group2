@@ -9,6 +9,7 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import checkInRoutes from "./routes/checkInRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import userRoutes from './routes/userRoutes.js';
+import checkoutRoutes from "./routes/checkoutRoutes.js";
 import reportRoutes from './routes/reportRoutes.js';
 // Load environment variables at the very beginning
 dotenv.config();
@@ -45,6 +46,9 @@ app.use("/api/bookings", bookingRoutes);
 
 // User Profile
 app.use('/api/users', userRoutes);
+
+// Checkout Routes
+app.use("/api/checkout", checkoutRoutes);
 
 // Report
 app.use('/api/report', reportRoutes);

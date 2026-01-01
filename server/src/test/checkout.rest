@@ -1,0 +1,48 @@
+@baseUrl = http://localhost:5000/api/checkout
+
+### 1. Ping server (kiểm tra server có chạy không)
+GET http://localhost:5000/
+
+### 2. Lấy danh sách phòng đang thuê (để đổ vào dropdown)
+GET {{baseUrl}}/rented-rooms
+
+### 3. Case Chuẩn: Khách thường, 1 người (Phòng 101) -> Không phụ thu
+GET {{baseUrl}}/preview/101
+
+### 4. Case Khách ngoại (Phòng 103) -> Phụ thu Foreign
+GET {{baseUrl}}/preview/103
+
+### 5. Case quá số lượng (Phòng 202) -> Phụ thu khách thứ 3
+GET {{baseUrl}}/preview/202
+
+### 6. Case Combo: Vừa khách ngoại vừa quá số lượng (Phòng 203) -> Phụ thu kép
+GET {{baseUrl}}/preview/203
+
+### 7. Case Ngày Lễ (Phòng 301) -> Phụ thu ngày lễ
+GET {{baseUrl}}/preview/203
+
+### 8. Case Lỗi: Phòng đang trống (102) -> Mong đợi lỗi 404
+GET {{baseUrl}}/preview/102
+
+### 9. Xác nhận thanh toán thành công
+POST {{baseUrl}}/confirm
+Content-Type: application/json
+
+{
+  "roomId": 101,
+  "bookingId": 1, 
+  "paymentMethod": "Cash",
+  "totalAmount": 500000
+}
+
+### 10. Test lỗi: Gửi thiếu thông tin (thiếu bookingId...)
+POST {{baseUrl}}/confirm
+Content-Type: application/json
+
+{
+  "roomId": 101,
+  "totalAmount": 500000
+}
+
+### 11. Check lại xem phòng 101 đã biến mất khỏi danh sách chưa
+GET {{baseUrl}}/rented-rooms

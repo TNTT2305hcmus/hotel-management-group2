@@ -79,6 +79,16 @@ CREATE TABLE BOOKING_DETAIL (
     PRIMARY KEY (BookingID, CitizenID)
 );
 
+-- 9. Table: Invoice 
+CREATE TABLE INVOICE (
+    InvoiceID INT PRIMARY KEY AUTO_INCREMENT, 
+    BookingID INT,
+    RoomID INT,
+    CustomerName VARCHAR(100),
+    TotalAmount DECIMAL(15, 2),
+    PaymentMethod VARCHAR(50),
+    CheckOutDate DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 -- ==========================================================
 -- II. FOREIGN KEYS 
 -- ==========================================================
@@ -128,6 +138,71 @@ INSERT INTO CUSTOMER_TYPE (CustomerTypeID, CustomerTypeName) VALUES
 (1, 'Domestic'), 
 (2, 'Foreign');
 
+-- -- 4. Insert Room Types 
+-- INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES 
+-- (1, 'Standard', 150000, 2),
+-- (2, 'VIP', 170000, 2),
+-- (3, 'Luxury', 200000, 2);
+
+-- -- 5. Insert Rooms 
+-- INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES 
+-- -- Standard Rooms (Type 1)
+-- (101, 1, 'Available',   'Clean room', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+-- (102, 1, 'Available',   'Near stairs', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+-- (103, 1, 'Occupied',    'Guest staying (Mr. Robert)', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+-- (104, 1, 'Maintenance', 'AC Repair', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+
+-- -- VIP Rooms (Type 2)
+-- (201, 2, 'Available',   'Has bathtub', 'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
+-- (202, 2, 'Available',   'Sea view', 'https://images.unsplash.com/photo-1566665797739-1674de7a421a'),
+-- (203, 2, 'Maintenance', 'Broken light', 'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
+
+-- -- Luxury Rooms (Type 3)
+-- (301, 3, 'Available',   'Spacious', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461'),
+-- (302, 3, 'Occupied',    'VIP Guest (Mr. Chris Evans)', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461'),
+-- (303, 3, 'Available',   'VIP Standard', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461');
+
+-- -- 6. Insert Customers
+-- INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) VALUES 
+-- ('001200000001', 1, 'Michael Johnson', '0909000001', '123 Main Street, New York, USA'),
+-- ('079200000002', 1, 'Sarah Williams', '0909000002', '45 Oxford Street, London, UK'),
+-- ('031200000003', 1, 'James Brown', '0909000003', '78 Rue de la Paix, Paris, France'),
+-- ('098765432001', 2, 'John Smith', '0909000004', '456 Fifth Avenue, New York, USA'), 
+-- ('001200000005', 1, 'Emma Davis', '0909000005', '10 Church Street, Toronto, Canada'),
+-- ('092200000006', 1, 'Robert Miller', '0909000006', '99 George Street, Sydney, Australia'),
+-- ('044200000007', 1, 'Lisa Anderson', '0909000007', '55 Champ-Élysées, Paris, France'),
+-- ('112233445566', 2, 'Akira Yamamoto', '0909000008', '1-2-3 Shibuya, Tokyo, Japan'), 
+-- ('001200000009', 1, 'David Martinez', '0909000009', '87 Gran Via, Madrid, Spain'),
+-- ('001200000010', 1, 'Amy Robinson', '0909000010', '202 Brooklyn Bridge, Brooklyn, USA'),
+-- ('001098000999', 1, 'Nguyen Van An', '0911222333', '12 Le Loi, Ho Chi Minh, Vietnam'),
+-- ('ABC123456789', 2, 'Chris Evans', '0944555666', '100 Hollywood Blvd, LA, USA');
+
+-- -- 7. Insert Bookings (10 Booking)
+-- INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) VALUES 
+-- (1, 101, '2025-12-20 14:00:00', '2025-12-22 11:00:00', '2025-12-22 11:00:00', 300000), 
+-- (2, 201, '2025-12-21 15:30:00', '2025-12-25 11:00:00', '2025-12-25 11:00:00', 680000), 
+-- (3, 301, '2025-12-22 16:00:00', '2025-12-23 12:00:00', '2025-12-23 12:00:00', 200000),
+-- (4, 102, '2025-12-18 13:00:00', '2025-12-24 11:00:00', '2025-12-24 11:00:00', 900000), 
+-- (5, 202, '2025-12-19 14:00:00', '2025-12-23 11:00:00', '2025-12-23 11:00:00', 680000),
+-- (6, 103, '2025-12-28 14:00:00', NULL, NULL, 0), 
+-- (7, 302, '2025-12-29 12:00:00', NULL, NULL, 0), 
+-- (8, 101, '2025-12-01 14:00:00', '2025-12-05 12:00:00', '2025-12-05 12:00:00', 600000), 
+-- (9, 303, '2025-12-10 14:00:00', '2025-12-15 11:00:00', '2025-12-15 11:00:00', 1000000), 
+-- (10, 203, '2025-12-15 14:00:00', '2025-12-16 12:00:00', '2025-12-16 12:00:00', 170000);
+
+-- -- 8. Insert Booking Details 
+-- INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES 
+-- (1, '001200000001'), 
+-- (2, '079200000002'), 
+-- (3, '031200000003'), 
+-- (4, '098765432001'), 
+-- (5, '001200000005'), 
+-- (6, '092200000006'), 
+-- (7, 'ABC123456789'), 
+-- (8, '001098000999'), 
+-- (9, '044200000007'), 
+-- (10, '001200000001'); 
+-- ==========================================================
 -- 4. Insert Room Types 
 INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES 
 (1, 'Standard', 150000, 2),
@@ -135,60 +210,66 @@ INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES
 (3, 'Luxury', 200000, 2);
 
 -- 5. Insert Rooms 
+-- Lưu ý: Set trạng thái 'Occupied' cho các phòng đang có khách để hiện lên màn hình Checkout
 INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES 
--- Standard Rooms (Type 1)
-(101, 1, 'Available',   'Clean room', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
-(102, 1, 'Available',   'Near stairs', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
-(103, 1, 'Occupied',    'Guest staying (Mr. Robert)', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
-(104, 1, 'Maintenance', 'AC Repair', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
-
--- VIP Rooms (Type 2)
-(201, 2, 'Available',   'Has bathtub', 'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
-(202, 2, 'Available',   'Sea view', 'https://images.unsplash.com/photo-1566665797739-1674de7a421a'),
-(203, 2, 'Maintenance', 'Broken light', 'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
-
--- Luxury Rooms (Type 3)
-(301, 3, 'Available',   'Spacious', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461'),
-(302, 3, 'Occupied',    'VIP Guest (Mr. Chris Evans)', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461'),
-(303, 3, 'Available',   'VIP Standard', 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461');
+-- Tầng 1 (Standard)
+(101, 1, 'Occupied',  'Test Base Case', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+(102, 1, 'Available', 'Clean',          'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+(103, 1, 'Occupied',  'Test Foreign',   'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
+-- Tầng 2 (VIP)
+(201, 2, 'Occupied',  'Test 3rd Guest', 'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
+(202, 2, 'Occupied',  'Test COMBO',     'https://images.unsplash.com/photo-1566665797739-1674de7a421a'),
+(203, 2, 'Available', 'Maintenance',    'https://images.unsplash.com/photo-1590490360182-c33d57733427'),
+-- Tầng 3 (Luxury)
+(301, 3, 'Available', 'Spacious',       'https://images.unsplash.com/photo-1578683010236-d716f9a3f461');
 
 -- 6. Insert Customers
 INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) VALUES 
-('001200000001', 1, 'Michael Johnson', '0909000001', '123 Main Street, New York, USA'),
-('079200000002', 1, 'Sarah Williams', '0909000002', '45 Oxford Street, London, UK'),
-('031200000003', 1, 'James Brown', '0909000003', '78 Rue de la Paix, Paris, France'),
-('098765432001', 2, 'John Smith', '0909000004', '456 Fifth Avenue, New York, USA'), 
-('001200000005', 1, 'Emma Davis', '0909000005', '10 Church Street, Toronto, Canada'),
-('092200000006', 1, 'Robert Miller', '0909000006', '99 George Street, Sydney, Australia'),
-('044200000007', 1, 'Lisa Anderson', '0909000007', '55 Champ-Élysées, Paris, France'),
-('112233445566', 2, 'Akira Yamamoto', '0909000008', '1-2-3 Shibuya, Tokyo, Japan'), 
-('001200000009', 1, 'David Martinez', '0909000009', '87 Gran Via, Madrid, Spain'),
-('001200000010', 1, 'Amy Robinson', '0909000010', '202 Brooklyn Bridge, Brooklyn, USA'),
-('001098000999', 1, 'Nguyen Van An', '0911222333', '12 Le Loi, Ho Chi Minh, Vietnam'),
-('ABC123456789', 2, 'Chris Evans', '0944555666', '100 Hollywood Blvd, LA, USA');
+-- Khách Nội
+('VN_001', 1, 'Nguyen Van A', '0901000001', 'Hanoi, Vietnam'),
+('VN_002', 1, 'Tran Thi B',   '0901000002', 'Da Nang, Vietnam'),
+('VN_003', 1, 'Le Van C',     '0901000003', 'HCM, Vietnam'),
+('VN_004', 1, 'Pham Van D',   '0901000004', 'Can Tho, Vietnam'),
+-- Khách Ngoại
+('US_001', 2, 'John Smith',       '0901000005', 'New York, USA'),
+('JP_001', 2, 'Akira Yamamoto',   '0901000006', 'Tokyo, Japan'),
+('FR_001', 2, 'Alice Wonderland', '0901000007', 'Paris, France');
 
--- 7. Insert Bookings (10 Booking)
-INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) VALUES 
-(1, 101, '2025-12-20 14:00:00', '2025-12-22 11:00:00', '2025-12-22 11:00:00', 300000), 
-(2, 201, '2025-12-21 15:30:00', '2025-12-25 11:00:00', '2025-12-25 11:00:00', 680000), 
-(3, 301, '2025-12-22 16:00:00', '2025-12-23 12:00:00', '2025-12-23 12:00:00', 200000),
-(4, 102, '2025-12-18 13:00:00', '2025-12-24 11:00:00', '2025-12-24 11:00:00', 900000), 
-(5, 202, '2025-12-19 14:00:00', '2025-12-23 11:00:00', '2025-12-23 11:00:00', 680000),
-(6, 103, '2025-12-28 14:00:00', NULL, NULL, 0), 
-(7, 302, '2025-12-29 12:00:00', NULL, NULL, 0), 
-(8, 101, '2025-12-01 14:00:00', '2025-12-05 12:00:00', '2025-12-05 12:00:00', 600000), 
-(9, 303, '2025-12-10 14:00:00', '2025-12-15 11:00:00', '2025-12-15 11:00:00', 1000000), 
-(10, 203, '2025-12-15 14:00:00', '2025-12-16 12:00:00', '2025-12-16 12:00:00', 170000);
+-- 7. Insert Bookings (Active Bookings - CheckOutDate IS NULL)
 
--- 8. Insert Booking Details 
+-- Case 1: Phòng 101 - Cơ bản (Khách Nội, 1 người)
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) 
+VALUES (1, 101, DATE_SUB(NOW(), INTERVAL 2 DAY), NULL, NULL, 0);
+
+-- Case 2: Phòng 103 - Khách Nước Ngoài (Phụ thu Foreign)
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) 
+VALUES (2, 103, DATE_SUB(NOW(), INTERVAL 3 DAY), NULL, NULL, 0);
+
+-- Case 3: Phòng 201 - Khách Thứ 3 (3 người Nội địa)
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) 
+VALUES (3, 201, DATE_SUB(NOW(), INTERVAL 1 DAY), NULL, NULL, 0);
+
+-- Case 4: Phòng 202 - COMBO (Khách Ngoại + 3 Người + Ngày Lễ)
+-- CheckIn đúng ngày 25/12 để kích hoạt Holiday Surcharge
+INSERT INTO BOOKING (BookingID, RoomID, CheckInDate, CheckOutDate, PaymentDate, TotalPrice) 
+VALUES (4, 202, '2025-12-25 14:00:00', NULL, NULL, 0);
+
+-- 8. Insert Booking Details (QUAN TRỌNG ĐỂ TÍNH LOGIC)
+
+-- Cho Case 1 (Phòng 101): 1 Khách nội
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (1, 'VN_001');
+
+-- Cho Case 2 (Phòng 103): 1 Khách ngoại
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (2, 'US_001');
+
+-- Cho Case 3 (Phòng 201): 3 Khách nội (Kích hoạt GuestCount >= 3)
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES 
-(1, '001200000001'), 
-(2, '079200000002'), 
-(3, '031200000003'), 
-(4, '098765432001'), 
-(5, '001200000005'), 
-(6, '092200000006'), 
-(7, 'ABC123456789'), 
-(8, '001098000999'), 
-(9, '044200000007'), 
-(10, '001200000001'); 
+(3, 'VN_002'),
+(3, 'VN_003'),
+(3, 'VN_004');
+
+-- Cho Case 4 (Phòng 202): 3 Khách (Có 1 khách ngoại) -> Kích hoạt GuestCount >= 3 VÀ IsForeign
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES 
+(4, 'JP_001'), -- Akira (Nước ngoài)
+(4, 'VN_001'),
+(4, 'VN_002');
