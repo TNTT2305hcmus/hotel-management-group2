@@ -3,7 +3,7 @@ import {
     getRentedRooms, 
     getInvoicePreview, 
     confirmCheckout 
-} from '../controllers/checkoutController.js'; 
+} from '../controllers/checkOutController.js'; 
 
 const router = express.Router();
 

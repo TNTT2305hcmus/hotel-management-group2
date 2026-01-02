@@ -151,10 +151,11 @@ INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES
 -- 5. Insert Customers 
 INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) VALUES 
 -- Khách Nội
-('VN_001', 1, 'Nguyen Van A', '0901000001', 'Hanoi, Vietnam'),
-('VN_002', 1, 'Tran Thi B',   '0901000002', 'Da Nang, Vietnam'),
-('VN_003', 1, 'Le Van C',     '0901000003', 'HCM, Vietnam'),
-('VN_004', 1, 'Pham Van D',   '0901000004', 'Can Tho, Vietnam'),
+('VN_001', 1, 'Trịnh Hồ Minh Thắng', '0901000001', 'Long An, Vietnam'),
+('VN_002', 1, 'Nguyễn Trần Trí Thanh',   '0901000002', 'Gia Lai, Vietnam'),
+('VN_003', 1, 'Cao Quốc Tuấn',     '0901000003', 'Binh Dinh, Vietnam'),
+('VN_004', 1, 'Lục Hoàng Tuấn',   '0901000004', 'Binh Phuoc, Vietnam'),
+('VN_005', 1, 'Huỳnh Trọng Viên',   '0901000005', 'Quang Ngai, Vietnam'),
 -- Khách Ngoại
 ('US_001', 2, 'John Smith',       '0901000005', 'New York, USA'),
 ('JP_001', 2, 'Akira Yamamoto',   '0901000006', 'Tokyo, Japan'),
@@ -190,7 +191,7 @@ INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES
 INSERT INTO BOOKING 
 (BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
 VALUES 
-(50, 101, 'Nguyen Van A', 1, 0, '2025-11-02 14:00:00', '2025-11-04 12:00:00', '2025-11-04 12:00:00', 300000, 'Completed');
+(50, 101, 'Trịnh Hồ Minh Thắng', 1, 0, '2025-11-02 14:00:00', '2025-11-04 12:00:00', '2025-11-04 12:00:00', 300000, 'Completed');
 
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (50, 'VN_001');
 
@@ -206,7 +207,7 @@ INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (51, 'US_001');
 INSERT INTO BOOKING 
 (BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
 VALUES 
-(52, 301, 'Tran Thi B', 2, 0, '2025-11-20 14:00:00', '2025-11-23 12:00:00', '2025-11-23 12:00:00', 600000, 'Completed');
+(52, 301, 'Nguyễn Trần Trí Thanh', 2, 0, '2025-11-20 14:00:00', '2025-11-23 12:00:00', '2025-11-23 12:00:00', 600000, 'Completed');
 
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (52, 'VN_002');
 
@@ -219,7 +220,7 @@ INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (52, 'VN_002');
 INSERT INTO BOOKING 
 (BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
 VALUES 
-(53, 102, 'Le Van C', 1, 0, '2025-12-01 14:00:00', '2025-12-06 12:00:00', '2025-12-06 12:00:00', 750000, 'Completed');
+(53, 102, 'Cao Quốc Tuấn', 1, 0, '2025-12-01 14:00:00', '2025-12-06 12:00:00', '2025-12-06 12:00:00', 750000, 'Completed');
 
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (53, 'VN_003');
 
@@ -240,7 +241,7 @@ INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (54, 'FR_001');
 
 -- Case 1: Phòng 101 - Khách Nội, 1 người (Cơ bản)
 INSERT INTO BOOKING (BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, Status, TotalPrice) 
-VALUES (1, 101, 'Nguyen Van A', 1, 0, DATE_SUB(NOW(), INTERVAL 2 DAY), NULL, 'Active', 0);
+VALUES (1, 101, 'Trịnh Hồ Minh Thắng', 1, 0, DATE_SUB(NOW(), INTERVAL 2 DAY), NULL, 'Active', 0);
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (1, 'VN_001');
 
 -- Case 2: Phòng 103 - Khách Ngoại, 1 người (Test Phụ thu Nước ngoài)
@@ -250,7 +251,7 @@ INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (2, 'US_001');
 
 -- Case 3: Phòng 201 - Khách Nội, 3 người (Test Phụ thu Người thứ 3)
 INSERT INTO BOOKING (BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, Status, TotalPrice) 
-VALUES (3, 201, 'Tran Thi B', 3, 0, DATE_SUB(NOW(), INTERVAL 1 DAY), NULL, 'Active', 0);
+VALUES (3, 201, 'Nguyễn Trần Trí Thanh', 3, 0, DATE_SUB(NOW(), INTERVAL 1 DAY), NULL, 'Active', 0);
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (3, 'VN_002'), (3, 'VN_003'), (3, 'VN_004');
 
 -- Case 4: Phòng 202 - COMBO (Khách Ngoại + 3 Người) (Test Phụ thu chồng chéo)

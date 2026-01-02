@@ -30,19 +30,31 @@ const CheckOutService = {
         const data = await CheckOutModel.findActiveBookingByRoomId(roomId);
         if (!data) throw new Error("No active booking found for this room.");
 
-        // -- BẮT ĐẦU LOGIC TÍNH TIỀN --
-        const now = new Date();
+        const now = new Date(); // Thời gian thực tế 
         const checkIn = new Date(data.CheckInDate);
+        const registeredCheckOut = new Date(data.CheckOutDate); // Thời gian đăng ký lúc Check-in
         
+        let calculationDate;
+
+        if (now < registeredCheckOut) {
+            // Trường hợp A: Check-out sớm -> Tính tiền theo ngày đăng ký
+            calculationDate = registeredCheckOut;
+        } else {
+            // Trường hợp B: Check-out muộn -> Tính tiền đến thời điểm hiện tại
+            calculationDate = now;
+        }
+
         // Tính số ngày (làm tròn lên, tối thiểu 1 ngày)
-        const diffDays = Math.ceil(Math.abs(now - checkIn) / (1000 * 60 * 60 * 24)) || 1; 
+        const diffTime = Math.abs(calculationDate - checkIn);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; 
+
+        // Tính tiền
         const roomPrice = parseFloat(data.Price);
-        
-        const baseTotal = roomPrice * diffDays; // Tổng tiền phòng gốc
+        const baseTotal = roomPrice * diffDays; 
 
         let totalSurchargeAmount = 0;
 
-        // a. Khách thứ 3 (GuestCount >= 3)
+        // a. Khách thứ 3 
         const hasExtraPerson = data.GuestCount >= 3;
         if (hasExtraPerson) {
             totalSurchargeAmount += baseTotal * (surchargeDefault.extraPerson - 1); 
@@ -54,8 +66,8 @@ const CheckOutService = {
             totalSurchargeAmount += baseTotal * (surchargeDefault.foreignGuest - 1);
         }
 
-        // c. Ngày lễ
-        const hasHoliday = isHoliday(now);
+        // c. Ngày lễ 
+        const hasHoliday = isHoliday(now); 
         if (hasHoliday) {
             totalSurchargeAmount += baseTotal * (surchargeDefault.holiday - 1);
         }
@@ -65,6 +77,8 @@ const CheckOutService = {
         return {
             bookingId: data.BookingID,
             checkInDate: data.CheckInDate,
+            registeredCheckOutDate: data.CheckOutDate, // Trả thêm cái này để Frontend hiển thị nếu cần
+            actualCheckOutDate: now,
             nights: diffDays,
             roomType: data.Type,
             guests: data.GuestCount,
@@ -81,7 +95,7 @@ const CheckOutService = {
         };
     },
 
-    // 3. Xử lý Checkout (Transaction)
+    // 3. Xử lý Checkout 
     processCheckout: async (checkoutData) => {
         const { roomId, bookingId, paymentMethod, totalAmount } = checkoutData;
         
@@ -93,9 +107,8 @@ const CheckOutService = {
             const customerRow = await CheckOutModel.findCustomerNameByBookingId(bookingId, connection);
             let customerName = customerRow ? customerRow.FullName : 'Unknown Guest';
             
-            // Nếu không tìm thấy trong detail, thử tìm trong booking (fallback)
+            // Nếu không tìm thấy trong detail, thử tìm trong booking 
             if (customerName === 'Unknown Guest') {
-                 // Logic fallback nếu cần, hoặc chấp nhận Unknown
             }
 
             // B. Cập nhật Booking -> Completed

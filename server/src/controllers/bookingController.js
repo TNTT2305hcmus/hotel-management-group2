@@ -17,7 +17,7 @@ export const createBooking = async (req, res) => {
             roomId, 
             checkInDate, 
             checkOutDate, 
-            guests: customers 
+            guests: guests
         });
 
         res.status(201).json(result);

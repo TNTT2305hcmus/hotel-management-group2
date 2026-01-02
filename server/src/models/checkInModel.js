@@ -10,12 +10,24 @@ const CheckInModel = {
 
     // Create new booking
     createBooking: async (bookingData) => {
-        const { roomId, checkInDate, checkOutDate, totalPrice } = bookingData;
+        const { roomId, checkInDate, checkOutDate, totalPrice, guestCount, isForeign } = bookingData;
+        
         const sql = `
-            INSERT INTO BOOKING (RoomID, CheckInDate, CheckOutDate, TotalPrice) 
-            VALUES (?, ?, ?, ?)
+            INSERT INTO BOOKING (RoomID, CheckInDate, CheckOutDate, TotalPrice, GuestCount, IsForeign) 
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
-        const [results] = await pool.query(sql, [roomId, checkInDate, checkOutDate, totalPrice]);
+        
+        const isForeignVal = isForeign ? 1 : 0;
+
+        const [results] = await pool.query(sql, [
+            roomId, 
+            checkInDate, 
+            checkOutDate, 
+            totalPrice, 
+            guestCount, 
+            isForeignVal
+        ]);
+        
         return { bookingId: results.insertId, ...bookingData };
     },
 

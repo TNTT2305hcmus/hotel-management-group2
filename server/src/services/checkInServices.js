@@ -34,22 +34,29 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
 
     // 1. Check room status
     const roomStatus = await CheckInModel.checkRoomStatus(roomId);
-
-    if (!roomStatus) {
-        throw new Error('Room does not exist');
-    }
-
-    if (roomStatus.Status !== 'Available') {
-        throw new Error(`Room ${roomId} is currently ${roomStatus.Status}, cannot book`);
-    }
+    if (!roomStatus) throw new Error('Room does not exist');
+    if (roomStatus.Status !== 'Available') throw new Error(`Room ${roomId} is currently ${roomStatus.Status}, cannot book`);
 
     // 2. Validate customers data
     if (!Array.isArray(customersData) || customersData.length === 0) {
         throw new Error('At least one customer is required');
     }
 
-    // 3. Create booking
-    const booking = await CheckInModel.createBooking(bookingData);
+    // Calculate the number of guests
+    const guestCount = customersData.length;
+    
+    // Check if there are any foreign guests.
+    const isForeign = customersData.some(c => Number(c.customerTypeId) === 2);
+
+    // Prepare final booking data
+    const finalBookingData = {
+        ...bookingData,
+        guestCount: guestCount,
+        isForeign: isForeign 
+    };
+
+    // 3. Create booking 
+    const booking = await CheckInModel.createBooking(finalBookingData);
 
     // 4. Process each customer
     const processedCustomers = [];
@@ -80,8 +87,9 @@ export const createBookingWithValidation = async (bookingData, customersData) =>
             roomId: roomId,
             roomStatus: 'Occupied',
             customers: processedCustomers,
-            customerCount: processedCustomers.length,
-            booking: bookingData
+            customerCount: guestCount, 
+            isForeign: isForeign,     
+            booking: finalBookingData
         }
     };
 };
