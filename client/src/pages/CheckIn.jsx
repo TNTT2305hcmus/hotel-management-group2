@@ -36,6 +36,8 @@ const formatDateTimeForAPI = (dateString, timeString = '00:00:00') => {
 };
 
 // --- GUEST TEMPLATE ---
+const MAX_GUESTS_ALLOWED = 3;
+
 const createEmptyGuest = () => ({
     fullName: '',
     citizenId: '',
@@ -134,11 +136,11 @@ const CheckIn = () => {
     };
 
     const handleAddGuest = () => {
-        if (selectedRoomMaxGuests && guests.length >= selectedRoomMaxGuests) {
+        if (guests.length >= MAX_GUESTS_ALLOWED) {
             setStatusModal({
                 isOpen: true,
                 type: 'error',
-                message: `Cannot add more guests. Room capacity is ${selectedRoomMaxGuests}.`
+                message: `Cannot add more than ${MAX_GUESTS_ALLOWED} guests.`
             });
             return;
         }
@@ -170,12 +172,6 @@ const CheckIn = () => {
         // Validate guest
         const mainGuest = guests[0];
         if (!mainGuest.fullName.trim() || !mainGuest.citizenId.trim()) {
-            return false;
-        }
-
-        // Validate guest count against maxGuests
-        const validGuests = guests.filter(g => g.fullName.trim() && g.citizenId.trim());
-        if (selectedRoomMaxGuests && validGuests.length > selectedRoomMaxGuests) {
             return false;
         }
 
@@ -332,7 +328,7 @@ const CheckIn = () => {
                         onRemove={() => handleRemoveGuest(index)}
                         canRemove={guests.length > 1}
                         maxGuests={selectedRoomMaxGuests}
-                        guestCount={guests.filter(g => g.fullName.trim() && g.citizenId.trim()).length}
+                        totalGuests={guests.length}
                     />
                 ))}
 
@@ -340,7 +336,7 @@ const CheckIn = () => {
                 <button
                     className="btn-add-guest"
                     onClick={handleAddGuest}
-                    disabled={selectedRoomMaxGuests && guests.length >= selectedRoomMaxGuests}
+                    disabled={guests.length >= MAX_GUESTS_ALLOWED}
                 >
                     + Add Guest
                 </button>

@@ -5,8 +5,8 @@ const GUEST_TYPES = [
     { id: 2, label: 'Foreign' }
 ];
 
-const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove, maxGuests, guestCount }) => {
-    const showWarning = maxGuests && guestCount > maxGuests;
+const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove, maxGuests, totalGuests }) => {
+    const showWarning = maxGuests && totalGuests > maxGuests;
 
     return (
         <div className={`guest-form-card ${showWarning ? 'warning' : ''}`}>
@@ -24,7 +24,7 @@ const GuestFormCard = ({ guest, index, onGuestChange, onRemove, canRemove, maxGu
 
             {showWarning && (
                 <div className="form-warning">
-                    ⚠️ Number of guests exceeds room capacity ({maxGuests} max allowed)
+                    ⚠️ Number of guests exceeds room capacity ({maxGuests} max). Additional surcharge will be applied.
                 </div>
             )}
 
