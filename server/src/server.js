@@ -55,7 +55,11 @@ app.use('/api/report', reportRoutes);
 
 // Checkout Routes
 app.use("/api/checkout", checkoutRoutes);
-// 4. Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running at http://localhost:${PORT}`);
-});
+
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+export default app; // Export app để file test sử dụng
