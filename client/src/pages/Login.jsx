@@ -4,6 +4,9 @@ import "../css/Login.css";
 import hotelImg from "../assets/hotel.jpg";
 import { useAuth } from "../api/AuthContext"; 
 
+// 1. Import Icon từ React-Icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth(); 
@@ -14,7 +17,17 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+  // Hàm xử lý toggle password riêng để tránh xung đột sự kiện
+  const togglePasswordVisibility = (e) => {
+    // Ngăn chặn hành vi click lan ra form gây submit nhầm
+    e.preventDefault(); 
+    e.stopPropagation();
+    setShowPassword(!showPassword);
+  };
+
+  const handleLogin = async (e) => {
+    // 2. Ngăn chặn reload trang ngay lập tức
+    e.preventDefault();
     setError("");
 
     if (!username || !password) {
@@ -25,15 +38,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // 1. Gọi hàm login từ AuthContext (nó sẽ gọi API backend)
-      const data = await login({ username, password });
-      
-      // Đẩy về 1 dashboard duy nhất
-      navigate("/dashboard"); // Mặc định
-
+      await login({ username, password });
+      navigate("/dashboard");
     } catch (err) {
-      console.error(err);
-      // Lấy message lỗi từ backend nếu có
+      console.error("Login Error:", err);
       const msg = err.response?.data?.error || "Login failed. Incorrect username or password.";
       setError(msg);
     } finally {
@@ -49,50 +57,60 @@ export default function Login() {
 
       <div className="login-form-section">
         <div className="login-card">
-          <h1>Welcome Back</h1>
+          <h1>Welcome Back!</h1>
           
-          {error && <p style={{ color: "red", fontSize: "14px", marginBottom: "10px", textAlign: "center" }}>{error}</p>}
+          {error && <p className="error-text">{error}</p>}
 
-          <label>Username</label>
-          <input 
-            type="text" 
-            placeholder="Enter your username" 
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+          {/* 3. Form onSubmit: 
+             Đây là cách chuẩn để lắng nghe phím Enter. 
+             Khi focus ở input và nhấn Enter, nó sẽ tự tìm nút submit để kích hoạt.
+          */}
+          <form onSubmit={handleLogin}>
+              <label>Username</label>
+              <input 
+                type="text" 
+                placeholder="Enter your username" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoFocus // Tự động focus vào đây khi vào trang
+              />
 
-          <label>Password</label>
-          <div className="password-box">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <span 
-              className="eye-icon" 
-              onClick={() => setShowPassword(!showPassword)}
-              style={{ cursor: "pointer" }}
-            >
-              {showPassword ? "👁️" : "🔒"} 
-            </span>
-          </div>
+              <label>Password</label>
+              <div className="password-box">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                
+                {/* 4. Xử lý Icon Show Password:
+                */}
+                <button 
+                  type="button" 
+                  className="eye-icon-btn" 
+                  onClick={togglePasswordVisibility}
+                  tabIndex="-1"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />} 
+                </button>
+              </div>
 
-          <div className="row-options">
-             {/* Bỏ chọn Role ở đây vì Backend sẽ quyết định Role */}
-            <div></div> 
-            <Link to="/forgot-password" className="forgot-link">
-              Forgot password?
-            </Link>
-          </div>
+              <div className="row-options">
+                <div></div> 
+                <Link to="/forgot-password" className="forgot-link">
+                  Forgot password?
+                </Link>
+              </div>
 
-          <button 
-            className="login-btn" 
-            onClick={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </button>
+              <button 
+                type="submit" 
+                className="login-btn" 
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Login"}
+              </button>
+          </form>
         </div>
       </div>
     </div>

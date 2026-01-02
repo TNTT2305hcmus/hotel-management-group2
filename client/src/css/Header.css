@@ -1,7 +1,15 @@
+:root {
+    --white: #ffffff;
+    --primary-color: #6d28d9; /* Tím */
+    --text-gray: #4b5563;     /* Xám đậm */
+    --border-color: #e5e7eb;
+    --danger-color: #dc2626;  /* Đỏ cho nút logout */
+}
+
 .hm-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Chia đều 3 phần trái/giữa/phải */
+    justify-content: space-between;
     height: 70px;
     padding: 0 40px;
     background-color: var(--white);
@@ -10,7 +18,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    font-family: 'Inter', sans-serif; /* Font hiện đại */
+    font-family: 'Inter', sans-serif;
 }
 
 /* --- LEFT: LOGO --- */
@@ -32,40 +40,24 @@
 .hm-header__nav {
     flex: 1;
     display: flex;
-    justify-content: center; /* Căn giữa menu */
+    justify-content: center;
 }
 
-/* --- RIGHT: ACTIONS --- */
+/* --- RIGHT: ACTIONS (Chứa cả User và Logout) --- */
 .hm-header__actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px; /* Khoảng cách giữa User và Logout */
 }
 
-.hm-action-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: var(--text-gray);
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
-}
-
-.hm-action-btn:hover {
-    color: var(--primary-color);
-}
-
-
-/* USER PROFILE & HOVER EFFECT */
-/* USER PROFILE CONTAINER */
+/* 1. USER PROFILE CONTAINER */
 .hm-user-container {
     position: relative;
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 10px 5px;
-    margin-right: 20px;
+    padding: 5px; /* Giảm padding một chút cho gọn */
+    /* Đã bỏ margin-right vì dùng gap của cha rồi */
 }
 
 .hm-user-info-trigger {
@@ -84,21 +76,20 @@
     color: var(--primary-color);
 }
 
-/* --- TOOLTIP / BADGE ROLE --- */
+/* 2. TOOLTIP / BADGE ROLE (Logic ẩn hiện) */
 .hm-role-tooltip {
-    visibility: hidden;
+    visibility: hidden; /* Mặc định ẩn */
     opacity: 0;
     
-    /* Căn giữa so với cha (hm-user-container) */
     position: absolute;
-    top: 100%; /* Đẩy xuống dưới đáy của container */
-    left: 50%;  /* Điểm neo nằm giữa container */
+    top: 120%; /* Đẩy xuống dưới một chút */
+    left: 50%;
     transform: translate(-50%, 10px);
     
-    background-color: #ffffff; /* Nền trắng */
-    color: #1f2937; /* Chữ đen/xám đậm */
-    border: 1px solid #e5e7eb; /* Viền xám nhạt */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Đổ bóng nổi bật */
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     
     padding: 10px 15px;
     border-radius: 8px;
@@ -108,15 +99,14 @@
     transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-/* Hiệu ứng khi Hover */
+/* CHỈ HIỆN KHI HOVER VÀO USER */
 .hm-user-container:hover .hm-role-tooltip {
     visibility: visible;
     opacity: 1;
-    /* Khi hover thì đưa về vị trí chuẩn (bỏ dịch 10px y) */
     transform: translate(-50%, 0); 
 }
 
-/* Nội dung bên trong Tooltip */
+/* Nội dung Tooltip */
 .tooltip-content {
     display: flex;
     flex-direction: column;
@@ -126,33 +116,103 @@
 .user-display-name {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #000; /* Chữ đen rõ ràng */
+    color: #000;
+    white-space: nowrap; /* Tránh xuống dòng tên */
 }
 
 .role-badge {
     font-size: 0.75rem;
-    background-color: #f3e8ff; /* Nền tím rất nhạt cho role */
-    color: var(--primary-color); /* Chữ tím */
+    background-color: #f3e8ff;
+    color: var(--primary-color);
     padding: 2px 8px;
     border-radius: 12px;
     font-weight: 600;
     text-transform: uppercase;
-    align-self: center; /* Căn giữa badge trong flex column */
+    align-self: center;
 }
 
-/* Mũi tên trỏ lên (Arrow) */
 .tooltip-arrow {
     position: absolute;
-    top: -6px; /* Đẩy lên trên tooltip */
+    top: -6px;
     left: 50%;
-    
-    /* Căn giữa mũi tên và xoay 45 độ để tạo hình tam giác */
     transform: translateX(-50%) rotate(45deg);
-    
     width: 12px;
     height: 12px;
     background-color: #ffffff;
-    border-left: 1px solid #e5e7eb; /* Viền khớp với tooltip */
+    border-left: 1px solid #e5e7eb;
     border-top: 1px solid #e5e7eb;
 }
 
+/* 3. NÚT LOGOUT (Hiển thị ngay từ đầu) */
+.hm-logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem; /* To hơn một chút cho dễ bấm */
+    color: var(--text-gray); /* Màu xám để hiện rõ trên nền trắng */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 5px;
+}
+
+/* Hover vào Logout thì đỏ lên */
+.hm-logout-btn:hover {
+    color: var(--danger-color) !important; 
+    transform: scale(1.1);
+}
+
+/* --- MODAL STYLES (Giữ nguyên) --- */
+.hm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Tăng z-index cao hơn header */
+}
+
+.hm-modal-content {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    min-width: 300px;
+}
+
+.hm-modal-content h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.hm-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.hm-btn-secondary {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.hm-btn-danger {
+    padding: 8px 16px;
+    border: none;
+    background: #dc3545;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.hm-btn-danger:hover {
+    background: #c82333;
+}

@@ -43,8 +43,6 @@
   max-width: 420px; /* Giới hạn chiều rộng card */
   padding: 40px;
   background: #ffffff;
-  /* Loại bỏ border cứng, dùng shadow mềm */
-  /* border: 1px solid #eee; */ 
   display: flex;
   flex-direction: column;
   /* Animation xuất hiện nhẹ */
@@ -93,30 +91,44 @@
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05); /* Shadow nhẹ xung quanh */
 }
 
-/* --- Password Box --- */
+/* --- Password Box (Đã cập nhật) --- */
 .password-box {
   position: relative;
   width: 100%;
+  display: flex; /* Đảm bảo căn chỉnh input và icon */
+  align-items: center;
 }
 
 .password-box input {
   padding-right: 45px; /* Chừa chỗ cho icon mắt */
+  width: 100%;
 }
 
-.eye-icon {
+/* --- Eye Icon Button (Đã cập nhật cho React Icons + Button) --- */
+.eye-icon-btn {
   position: absolute;
-  right: 15px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  
+  background: none; /* Bỏ nền button mặc định */
+  border: none;     /* Bỏ viền button mặc định */
+  padding: 5px;     /* Tăng vùng bấm */
+  
   cursor: pointer;
-  font-size: 18px;
+  font-size: 18px;  /* Kích thước icon */
   color: #888;
-  user-select: none;
+  
+  display: flex;    /* Căn giữa icon bên trong button */
+  align-items: center;
+  justify-content: center;
+  
   transition: color 0.2s;
+  outline: none; /* Bỏ viền xanh khi focus */
 }
 
-.eye-icon:hover {
-  color: #333;
+.eye-icon-btn:hover {
+  color: #1a1a1a;
 }
 
 /* --- Options Row (Forgot pass) --- */
@@ -173,14 +185,26 @@
   box-shadow: none;
 }
 
-/* --- Error Message --- */
-.login-card p {
-  background-color: #fff0f0;
-  color: #d32f2f !important;
-  padding: 10px;
+/* --- Error Message (Đã cập nhật class .error-text) --- */
+.error-text {
+  background-color: #fee2e2; /* Nền đỏ nhạt */
+  color: #dc2626; /* Chữ đỏ đậm */
+  padding: 12px;
   border-radius: 6px;
-  border: 1px solid #ffcdd2;
+  border: 1px solid #fecaca;
   font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
+  /* Animation rung nhẹ khi lỗi xuất hiện */
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 /* --- Responsive Design (Mobile) --- */
@@ -190,17 +214,16 @@
   }
   
   .login-image-section {
-    display: none; /* Ẩn ảnh trên mobile để tập trung form */
-    /* Hoặc có thể để height: 200px nếu muốn hiện 1 phần ảnh */
+    display: none;
   }
 
   .login-form-section {
-    background-color: #fff; /* Full trắng trên mobile */
+    background-color: #fff;
     padding: 20px;
   }
 
   .login-card {
-    box-shadow: none; /* Bỏ shadow trên mobile cho phẳng */
+    box-shadow: none;
     padding: 0;
   }
   
