@@ -27,7 +27,7 @@ CREATE TABLE ROOM_TYPE (
 CREATE TABLE ROOM (
     RoomID INT PRIMARY KEY,
     RoomTypeID INT NOT NULL,
-    Status VARCHAR(20) DEFAULT 'Available', -- 'Available', 'Occupied', 'Maintenance', 'Dirty'
+    Status VARCHAR(20) DEFAULT 'Available', -- 'Available', 'Occupied', 'Maintenance'
     ImageURL TEXT,
     Notes TEXT
 );
@@ -66,7 +66,7 @@ CREATE TABLE ACCOUNT (
 CREATE TABLE BOOKING (
     BookingID INT PRIMARY KEY AUTO_INCREMENT, 
     RoomID INT NOT NULL, 
-    CustomerName VARCHAR(100),       -- Tên khách đại diện (Cache để hiển thị nhanh)
+    CustomerName VARCHAR(100),       -- Tên khách đại diện 
     GuestCount INT DEFAULT 1,        -- Số lượng khách
     IsForeign BOOLEAN DEFAULT 0,     -- 0: Nội địa, 1: Nước ngoài (để tính phụ thu)
     CheckInDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -83,7 +83,7 @@ CREATE TABLE BOOKING_DETAIL (
     PRIMARY KEY (BookingID, CitizenID)
 );
 
--- 9. Table: Invoice (Phục vụ Report doanh thu)
+-- 9. Table: Invoice 
 CREATE TABLE INVOICE (
     InvoiceID INT PRIMARY KEY AUTO_INCREMENT, 
     BookingID INT,
@@ -148,7 +148,7 @@ INSERT INTO ROOM_TYPE (RoomTypeID, RoomTypeName, Price, MaxGuests) VALUES
 (2, 'VIP', 170000, 2),
 (3, 'Luxury', 200000, 2);
 
--- 5. Insert Customers (Dùng ID dễ nhớ để test)
+-- 5. Insert Customers 
 INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address) VALUES 
 -- Khách Nội
 ('VN_001', 1, 'Nguyen Van A', '0901000001', 'Hanoi, Vietnam'),
@@ -160,7 +160,7 @@ INSERT INTO CUSTOMER (CitizenID, CustomerTypeID, FullName, PhoneNumber, Address)
 ('JP_001', 2, 'Akira Yamamoto',   '0901000006', 'Tokyo, Japan'),
 ('FR_001', 2, 'Alice Wonderland', '0901000007', 'Paris, France');
 
--- 6. Insert Rooms (Trạng thái sẽ được cập nhật theo Booking bên dưới)
+-- 6. Insert Rooms 
 INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES 
 -- Tầng 1 (Standard)
 (101, 1, 'Occupied',  'Test Base Case', 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304'),
@@ -180,7 +180,7 @@ INSERT INTO ROOM (RoomID, RoomTypeID, Status, Notes, ImageURL) VALUES
 
 
 -- ==========================================================
--- IV. SCENARIO A: HISTORICAL DATA (DỮ LIỆU ĐỂ HIỆN REPORT)
+-- IV. SCENARIO A: HISTORICAL DATA 
 -- ==========================================================
 -- =============================================
 -- 1. THÁNG 11/2025 (3 Đơn)
