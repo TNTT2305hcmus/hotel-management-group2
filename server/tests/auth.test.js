@@ -1,36 +1,35 @@
 import request from 'supertest';
-import app from '../src/server.js'; // Import app từ server
+import app from '../src/server.js'; // Import app from server
 import pool from '../src/config/database.js'; 
 
 describe('AUTH API Testing', () => {
     
-    // Test Case 1: Đăng nhập thất bại (Username không tồn tại hoặc sai pass)
+    // Test Case 1: Login failure (Non-existent username or wrong password)
     test('POST /api/auth/login - Should fail with wrong credentials', async () => {
         const res = await request(app).post('/api/auth/login').send({
             username: 'UserKhongTonTai123',
             password: 'WrongPassword123'
         });
 
-        // Mong đợi trả về 401 hoặc 404 tùy logic code của bạn (trong code cũ bạn trả 401)
         expect(res.statusCode).toBe(401); 
         expect(res.body).toHaveProperty('error');
     });
 
-    // Test Case 2: Reset Password thất bại do sai OTP
+    // Test Case 2: Reset Password failure due to invalid OTP
     test('POST /api/auth/reset-password - Should fail with Invalid OTP', async () => {
         const res = await request(app).post('/api/auth/reset-password').send({
-            email: 'test@gmail.com', // Email giả định
-            otp: '000000',           // OTP cố tình nhập sai
+            email: 'test@gmail.com', // Dummy email
+            otp: '000000',           // Intentionally incorrect OTP
             newPassword: 'newpass123'
         });
 
-        // Mong đợi trả về 400 hoặc 401
-        expect(res.statusCode).toBe(400); // Code cũ trả 400 nếu lỗi
+        // Expect 400 or 401 response
+        expect(res.statusCode).toBe(400); 
         expect(res.body.error).toMatch(/Invalid OTP|No OTP requested/);
     });
 
-    // Clean up: Đóng kết nối DB sau khi chạy xong test file này
+    // Clean up: Close DB connection after running tests
     afterAll(async () => {
-        await pool.end(); // Nếu pool của bạn hỗ trợ end(), nếu không thì bỏ qua
+        await pool.end(); 
     });
 });

@@ -7,19 +7,19 @@ describe('CHECK-IN API Testing', () => {
     const TEST_ROOM_ID = 101; 
     const TEST_CITIZEN_ID = 'TEST_JEST_001'; 
 
-    // Test case 3: Hiện thị phòng available
+    // Test case 3: Display available rooms
     test('GET /api/check-in/rooms/available - Should return available rooms with correct structure', async () => {
         const res = await request(app).get('/api/check-in/rooms/available');
 
-        // 1. Kiểm tra Status Code
+        // 1. Check Status Code
         expect(res.statusCode).toBe(200);
 
-        // 2. Kiểm tra cấu trúc bao bọc (Wrapper) từ Service
+        // 2. Check wrapper structure from Service
         expect(res.body).toHaveProperty('success', true);
         expect(res.body).toHaveProperty('count');
         expect(Array.isArray(res.body.data)).toBe(true);
 
-        // 3. Kiểm tra chi tiết dữ liệu phòng (Nếu có dữ liệu)
+        // 3. Check room data details (if data exists)
         if (res.body.data.length > 0) {
             const room = res.body.data[0];
             expect(room).toHaveProperty('roomId');     // R.RoomID as roomId
@@ -27,29 +27,29 @@ describe('CHECK-IN API Testing', () => {
             expect(room).toHaveProperty('price');      // RT.Price as price
             expect(room).toHaveProperty('maxGuests');  // RT.MaxGuests as maxGuests
             
-            // Logic: API này chỉ được trả về phòng có status là 'Available'
+            // Logic: This API should only return rooms with status 'Available'
             expect(room.status).toBe('Available');
         }
     });
 
-    // --- TEST CASE: Logic lọc phòng (Không hiện phòng đang bận) ---
+    // --- TEST CASE: Room filtering logic (Do not show occupied rooms) ---
     test('GET /api/check-in/rooms/available - Should NOT return occupied rooms', async () => {
-        // BƯỚC 1: Giả lập phòng 101 đang bận (Occupied)
+        // STEP 1: Simulate room 101 being occupied
         await pool.query("UPDATE ROOM SET Status = 'Occupied' WHERE RoomID = ?", [TEST_ROOM_ID]);
 
-        // BƯỚC 2: Gọi API
+        // STEP 2: Call API
         const res = await request(app).get('/api/check-in/rooms/available');
 
-        // BƯỚC 3: Kiểm tra phòng 101 KHÔNG có trong danh sách
-        // Map ra mảng ID để kiểm tra cho dễ
+        // STEP 3: Verify room 101 is NOT in the list
+        // Map to ID array for easy checking
         const availableRoomIds = res.body.data.map(r => r.roomId); 
         expect(availableRoomIds).not.toContain(TEST_ROOM_ID);
 
-        // BƯỚC 4: (Cleanup) Trả lại trạng thái Available ngay lập tức
+        // STEP 4: (Cleanup) Restore status to Available immediately
         await pool.query("UPDATE ROOM SET Status = 'Available' WHERE RoomID = ?", [TEST_ROOM_ID]);
     });
 
-    // Test case 4: Tạo booking mới
+    // Test case 4: Create new booking
     test('POST /api/check-in/booking - Should create booking successfully', async () => {
         
         const bookingData = {
@@ -71,25 +71,25 @@ describe('CHECK-IN API Testing', () => {
             .post('/api/check-in/booking')
             .send(bookingData);
 
-        // Debug log (giữ lại để xem nếu có lỗi khác)
+        // Debug log 
         if (res.statusCode !== 201) {
             console.log("❌ Check-in Failed Response:", res.body);
         }
 
-        // 1. Kiểm tra Status Code
+        // 1. Check Status Code
         expect(res.statusCode).toBe(201);
 
-        // 2. Kiểm tra cấu trúc data trả về (SỬA LẠI ĐƯỜNG DẪN)
-        // bookingId nằm trong object 'data'
+        // 2. Check returned data structure 
+        // bookingId is inside 'data' object
         expect(res.body.data).toHaveProperty('bookingId');
         
-        // Kiểm tra success = true (thay vì status = Success)
+        // Check success = true 
         expect(res.body.success).toBe(true);
 
-        // 3. Kiểm tra bookingId là số
+        // 3. Check bookingId is a number
         expect(typeof res.body.data.bookingId).toBe('number');
         
-        // (Tùy chọn) Kiểm tra totalPrice 
+        // (Optional) Check totalPrice 
         if (res.body.data.booking && res.body.data.booking.totalPrice !== undefined) {
              expect(Number(res.body.data.booking.totalPrice)).toBeGreaterThanOrEqual(0);
         }
