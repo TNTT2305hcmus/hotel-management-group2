@@ -83,17 +83,6 @@ CREATE TABLE BOOKING_DETAIL (
     PRIMARY KEY (BookingID, CitizenID)
 );
 
--- 9. Table: Invoice 
-CREATE TABLE INVOICE (
-    InvoiceID INT PRIMARY KEY AUTO_INCREMENT, 
-    BookingID INT,
-    RoomID INT,
-    CustomerName VARCHAR(100),
-    TotalAmount DECIMAL(15, 2),
-    PaymentMethod VARCHAR(50),
-    CheckOutDate DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
 -- ==========================================================
 -- II. FOREIGN KEYS 
 -- ==========================================================

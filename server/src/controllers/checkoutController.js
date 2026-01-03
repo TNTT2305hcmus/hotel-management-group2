@@ -1,4 +1,4 @@
-import CheckOutService from '../services/checkOutService.js';
+import CheckOutService from '../services/checkoutService.js';
 
 // 1. Lấy danh sách phòng
 export const getRentedRooms = async (req, res) => {

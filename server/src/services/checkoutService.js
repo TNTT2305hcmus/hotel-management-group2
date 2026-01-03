@@ -117,15 +117,6 @@ const CheckOutService = {
             // C. Cập nhật Room -> Available
             await CheckOutModel.updateRoomStatus(roomId, 'Available', connection);
 
-            // D. Tạo Invoice
-            await CheckOutModel.createInvoice({
-                bookingId, 
-                roomId, 
-                customerName, 
-                totalAmount, 
-                paymentMethod
-            }, connection);
-
             await connection.commit();
             return { message: "Checkout successful!" };
 

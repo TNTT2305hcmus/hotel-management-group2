@@ -63,21 +63,6 @@ const CheckOutModel = {
         const query = "UPDATE ROOM SET Status = ? WHERE RoomID = ?";
         await connection.query(query, [status, roomId]);
     },
-
-    // 6. Tạo hóa đơn 
-    createInvoice: async (data, connection) => {
-        const query = `
-            INSERT INTO INVOICE (BookingID, RoomID, CustomerName, TotalAmount, PaymentMethod, CheckOutDate)
-            VALUES (?, ?, ?, ?, ?, NOW())
-        `;
-        await connection.query(query, [
-            data.bookingId, 
-            data.roomId, 
-            data.customerName, 
-            data.totalAmount, 
-            data.paymentMethod
-        ]);
-    }
 };
 
 export default CheckOutModel;

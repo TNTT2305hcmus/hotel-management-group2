@@ -36,7 +36,7 @@ export const fetchInvoicePreviewAPI = async (roomId) => {
     }
 };
 
-// 3. Xác nhận thanh toán (Checkout & Tạo Invoice)
+// 3. Xác nhận thanh toán (Checkout)
 // Endpoint: POST /api/checkout/confirm
 export const confirmCheckoutAPI = async (checkoutData) => {
     try {
