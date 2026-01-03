@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom";
 import "../css/Login.css";
 import hotelImg from "../assets/hotel.jpg";
-import { useAuth } from "../api/AuthContext"; 
+import { useAuth } from "../api/AuthContext";
 
 // 1. Import Icon từ React-Icons
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +20,7 @@ export default function Login() {
   // Hàm xử lý toggle password riêng để tránh xung đột sự kiện
   const togglePasswordVisibility = (e) => {
     // Ngăn chặn hành vi click lan ra form gây submit nhầm
-    e.preventDefault(); 
+    e.preventDefault();
     e.stopPropagation();
     setShowPassword(!showPassword);
   };
@@ -31,7 +31,7 @@ export default function Login() {
     setError("");
 
     if (!username || !password) {
-      setError("Please enter both username and password.");
+      setError("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
       return;
     }
 
@@ -42,8 +42,22 @@ export default function Login() {
       navigate("/dashboard");
     } catch (err) {
       console.error("Login Error:", err);
-      const msg = err.response?.data?.error || "Login failed. Incorrect username or password.";
-      setError(msg);
+
+      let errorMessage = "";
+
+      if (!err.response) {
+        errorMessage = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng hoặc thử lại sau.";
+      } else if (err.response.status === 401) {
+        errorMessage = "Tên đăng nhập hoặc mật khẩu không đúng. Vui lòng thử lại.";
+      } else if (err.response.status === 400) {
+        errorMessage = err.response.data?.error || "Thông tin đăng nhập không hợp lệ.";
+      } else if (err.response.status === 500) {
+        errorMessage = "Lỗi máy chủ. Vui lòng thử lại sau.";
+      } else {
+        errorMessage = err.response.data?.error || "Đã xảy ra lỗi. Vui lòng thử lại.";
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +72,7 @@ export default function Login() {
       <div className="login-form-section">
         <div className="login-card">
           <h1>Welcome Back!</h1>
-          
+
           {error && <p className="error-text">{error}</p>}
 
           {/* 3. Form onSubmit: 
@@ -66,50 +80,50 @@ export default function Login() {
              Khi focus ở input và nhấn Enter, nó sẽ tự tìm nút submit để kích hoạt.
           */}
           <form onSubmit={handleLogin}>
-              <label>Username</label>
-              <input 
-                type="text" 
-                placeholder="Enter your username" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoFocus // Tự động focus vào đây khi vào trang
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoFocus // Tự động focus vào đây khi vào trang
+            />
+
+            <label>Password</label>
+            <div className="password-box">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
 
-              <label>Password</label>
-              <div className="password-box">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                
-                {/* 4. Xử lý Icon Show Password:
+              {/* 4. Xử lý Icon Show Password:
                 */}
-                <button 
-                  type="button" 
-                  className="eye-icon-btn" 
-                  onClick={togglePasswordVisibility}
-                  tabIndex="-1"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />} 
-                </button>
-              </div>
-
-              <div className="row-options">
-                <div></div> 
-                <Link to="/forgot-password" className="forgot-link">
-                  Forgot password?
-                </Link>
-              </div>
-
-              <button 
-                type="submit" 
-                className="login-btn" 
-                disabled={isLoading}
+              <button
+                type="button"
+                className="eye-icon-btn"
+                onClick={togglePasswordVisibility}
+                tabIndex="-1"
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
+            </div>
+
+            <div className="row-options">
+              <div></div>
+              <Link to="/forgot-password" className="forgot-link">
+                Forgot password?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
           </form>
         </div>
       </div>

@@ -26,7 +26,10 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/api/auth/login');
+    const hasToken = localStorage.getItem("hm_token");
+
+    if (error.response?.status === 401 && !isLoginRequest && hasToken) {
       // Token hết hạn hoặc không hợp lệ -> Xóa token và đá về Login
       localStorage.removeItem("hm_token");
       // Dùng window.location để force reload trang về login
