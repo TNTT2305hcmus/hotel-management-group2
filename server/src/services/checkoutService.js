@@ -115,7 +115,7 @@ const CheckOutService = {
             await CheckOutModel.updateBookingStatus(bookingId, totalAmount, connection);
 
             // C. Cập nhật Room -> Available
-            await CheckOutModel.updateRoomStatus(roomId, 'Available', connection);
+            await CheckOutModel.updateRoomStatus(roomId, 'Maintanance', connection);
 
             await connection.commit();
             return { message: "Checkout successful!" };
