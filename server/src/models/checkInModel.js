@@ -85,7 +85,7 @@ const CheckInModel = {
             INNER JOIN BOOKING_DETAIL BD ON B.BookingID = BD.BookingID
             INNER JOIN CUSTOMER C ON BD.CitizenID = C.CitizenID
             INNER JOIN CUSTOMER_TYPE CT ON C.CustomerTypeID = CT.CustomerTypeID
-            WHERE DATE(B.CheckInDate) <= CURDATE() AND DATE(B.CheckOutDate) >= CURDATE()
+            WHERE DATE(B.CheckInDate) = CURDATE()
             ORDER BY B.CheckInDate DESC
         `;
         const [results] = await pool.query(sql);
@@ -149,7 +149,7 @@ const CheckInModel = {
             INNER JOIN BOOKING_DETAIL BD ON B.BookingID = BD.BookingID
             INNER JOIN CUSTOMER C ON BD.CitizenID = C.CitizenID
             INNER JOIN CUSTOMER_TYPE CT ON C.CustomerTypeID = CT.CustomerTypeID
-            WHERE DATE(B.CheckInDate) <= CURDATE() AND DATE(B.CheckOutDate) >= CURDATE()
+            WHERE DATE(B.CheckInDate) = CURDATE()
             AND (C.FullName LIKE ? OR B.RoomID LIKE ? OR C.PhoneNumber LIKE ?)
             ORDER BY B.CheckInDate DESC
         `;
