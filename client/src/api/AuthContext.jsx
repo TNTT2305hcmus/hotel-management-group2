@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { loginAPI, registerAPI } from "../services/authService"; 
 
 const AuthContext = createContext(null);
-const LS_KEY = "hm_token"; 
+const LS_KEY = "hm_token"; // key save token to localStorage
 
 const initialState = {
   accessToken: null,
@@ -12,6 +12,7 @@ const initialState = {
   loading: true,
 };
 
+// decode jwt token -> object
 function parseAccessToken(token) {
   try {
     const p = jwtDecode(token);
@@ -31,10 +32,13 @@ function isExpired(expSeconds) {
   return Math.floor(Date.now() / 1000) >= expSeconds;
 }
 
+// Takcle token's state
 function reducer(state, action) {
   switch (action.type) {
     case "SET_TOKEN": {
       const token = action.payload;
+      // Token -> save to localStorage
+      // ! Token -> remove localStorage -> reset state
       if (token) localStorage.setItem(LS_KEY, token);
       else localStorage.removeItem(LS_KEY);
 
@@ -48,6 +52,7 @@ function reducer(state, action) {
       };
     }
     case "DONE_LOADING":
+      // when loading == true -> UI is reading localStorage -> take user information (F5)
       return { ...state, loading: false };
     default:
       return state;
@@ -63,30 +68,31 @@ export function AuthProvider({ children }) {
 
   // --- LOGIN ---
   const login = useCallback(async ({ username, password }) => {
-    // 1. Gọi API
+    // call API to login
     const res = await loginAPI({ username, password });
     const data = res.data; 
     
-    // 2. Lưu token vào Context & LocalStorage
+    // save token to localStorage
     if (data?.token) {
         setToken(data.token);
     }
-    return data; // Trả data về để Login.jsx xử lý điều hướng
+    return data; // return data for Login.jsx diverts
   }, [setToken]);
 
   // --- REGISTER ---
   const register = useCallback(async (registerData) => {
+    // call API to register
     const res = await registerAPI(registerData);
     return res.data;
   }, []);
 
   // --- LOGOUT ---
   const logout = useCallback(() => {
+    // reducer automatically delete localStorage -> set state to init state
     setToken(null);
-    // window.location.href = "/login"; // Tùy chọn nếu muốn reload sạch sẽ
   }, [setToken]);
 
-  // --- AUTO LOAD TOKEN KHI F5 ---
+  // --- UI load token from localStorage when F5 ---
   useEffect(() => {
     const token = localStorage.getItem(LS_KEY);
     if (!token) {
@@ -94,7 +100,7 @@ export function AuthProvider({ children }) {
       return;
     }
     const user = parseAccessToken(token);
-    // Nếu token hết hạn thì xóa luôn
+    // If token is expired -> delete token
     if (!user || isExpired(user.exp)) {
       localStorage.removeItem(LS_KEY);
       dispatch({ type: "SET_TOKEN", payload: null });
@@ -113,6 +119,7 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// custom hook
 export function useAuth() {
   return useContext(AuthContext);
 }

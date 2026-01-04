@@ -11,7 +11,7 @@ const UserService = {
                 username: user.Username,
                 email: user.Email,
                 phone: user.Phone,
-                accountTypeID: user.AccountTypeID, // Thêm ID để client check quyền
+                accountTypeID: user.AccountTypeID, // Thêm AccountTypeID để client check quyền
                 accountTypeName: user.AccountTypeName
             };
         } catch (error) {

@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise'; // Using mysql2 to support async/await
+import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -21,10 +21,10 @@ const pool = mysql.createPool({
 export const connectDB = async () => {
     try {
         const connection = await pool.getConnection();
-        console.log("✅ MySQL CONNECTION SUCCESSFUL!");
+        console.log("MySQL CONNECTION SUCCESSFUL!");
         connection.release(); // Release connection back to the pool immediately
     } catch (err) {
-        console.error("❌ DATABASE CONNECTION ERROR:", err.message);
+        console.error("DATABASE CONNECTION ERROR:", err.message);
         // Check if it's a password error or if Docker is not running
         if (err.code === 'ECONNREFUSED') {
             console.error("Check if Docker MySQL is running?");

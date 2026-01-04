@@ -1,11 +1,16 @@
-// Chuẩn hoá tên role để tránh lệch chữ hoa/thường
+// Standardization to upper case
 const norm = (s) => (s ? String(s).trim().toUpperCase() : "");
 
+// Decentralize 
+// MANAGER: ["RECEPTIONIST"] -> Manager is father -> Can do all work that receptionist can do
 const roleHierarchy = {
     MANAGER: ["RECEPTIONIST"],
     RECEPTIONIST: [],
 };
 
+// From a single job title, all the rights that person holds can be inferred.
+// Input is "RECEPTIONIST" -> Return ["RECEPTIONIST"]
+// Input is "MANAGER" -> Return ["MANAGER", "RECEPTIONIST"]
 export function expandRoles(accountTypeName) {
     const root = norm(accountTypeName);
     const set = new Set();
@@ -23,7 +28,9 @@ export function expandRoles(accountTypeName) {
 }
 
 export function hasRole(user, allowedRoles = []) {
+    // Take all the rights of user
     const userRoles = expandRoles(user?.accountTypeName);
+    // Check allowRoles is included in this list
     return allowedRoles.map(norm).some((r) => userRoles.includes(r));
 }
     

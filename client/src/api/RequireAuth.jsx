@@ -6,13 +6,15 @@ import { hasRole } from "../api/accessControl";
 export default function RequireAuth({ allowedRoles }) {
   const { isAuthenticated, user, loading } = useAuth();
 
-  if (loading) return null; // hoặc spinner
+  // when F5, UI need time to read localStorage -> Appear spin on temporary white screen
+  if (loading) return <Spin />;
 
+  // replace -> Delete browsing history -> Can't use back button
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   if (allowedRoles?.length) {
     return hasRole(user, allowedRoles)
-      ? <Outlet />
+      ? <Outlet /> // Appear inner content
       : <Navigate to="/unauthorized" replace />;
   }
 

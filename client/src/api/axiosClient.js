@@ -1,15 +1,14 @@
 import axios from "axios";
 
-// 1. Tạo instance
+// Tạo instance
 export const axiosClient = axios.create({
-  // URL Backend của bạn. Nếu chạy local thì là http://localhost:5000
   baseURL: "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// 2. Interceptor REQUEST: Tự động gắn Token vào Header
+// Interceptor REQUEST: Tự động gắn Token vào Header
 axiosClient.interceptors.request.use(
   (config) => {
     // Lấy token từ localStorage (phải trùng tên key bên AuthContext)
@@ -22,7 +21,7 @@ axiosClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 3. Interceptor RESPONSE: Xử lý khi Token hết hạn (Lỗi 401)
+// Interceptor RESPONSE: Xử lý khi Token hết hạn (Lỗi 401)
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {

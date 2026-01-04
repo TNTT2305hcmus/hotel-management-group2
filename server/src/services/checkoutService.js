@@ -77,7 +77,7 @@ const CheckOutService = {
         return {
             bookingId: data.BookingID,
             checkInDate: data.CheckInDate,
-            registeredCheckOutDate: data.CheckOutDate, // Trả thêm cái này để Frontend hiển thị nếu cần
+            registeredCheckOutDate: data.CheckOutDate,
             actualCheckOutDate: now,
             nights: diffDays,
             roomType: data.Type,
@@ -114,8 +114,8 @@ const CheckOutService = {
             // B. Cập nhật Booking -> Completed
             await CheckOutModel.updateBookingStatus(bookingId, totalAmount, connection);
 
-            // C. Cập nhật Room -> Available
-            await CheckOutModel.updateRoomStatus(roomId, 'Available', connection);
+            // C. Cập nhật Room -> Mantainance
+            await CheckOutModel.updateRoomStatus(roomId, 'Mantainance', connection);
 
             await connection.commit();
             return { message: "Checkout successful!" };

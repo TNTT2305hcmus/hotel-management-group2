@@ -47,9 +47,6 @@ app.use("/api/bookings", bookingRoutes);
 // User Profile
 app.use('/api/users', userRoutes);
 
-// Checkout Routes
-app.use("/api/checkout", checkoutRoutes);
-
 // Report
 app.use('/api/report', reportRoutes);
 
