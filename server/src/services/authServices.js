@@ -100,6 +100,29 @@ async function forgotPassword(email) {
     }
 }
 
+async function verifyOtp(email, otp) {
+    try {
+        const entry = otpStore.get(email);
+
+        if (!entry) {
+            throw new Error('No OTP requested for this email');
+        }
+
+        if (Date.now() > entry.expiresAt) {
+            otpStore.delete(email);
+            throw new Error('OTP expired');
+        }
+
+        if (entry.otp !== otp) {
+            throw new Error('Invalid OTP');
+        }
+
+        return { message: 'OTP Verified successfully', valid: true };
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 async function resetPasswordWithOtp(email, otp, newPassword) {
     try {
         const entry = otpStore.get(email);
@@ -132,4 +155,4 @@ async function resetPasswordWithOtp(email, otp, newPassword) {
 }
 
 // Export default Object as before
-export default { register, login, forgotPassword, resetPasswordWithOtp };
+export default { register, login, forgotPassword, resetPasswordWithOtp, verifyOtp };

@@ -57,10 +57,23 @@ async function controllersResetPassword(req, res) {
   }
 }
 
+async function controllersVerifyOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+    // Gọi service check
+    const data = await authServices.verifyOtp(email, otp);
+    return res.status(200).json(data);
+  } catch (err) {
+    // console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+}
+
 
 export default { 
     controllersRegister, 
     controllersLogin, 
     controllersForgotPassword, 
-    controllersResetPassword 
+    controllersResetPassword,
+    controllersVerifyOtp
 };

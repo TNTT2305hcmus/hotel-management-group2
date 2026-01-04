@@ -1,66 +1,104 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/ForgotPassword.css";
-import { sendOtpAPI } from "../services/authService";
+import { sendOtpAPI, verifyOtpAPI } from "../services/authService";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
+  
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [error, setError] = useState(""); 
+  
+  // Trạng thái UI
+  const [otpSent, setOtpSent] = useState(false); // Đã gửi OTP chưa?
+  const [loading, setLoading] = useState(false); // Đang gọi API?
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
 
-  // --- Send OTP ---
+  // Countdown cho việc gửi lại OTP
+  const [countdown, setCountdown] = useState(0); 
+
+  // Effect để chạy đồng hồ đếm ngược
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  // --- 1. Gửi OTP ---
   const handleSendOtp = async () => {
     if (!email) {
-      setError("Please enter your email address!"); 
+      setError("Please enter your email address!");
       return;
     }
 
-    setIsSending(true);
+    setLoading(true);
     setError("");
     setMessage("");
 
     try {
-      // Gọi API backend: /api/auth/forgot-password
       const res = await sendOtpAPI(email);
-      
-      // Backend trả về status 200 là thành công
       setOtpSent(true);
-      // Backend mock OTP trả về trong res.data.mockOtp (chỉ để test)
-      // Thực tế bạn check console log của Server để lấy OTP
-      setMessage(`OTP sent to ${email}. Check server console!`);
       
+      // Mock log (xóa khi production)
+      if(res.data?.mockOtp) {
+          setMessage(`OTP sent! (Mock: ${res.data.mockOtp})`);
+      } else {
+          setMessage(`OTP has been sent to ${email}`);
+      }
+      
+      // Reset countdown về 0 để người dùng có thể gửi lại nếu muốn (hoặc set 60s tùy ý)
+      setCountdown(60); 
+
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to send OTP. Email might not exist.";
+      const msg = err.response?.data?.error || "Failed to send OTP.";
       setError(msg);
     } finally {
-      setIsSending(false);
+      setLoading(false);
     }
   };
 
-  // --- Verify & Next Step ---
-  const handleVerify = () => {
+  // --- 2. Xác thực OTP & Chuyển trang ---
+  const handleVerifyOtp = async () => {
     if (!otp) {
       setError("Please enter the OTP!");
       return;
     }
-    // Ở đây ta chưa gọi API verify ngay, mà chuyển OTP + Email sang trang Reset
-    // Vì API resetPassword của backend cần cả 3 thứ: Email, OTP, NewPass
-    navigate("/reset-password", { state: { email, otp } });
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Gọi API Verify OTP
+      await verifyOtpAPI(email, otp);
+
+      // Nếu thành công (không nhảy vào catch):
+      // Chuyển sang trang ResetPassword, mang theo Email và OTP (để dùng cho bước cuối)
+      navigate("/reset-password", { state: { email, otp } });
+
+    } catch (err) {
+      const msg = err.response?.data?.error || "Invalid OTP.";
+      setError(msg);
+
+      // Yêu cầu: "Nếu OTP sai... đợi 10s đếm ngược thì cho phép bấm nút sendOTP lại"
+      // Logic: Nếu sai, ta set countdown = 10. Trong lúc countdown > 0, nút Send OTP sẽ bị disable
+      setCountdown(10);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="forgot-container">
       <div className="forgot-card">
         <span className="back-btn" onClick={() => navigate("/login")}>Back</span>
-        <h2>Reset your password</h2>
+        <h2>Reset Password</h2>
 
-        {message && <p style={{color: "green", textAlign: "center", fontSize: "14px"}}>{message}</p>}
-        {error && <p style={{color: "red", textAlign: "center", fontSize: "14px"}}>{error}</p>}
+        {message && <p className="success-msg" style={{color: "green", textAlign: "center"}}>{message}</p>}
+        {error && <p className="error-msg" style={{color: "red", textAlign: "center"}}>{error}</p>}
 
+        {/* Input Email */}
         <label>Email Address</label>
         <div className="input-with-button">
           <input
@@ -68,33 +106,46 @@ export default function ForgotPassword() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={otpSent || isSending} 
+            // Nếu đã gửi OTP rồi thì disable ô email để tránh sửa đổi
+            disabled={otpSent || loading} 
           />
+          
+          {/* Nút Send OTP nằm trong ô input hoặc ngay cạnh */}
           <button 
             className="send-otp-btn" 
             onClick={handleSendOtp}
-            disabled={isSending || otpSent}
+            // Disable khi: Đang loading HOẶC Đang đếm ngược
+            disabled={loading || countdown > 0}
+            style={{ 
+                background: countdown > 0 ? "#ccc" : "#000",
+                cursor: countdown > 0 ? "not-allowed" : "pointer"
+            }}
           >
-            {isSending ? "..." : (otpSent ? "Sent" : "Send OTP")}
+            {loading ? "..." : (countdown > 0 ? `Wait ${countdown}s` : (otpSent ? "Resend" : "Send OTP"))}
           </button>
         </div>
 
+        {/* Khu vực nhập OTP - Chỉ hiện khi đã gửi OTP thành công */}
         {otpSent && (
-          <>
-            <label>OTP Code</label>
+          <div className="otp-section" style={{ marginTop: "20px", animation: "fadeInUp 0.5s" }}>
+            <label>Enter OTP Code</label>
             <input
               type="text"
-              placeholder="Enter OTP from server console"
+              placeholder="6-digit code"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
+              disabled={loading}
+              maxLength={6}
             />
+
             <button 
                 className="verify-btn" 
-                onClick={handleVerify}
+                onClick={handleVerifyOtp}
+                disabled={loading}
             >
-                Next Step
+                {loading ? "Verifying..." : "Verify OTP & Continue"}
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>
