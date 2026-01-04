@@ -202,7 +202,7 @@ INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (52, 'VN_002');
 
 
 -- =============================================
--- 2. THÁNG 12/2025 (2 Đơn)
+-- 2. THÁNG 12/2025 (10 Đơn)
 -- =============================================
 
 -- Booking 53: Phòng 102 - Đã thanh toán
@@ -220,6 +220,155 @@ VALUES
 (54, 202, 'Alice Wonderland', 2, 1, '2025-12-15 14:00:00', '2025-12-17 12:00:00', '2025-12-17 12:00:00', 510000, 'Completed');
 
 INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (54, 'FR_001');
+
+-- Booking 55: Phòng 301 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(55, 301, 'Luc Hoang Tuan', 2, 0, '2025-12-05 14:00:00', '2025-12-08 12:00:00', '2025-12-08 12:00:00', 600000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (55, 'VN_004');
+
+-- Booking 56: Phòng 203 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(56, 203, 'Huynh Trong Vien', 1, 0, '2025-12-10 14:00:00', '2025-12-12 12:00:00', '2025-12-12 12:00:00', 340000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (56, 'VN_005');
+
+-- Booking 57: Phòng 302 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(57, 302, 'John Smith', 1, 1, '2025-12-12 14:00:00', '2025-12-16 12:00:00', '2025-12-16 12:00:00', 1020000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (57, 'US_001');
+
+-- Booking 58: Phòng 101 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(58, 101, 'Akira Yamamoto', 2, 1, '2025-12-18 14:00:00', '2025-12-20 12:00:00', '2025-12-20 12:00:00', 382500, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (58, 'JP_001');
+
+-- Booking 59: Phòng 303 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(59, 303, 'Trinh Ho Minh Thang', 1, 0, '2025-12-20 14:00:00', '2025-12-25 12:00:00', '2025-12-25 12:00:00', 1000000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (59, 'VN_001');
+
+-- Booking 60: Phòng 201 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(60, 201, 'Tran Nguyen Tri Thanh', 2, 0, '2025-12-22 14:00:00', '2025-12-24 12:00:00', '2025-12-24 12:00:00', 340000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (60, 'VN_002');
+
+
+-- =============================================
+-- 3. THÁNG 1/2026 (12 Đơn - Bao gồm booking chéo tháng)
+-- =============================================
+
+-- Booking 61: Phòng 102 - Đã thanh toán (Hoàn toàn trong tháng 1)
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(61, 102, 'Cao Quoc Tuan', 1, 0, '2026-01-01 14:00:00', '2026-01-04 12:00:00', '2026-01-04 12:00:00', 450000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (61, 'VN_003');
+
+-- Booking 62: Phòng 203 - Đã thanh toán 
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(62, 203, 'Alice Wonderland', 2, 1, '2026-01-02 14:00:00', '2026-01-05 12:00:00', '2026-01-05 12:00:00', 637500, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (62, 'FR_001');
+
+-- Booking 63: Phòng 301 - Đã thanh toán (Chéo tháng: 28/12/2025 -> 05/01/2026)
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(63, 301, 'Luc Hoang Tuan', 2, 0, '2025-12-28 14:00:00', '2026-01-05 12:00:00', '2026-01-05 12:00:00', 1600000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (63, 'VN_004');
+
+-- Booking 64: Phòng 302 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(64, 302, 'Huynh Trong Vien', 1, 0, '2026-01-06 14:00:00', '2026-01-10 12:00:00', '2026-01-10 12:00:00', 800000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (64, 'VN_005');
+
+-- Booking 65: Phòng 202 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(65, 202, 'John Smith', 1, 1, '2026-01-08 14:00:00', '2026-01-11 12:00:00', '2026-01-11 12:00:00', 637500, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (65, 'US_001');
+
+-- Booking 66: Phòng 101 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(66, 101, 'Trinh Ho Minh Thang', 2, 0, '2026-01-10 14:00:00', '2026-01-13 12:00:00', '2026-01-13 12:00:00', 450000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (66, 'VN_001');
+
+-- Booking 67: Phòng 303 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(67, 303, 'Akira Yamamoto', 2, 1, '2026-01-12 14:00:00', '2026-01-16 12:00:00', '2026-01-16 12:00:00', 1020000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (67, 'JP_001');
+
+-- Booking 68: Phòng 201 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(68, 201, 'Tran Nguyen Tri Thanh', 1, 0, '2026-01-15 14:00:00', '2026-01-18 12:00:00', '2026-01-18 12:00:00', 510000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (68, 'VN_002');
+
+-- Booking 69: Phòng 102 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(69, 102, 'Cao Quoc Tuan', 3, 0, '2026-01-18 14:00:00', '2026-01-20 12:00:00', '2026-01-20 12:00:00', 345000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (69, 'VN_003');
+
+-- Booking 70: Phòng 203 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(70, 203, 'Alice Wonderland', 1, 1, '2026-01-20 14:00:00', '2026-01-25 12:00:00', '2026-01-25 12:00:00', 1062500, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (70, 'FR_001');
+
+-- Booking 71: Phòng 301 - Đã thanh toán
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(71, 301, 'Luc Hoang Tuan', 2, 0, '2026-01-22 14:00:00', '2026-01-26 12:00:00', '2026-01-26 12:00:00', 800000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (71, 'VN_004');
+
+-- Booking 72: Phòng 302 - Đã thanh toán (Chéo sang tháng 2: 28/01 -> 03/02)
+INSERT INTO BOOKING 
+(BookingID, RoomID, CustomerName, GuestCount, IsForeign, CheckInDate, CheckOutDate, PaymentDate, TotalPrice, Status) 
+VALUES 
+(72, 302, 'Huynh Trong Vien', 1, 0, '2026-01-28 14:00:00', '2026-02-03 12:00:00', '2026-02-03 12:00:00', 1200000, 'Completed');
+
+INSERT INTO BOOKING_DETAIL (BookingID, CitizenID) VALUES (72, 'VN_005');
 
 
 -- ==========================================================
