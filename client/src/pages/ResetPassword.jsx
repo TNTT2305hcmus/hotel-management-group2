@@ -71,7 +71,7 @@ const ResetPassword = () => {
     <div className="forgot-container">
       <div className="forgot-card">
         <h2>Set New Password</h2>
-        <p style={{textAlign: "center", color: "#666"}}>Account: <strong>{email}</strong></p>
+        <p style={{textAlign: "center", color: "#666"}}>Gmail: <strong>{email}</strong></p>
 
         {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
